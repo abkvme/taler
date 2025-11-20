@@ -1,0 +1,65 @@
+name: Build macOS
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install automake libtool pkg-config berkeley-db boost@1.85 \
+                       openssl qt@5 libevent qrencode zeromq
+
+      - name: Set up environment variables
+        run: |
+          echo "BDB_PREFIX=$(brew --prefix berkeley-db)" >> $GITHUB_ENV
+          echo "BOOST_ROOT=$(brew --prefix boost@1.85)" >> $GITHUB_ENV
+          echo "OPENSSL_ROOT=$(brew --prefix openssl)" >> $GITHUB_ENV
+          echo "QT5_ROOT=$(brew --prefix qt@5)" >> $GITHUB_ENV
+
+      - name: Build Taler
+        run: |
+          chmod +x build_macos.sh
+          ./build_macos.sh
+
+      - name: Verify binaries
+        run: |
+          ls -lh bin/
+          file bin/talerd
+          file bin/taler-qt
+          ./bin/talerd --version
+          ./bin/taler-qt --version
+
+      - name: Create release archive
+        run: |
+          cd bin
+          tar -czf taler-${{ github.ref_name }}-macos-arm64.tar.gz talerd taler-cli taler-tx taler-qt
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: taler-${{ github.ref_name }}-macos-arm64
+          path: bin/taler-${{ github.ref_name }}-macos-arm64.tar.gz
+          retention-days: 365
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: bin/taler-${{ github.ref_name }}-macos-arm64.tar.gz
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

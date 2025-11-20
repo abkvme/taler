@@ -1,3 +1,22 @@
+# Taler 0.18.2.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Branding Update
+- Updated to new circular Taler logo with transparent background
+- New app icons across all platforms (macOS ICNS, Windows ICO, PNG)
+- Updated splash screen and about dialog icons
+
+### CI/CD Automation
+- Added GitHub Actions workflow for automated macOS builds
+- Automatic binary packaging and release creation on tag push
+- 1-year artifact retention for release binaries
+
+## Previous Releases
+
 # Taler 0.18.0.7
 
 ## Release Date
