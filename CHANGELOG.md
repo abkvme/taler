@@ -1,3 +1,17 @@
+# Taler 0.18.3.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed GitHub Actions macOS build compatibility
+- Removed macOS version-specific endian header dependency in scrypt.cpp
+- Now uses portable endian implementations across all platforms
+
+## Previous Releases
+
 # Taler 0.18.2.7
 
 ## Release Date

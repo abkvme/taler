@@ -34,10 +34,6 @@
 #include <string.h>
 #include <openssl/sha.h>
 
-#ifdef __APPLE__
-#include <sys/endian.h>
-#endif
-
 #if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 #include <crypto/scrypt-sse2.cpp>
 #endif
@@ -52,7 +48,6 @@
 #endif
 #endif
 
-#ifndef __APPLE__
 static inline uint32_t le32dec(const void *pp)
 {
 	const uint8_t *p = (uint8_t const *)pp;
@@ -84,7 +79,6 @@ static inline void be32enc(void *pp, uint32_t x)
 	p[1] = (x >> 16) & 0xff;
 	p[0] = (x >> 24) & 0xff;
 }
-#endif
 
 typedef struct HMAC_SHA256Context {
 	SHA256_CTX ictx;
