@@ -650,7 +650,7 @@ bool api_chain (HTTPRequest* req, const std::string& strURIPart) {
     root.pushKV("chainwork",            chainActive.Tip()->nChainWork().GetHex()); 
     root.pushKV("size_on_disk",         CalculateCurrentUsage()); 
     root.pushKV("networkhash",          GetNetworkHash());
-    root.pushKV("mempool_count",        mempool.mapTx.size());
+    root.pushKV("mempool_count",        (uint64_t)mempool.mapTx.size());
     return API_OK (req, root);
 }
 

@@ -3,6 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <validationinterface.h>
 
 #include <primitives/block.h>
@@ -16,6 +17,7 @@
 #include <atomic>
 #include <future>
 
+#include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
 
 struct MainSignalsInstance {

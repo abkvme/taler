@@ -1,12 +1,12 @@
 dnl require autoconf 2.60 (AS_ECHO/AS_ECHO_N)
 AC_PREREQ([2.60])
 define(_CLIENT_VERSION_MAJOR, 0)
-define(_CLIENT_VERSION_MINOR, 17)
-define(_CLIENT_VERSION_REVISION, 2)
-define(_CLIENT_VERSION_BUILD, 6)
+define(_CLIENT_VERSION_MINOR, 18)
+define(_CLIENT_VERSION_REVISION, 0)
+define(_CLIENT_VERSION_BUILD, 7)
 define(_CLIENT_VERSION_IS_RELEASE, true)
-define(_COPYRIGHT_YEAR, 2023)
-define(_COPYRIGHT_HOLDERS,[Uladzimir (https://t.me/cryptadev) for %s])
+define(_COPYRIGHT_YEAR, 2025)
+define(_COPYRIGHT_HOLDERS,[abkv (https://github.com/abkvme) for %s])
 define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[[Taler]])
 AC_INIT([Taler],[_CLIENT_VERSION_MAJOR._CLIENT_VERSION_MINOR._CLIENT_VERSION_REVISION],[https://github.com/cryptadev/taler],[taler],[https://taler.vovanchik.net])
 AC_CONFIG_SRCDIR([src/validation.cpp])
@@ -500,7 +500,7 @@ case $host in
          dnl the user (--without-wallet or --without-gui for example).
 
          openssl_prefix=`$BREW --prefix openssl 2>/dev/null`
-         bdb_prefix=`$BREW --prefix berkeley-db4 2>/dev/null`
+         bdb_prefix=`$BREW --prefix berkeley-db 2>/dev/null`
          qt5_prefix=`$BREW --prefix qt5 2>/dev/null`
          if test x$openssl_prefix != x; then
            PKG_CONFIG_PATH="$openssl_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"

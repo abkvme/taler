@@ -5,6 +5,8 @@
 #ifndef BITCOIN_QT_CLIENTMODEL_H
 #define BITCOIN_QT_CLIENTMODEL_H
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+
 #include <QObject>
 #include <QDateTime>
 

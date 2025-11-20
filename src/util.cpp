@@ -1208,20 +1208,20 @@ int GetNumCores()
 
 std::string CopyrightHolders(const std::string& strPrefix)
 {
-    std::string strCopyrightHolders = strPrefix + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
+    std::string result;
 
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident
     if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Bitcoin Core") == std::string::npos) {
-        strCopyrightHolders.replace(strCopyrightHolders.find("2009"), sizeof("2009")-1, "2019"); 
-        std::string strPrefix1 = strPrefix;
-        strPrefix1.replace(strPrefix1.find("2009"), sizeof("2009")-1, "2017");
-        strPrefix1.replace(strPrefix1.find("2023"), sizeof("2023")-1, "2018");
-        strCopyrightHolders += "\n" + strPrefix1 + "The Taler Core developers";
-        std::string strPrefix2 = strPrefix;
-        strPrefix2.replace(strPrefix2.find("2023"), sizeof("2023")-1, "2018");
-        strCopyrightHolders += "\n" + strPrefix2 + "The Bitcoin Core developers";
+        // Taler copyright timeline
+        result += "Copyright (C) 2025-2025 abkv (https://github.com/abkvme)\n";
+        result += "Copyright (C) 2019-2023 Uladzimir (https://t.me/cryptadev)\n";
+        result += "Copyright (C) 2017-2019 The Taler Core developers\n";
+        result += "Copyright (C) 2009-2017 The Bitcoin Core developers";
+    } else {
+        result = strPrefix + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
     }
-    return strCopyrightHolders;
+
+    return result;
 }
 
 // Obtain the application startup time (used for uptime calculation)
