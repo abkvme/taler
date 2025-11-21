@@ -1,0 +1,80 @@
+name: Build Linux ARM64
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build-linux-arm64:
+    name: Build for Linux ARM64
+    runs-on: ubuntu-22.04-arm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential libtool autotools-dev automake pkg-config \
+            libssl-dev libevent-dev bsdmainutils python3 \
+            libboost-system-dev libboost-filesystem-dev libboost-chrono-dev \
+            libboost-test-dev libboost-thread-dev \
+            libdb-dev libdb++-dev \
+            qtbase5-dev qttools5-dev qttools5-dev-tools \
+            protobuf-compiler libprotobuf-dev \
+            libqrencode-dev libzmq3-dev
+
+      - name: Build Taler
+        run: |
+          ./autogen.sh
+          ./configure \
+            --with-incompatible-bdb \
+            --with-gui \
+            CXXFLAGS="-O2"
+          make -j$(nproc)
+
+      - name: Create bin directory and copy binaries
+        run: |
+          mkdir -p bin
+          cp src/talerd bin/
+          cp src/taler-cli bin/
+          cp src/taler-tx bin/
+          if [ -f "src/qt/taler-qt" ]; then
+            cp src/qt/taler-qt bin/
+          fi
+
+      - name: Verify binaries
+        run: |
+          ls -lh bin/
+          file bin/talerd
+          file bin/taler-qt
+          ./bin/talerd --version
+          ./bin/taler-qt --version
+
+      - name: Create release archive
+        run: |
+          cd bin
+          tar -czf taler-${{ github.ref_name }}-linux-arm64.tar.gz talerd taler-cli taler-tx taler-qt
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: taler-${{ github.ref_name }}-linux-arm64
+          path: bin/taler-${{ github.ref_name }}-linux-arm64.tar.gz
+          retention-days: 365
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: bin/taler-${{ github.ref_name }}-linux-arm64.tar.gz
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

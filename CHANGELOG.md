@@ -1,9 +1,14 @@
-# Taler 0.18.5.7
+# Taler 0.18.6.7
 
 ## Release Date
 November 2025
 
 ## Major Changes
+
+### CI/CD Enhancements
+- Added GitHub Actions workflows for Linux x64 and ARM64 builds
+- Automated multi-platform binary releases (macOS ARM64, Linux x64, Linux ARM64)
+- All platforms now use Berkeley DB 18.x with --with-incompatible-bdb flag
 
 ### Build Fixes
 - Fixed GitHub Actions macOS build compatibility
