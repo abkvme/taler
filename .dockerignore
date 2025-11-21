@@ -27,6 +27,32 @@ src/qt/taler-qt
 src/qt/moc_*.cpp
 src/qt/*.moc
 
+# Build artifacts and generated files (must be excluded for cross-platform Docker builds)
+*.o
+*.lo
+*.a
+*.la
+.libs/
+.deps/
+config.status
+config.log
+Makefile
+!Makefile.am
+!Makefile.in
+libtool
+stamp-h1
+autom4te.cache/
+
+# Subdirectory build artifacts
+src/univalue/Makefile
+src/univalue/config.status
+src/univalue/.libs/
+src/univalue/libtool
+src/secp256k1/Makefile
+src/secp256k1/config.status
+src/secp256k1/.libs/
+src/secp256k1/libtool
+
 # Local database and blockchain data
 db4/
 *.dat

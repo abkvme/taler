@@ -1,3 +1,19 @@
+# Taler 0.18.19.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed UniValue linking errors by excluding build artifacts from Docker context
+- Root cause: COPY . . was copying macOS ARM64 compiled objects (.o, .a, .la files)
+- Added comprehensive build artifact exclusions to .dockerignore
+- Docker now gets clean source tree like GitHub Actions checkout
+- Excludes: *.o, *.a, *.la, .libs/, config.status, Makefile, libtool, etc.
+
+## Previous Releases
+
 # Taler 0.18.18.7
 
 ## Release Date
