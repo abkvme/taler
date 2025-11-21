@@ -1,3 +1,18 @@
+# Taler 0.18.18.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Qt moc compilation error by excluding platform-specific generated files from Docker
+- Added src/qt/moc_*.cpp and src/qt/*.moc to .dockerignore
+- Root cause: macOS-generated moc files were being copied to Linux container
+- Docker now regenerates moc files for target platform, matching GitHub Actions behavior
+
+## Previous Releases
+
 # Taler 0.18.17.7
 
 ## Release Date

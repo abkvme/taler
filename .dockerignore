@@ -23,6 +23,10 @@ src/taler-cli
 src/taler-tx
 src/qt/taler-qt
 
+# Qt moc generated files (must be regenerated for target platform)
+src/qt/moc_*.cpp
+src/qt/*.moc
+
 # Local database and blockchain data
 db4/
 *.dat
