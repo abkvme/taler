@@ -63,6 +63,8 @@ RUN apt-get update && apt-get install -y \
     libevent-2.1-7 \
     libevent-pthreads-2.1-7 \
     libdb5.3++ \
+    libzmq5 \
+    libqrencode4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy binaries from builder (from src/ not /usr/local/bin)

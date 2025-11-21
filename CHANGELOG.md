@@ -1,3 +1,17 @@
+# Taler 0.18.23.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed missing runtime dependencies (libzmq.so.5, libqrencode)
+- Added libzmq5 and libqrencode4 to runtime stage dependencies
+- Binaries now have all required shared libraries to run
+
+## Previous Releases
+
 # Taler 0.18.22.7
 
 ## Release Date
