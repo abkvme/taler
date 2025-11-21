@@ -6,6 +6,8 @@
 #ifndef BITCOIN_UI_INTERFACE_H
 #define BITCOIN_UI_INTERFACE_H
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+
 #include <memory>
 #include <stdint.h>
 #include <string>

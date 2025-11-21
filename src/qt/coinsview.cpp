@@ -2,6 +2,8 @@
 // Copyright (c) 2019-2021 Uladzimir (https://t.me/vovanchik_net)
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <boost/bind.hpp>
 #include <qt/coinsview.h>
 #include <qt/walletmodel.h>
 #include <qt/guiutil.h>

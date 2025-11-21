@@ -46,6 +46,16 @@ share/qt/Info.plist
 doc/man/Makefile
 src/Makefile
 src/univalue/Makefile
+Makefile
+
+# macOS build
+db4/
+bin/
+src/qt/taler-qt
+
+# Backup files
+configure~
+*/configure~
 
 src/qt/*.moc
 src/qt/moc_*.cpp
