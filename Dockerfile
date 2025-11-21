@@ -4,6 +4,10 @@
 
 FROM ubuntu:22.04 AS builder
 
+# Set timezone non-interactively
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
 # Install build dependencies (same as GitHub Actions)
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -22,17 +26,24 @@ RUN apt-get update && apt-get install -y \
     libboost-thread-dev \
     libdb-dev \
     libdb++-dev \
+    qtbase5-dev \
+    qttools5-dev \
+    qttools5-dev-tools \
+    protobuf-compiler \
+    libprotobuf-dev \
+    libqrencode-dev \
+    libzmq3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy source code
 WORKDIR /taler
 COPY . .
 
-# Build Taler (same as GitHub Actions, but without GUI)
+# Build Taler (exactly like GitHub Actions)
 RUN ./autogen.sh && \
     ./configure \
         --with-incompatible-bdb \
-        --without-gui \
+        --with-gui \
         CXXFLAGS="-O2" && \
     make -j$(nproc)
 

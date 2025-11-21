@@ -1,3 +1,33 @@
+# Taler 0.18.17.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Dockerfile to match GitHub Actions Linux build exactly
+- Build includes Qt libraries (same as GitHub Actions) but only daemon binaries are shipped in container
+- Removed .git/ from .dockerignore to ensure correct source tree is used
+- Configure flags: --with-incompatible-bdb --with-gui CXXFLAGS="-O2"
+
+## Previous Releases
+
+# Taler 0.18.16.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Dockerfile build by removing manual univalue compilation
+- Root cause: Pre-building univalue caused autoconf to treat it as external library instead of embedded
+- Now uses same build process as GitHub Actions (autogen.sh → configure → make)
+- Removed Qt/GUI dependencies from Docker build (daemon-only)
+
+## Previous Releases
+
 # Taler 0.18.15.7
 
 ## Release Date
