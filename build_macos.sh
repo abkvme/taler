@@ -90,6 +90,7 @@ echo ""
 echo "Running configure..."
 ./configure \
     --with-incompatible-bdb \
+    --with-gui \
     --with-boost-system=boost_system \
     CPPFLAGS="$CPPFLAGS" \
     LDFLAGS="$LDFLAGS" \
@@ -124,7 +125,9 @@ mkdir -p bin
 cp src/talerd bin/
 cp src/taler-cli bin/
 cp src/taler-tx bin/
-cp src/qt/taler-qt bin/
+if [ -f "src/qt/taler-qt" ]; then
+    cp src/qt/taler-qt bin/
+fi
 
 echo ""
 echo "======================================"
@@ -135,7 +138,9 @@ echo "Binaries copied to ./bin directory:"
 echo "  - talerd:     bin/talerd"
 echo "  - taler-cli:  bin/taler-cli"
 echo "  - taler-tx:   bin/taler-tx"
-echo "  - taler-qt:   bin/taler-qt"
+if [ -f "bin/taler-qt" ]; then
+    echo "  - taler-qt:   bin/taler-qt"
+fi
 echo ""
 echo "To install system-wide, run: sudo make install"
 echo ""
