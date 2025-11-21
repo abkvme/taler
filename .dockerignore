@@ -1,0 +1,52 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Local build outputs (will be rebuilt in container)
+bin/
+build/
+src/taler-qt
+src/talerd
+src/taler-cli
+src/taler-tx
+src/qt/taler-qt
+
+# Local database and blockchain data
+db4/
+*.dat
+blocks/
+chainstate/
+
+# Documentation (keep what's needed for build)
+*.md
+!README-DOCKER.md
+
+# Logs
+*.log
+debug.log
+
+# macOS
+.DS_Store
+*.app
+
+# Windows
+*.exe
+*.dll
+
+# Temporary files
+*.tmp
+*.bak
+*.old

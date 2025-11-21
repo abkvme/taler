@@ -1,11 +1,8 @@
 --- a/src/dbinc/win_db.h
 +++ b/src/dbinc/win_db.h
-@@ -53,7 +53,7 @@
- #include <sys/types.h>
- #include <sys/stat.h>
-
+@@ -54,7 +54,7 @@
+ #include <winsock2.h>
+ #ifndef DB_WINCE
 -#include <WinIoCtl.h>
 +#include <winioctl.h>
- #include <process.h>
-
- /*
+ #endif

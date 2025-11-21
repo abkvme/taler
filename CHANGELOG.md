@@ -1,3 +1,37 @@
+# Taler 0.18.15.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed BDB 18.1.40 patch for Windows (corrected line numbers for win_db.h)
+- Fixed Dockerfile to match working GitHub Actions Linux build configuration
+- Optimized .dockerignore to include necessary build files
+- Removed Travis CI configuration (replaced by GitHub Actions)
+- Fixed trailing whitespace in src/Makefile.am causing automake errors
+
+## Previous Releases
+
+# Taler 0.18.14.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Support
+- Added Dockerfile with multi-stage build for optimized container size
+- Added docker-compose.yml for easy node deployment
+- Support for both amd64 and arm64 architectures
+- Daemon-only build (no GUI) for containers
+- Comprehensive Docker documentation in README-DOCKER.md
+- Example configuration file for Docker environments
+- Automated entrypoint script with configuration management
+
+## Previous Releases
+
 # Taler 0.18.13.7
 
 ## Release Date
