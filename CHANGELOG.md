@@ -1,4 +1,4 @@
-# Taler 0.18.8.7
+# Taler 0.18.9.7
 
 ## Release Date
 November 2025
@@ -6,9 +6,10 @@ November 2025
 ## Major Changes
 
 ### CI/CD Enhancements
-- Added GitHub Actions workflows for Linux x64 and ARM64 builds
-- Automated multi-platform binary releases (macOS ARM64, Linux x64, Linux ARM64)
+- Added GitHub Actions workflows for all major platforms
+- Automated multi-platform binary releases (macOS ARM64, Linux x64, Linux ARM64, Windows x64)
 - All platforms now use Berkeley DB 18.x with --with-incompatible-bdb flag
+- Windows builds use MinGW cross-compilation with depends system
 
 ### Build Fixes
 - Fixed function ordering in scrypt.cpp for Linux x64 SSE2 compilation
