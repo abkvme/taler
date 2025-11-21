@@ -1,4 +1,4 @@
-# Taler 0.18.9.7
+# Taler 0.18.10.7
 
 ## Release Date
 November 2025
@@ -12,6 +12,7 @@ November 2025
 - Windows builds use MinGW cross-compilation with depends system
 
 ### Build Fixes
+- Fixed executable permissions on depends/config.guess and depends/config.sub for Windows builds
 - Fixed function ordering in scrypt.cpp for Linux x64 SSE2 compilation
 - Fixed missing `<deque>` header in httpserver.cpp for Linux builds
 - Added Xvfb for headless Qt GUI testing in Linux CI/CD
