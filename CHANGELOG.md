@@ -1,3 +1,20 @@
+# Taler 0.18.21.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Architecture Change
+- Complete redesign: Docker now clones from git repository instead of copying local files
+- Eliminated all .dockerignore complexity and cross-platform build artifact issues
+- Docker automatically finds and checks out latest git tag
+- Docker build now gets exact same source tree as GitHub Actions
+- Solution: `git clone https://github.com/abkvme/taler.git . && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))`
+- No more macOS ARM64 artifacts contaminating Linux builds
+
+## Previous Releases
+
 # Taler 0.18.20.7
 
 ## Release Date

@@ -10,6 +10,7 @@ ENV TZ=UTC
 
 # Install build dependencies (same as GitHub Actions)
 RUN apt-get update && apt-get install -y \
+    git \
     build-essential \
     libtool \
     autotools-dev \
@@ -35,9 +36,11 @@ RUN apt-get update && apt-get install -y \
     libzmq3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy source code
+# Clone source from git and checkout latest tag
 WORKDIR /taler
-COPY . .
+RUN git clone https://github.com/abkvme/taler.git . && \
+    git fetch --tags && \
+    git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 # Build Taler (exactly like GitHub Actions)
 RUN ./autogen.sh && \
