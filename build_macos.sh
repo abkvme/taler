@@ -40,7 +40,7 @@ echo "Homebrew prefix: $BREW_PREFIX"
 # Check for required dependencies
 echo ""
 echo "Checking for required dependencies..."
-REQUIRED_DEPS=("automake" "libtool" "pkg-config" "berkeley-db" "boost@1.85" "openssl" "qt@5" "libevent" "qrencode" "zeromq")
+REQUIRED_DEPS=("automake" "libtool" "pkg-config" "berkeley-db" "boost@1.85" "openssl" "qt@5" "libevent" "qrencode" "zeromq" "protobuf")
 MISSING_DEPS=()
 
 for dep in "${REQUIRED_DEPS[@]}"; do

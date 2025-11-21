@@ -1,4 +1,4 @@
-# Taler 0.18.4.7
+# Taler 0.18.5.7
 
 ## Release Date
 November 2025
@@ -11,6 +11,7 @@ November 2025
 - Now uses portable endian implementations across all platforms
 - Added explicit --with-gui flag to ensure Qt GUI is built
 - Made taler-qt binary copy conditional for build flexibility
+- Added protobuf to required dependencies for Qt GUI support
 
 ## Previous Releases
 

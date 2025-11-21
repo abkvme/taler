@@ -18,7 +18,7 @@ jobs:
       - name: Install Homebrew dependencies
         run: |
           brew install automake libtool pkg-config berkeley-db boost@1.85 \
-                       openssl qt@5 libevent qrencode zeromq
+                       openssl qt@5 libevent qrencode zeromq protobuf
 
       - name: Set up environment variables
         run: |
