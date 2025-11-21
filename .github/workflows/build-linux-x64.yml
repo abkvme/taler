@@ -26,7 +26,8 @@ jobs:
             libdb-dev libdb++-dev \
             qtbase5-dev qttools5-dev qttools5-dev-tools \
             protobuf-compiler libprotobuf-dev \
-            libqrencode-dev libzmq3-dev
+            libqrencode-dev libzmq3-dev \
+            xvfb
 
       - name: Build Taler
         run: |
@@ -53,7 +54,7 @@ jobs:
           file bin/talerd
           file bin/taler-qt
           ./bin/talerd --version
-          ./bin/taler-qt --version
+          xvfb-run ./bin/taler-qt --version
 
       - name: Create release archive
         run: |
