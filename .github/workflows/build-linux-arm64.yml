@@ -23,11 +23,15 @@ jobs:
             libssl-dev libevent-dev bsdmainutils python3 \
             libboost-system-dev libboost-filesystem-dev libboost-chrono-dev \
             libboost-test-dev libboost-thread-dev \
-            libdb-dev libdb++-dev \
             qtbase5-dev qttools5-dev qttools5-dev-tools \
             protobuf-compiler libprotobuf-dev \
             libqrencode-dev libzmq3-dev \
             xvfb
+
+      - name: Build Berkeley DB 18.1.40
+        run: |
+          chmod +x contrib/install_db18.sh
+          ./contrib/install_db18.sh $(pwd)
 
       - name: Build Taler
         run: |
@@ -35,6 +39,8 @@ jobs:
           ./configure \
             --with-incompatible-bdb \
             --with-gui \
+            BDB_LIBS="-L$(pwd)/db18/lib -ldb_cxx-18.1" \
+            BDB_CFLAGS="-I$(pwd)/db18/include" \
             CXXFLAGS="-O2"
           make -j$(nproc)
 

@@ -1,3 +1,21 @@
+# Taler 0.18.24.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Berkeley DB Standardization
+- All platforms now use Berkeley DB 18.1.40 for wallet compatibility
+- Added contrib/install_db18.sh script to build BDB 18 from source
+- Docker now builds BDB 18 from source and links statically
+- GitHub Actions Linux builds (x64 and ARM64) now build BDB 18 from source
+- macOS already uses BDB 18 from Homebrew
+- Ensures wallet files are compatible across all platforms
+- Replaced system libdb5.3++ with custom-built BDB 18.1.40
+
+## Previous Releases
+
 # Taler 0.18.23.7
 
 ## Release Date

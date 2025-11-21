@@ -8,9 +8,10 @@ FROM ubuntu:22.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# Install build dependencies (same as GitHub Actions)
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     git \
+    curl \
     build-essential \
     libtool \
     autotools-dev \
@@ -25,8 +26,6 @@ RUN apt-get update && apt-get install -y \
     libboost-chrono-dev \
     libboost-test-dev \
     libboost-thread-dev \
-    libdb-dev \
-    libdb++-dev \
     qtbase5-dev \
     qttools5-dev \
     qttools5-dev-tools \
@@ -42,18 +41,24 @@ RUN git clone https://github.com/abkvme/taler.git . && \
     git fetch --tags && \
     git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
-# Build Taler (exactly like GitHub Actions)
+# Build Berkeley DB 18.1.40
+RUN chmod +x contrib/install_db18.sh && \
+    ./contrib/install_db18.sh $(pwd)
+
+# Build Taler with BDB 18
 RUN ./autogen.sh && \
     ./configure \
         --with-incompatible-bdb \
         --with-gui \
+        BDB_LIBS="-L$(pwd)/db18/lib -ldb_cxx-18.1" \
+        BDB_CFLAGS="-I$(pwd)/db18/include" \
         CXXFLAGS="-O2" && \
     make -j$(nproc)
 
 # Runtime stage - minimal image
 FROM ubuntu:22.04
 
-# Install only runtime dependencies
+# Install only runtime dependencies (no BDB - using custom built 18.1.40)
 RUN apt-get update && apt-get install -y \
     libboost-system1.74.0 \
     libboost-filesystem1.74.0 \
@@ -62,10 +67,14 @@ RUN apt-get update && apt-get install -y \
     libssl3 \
     libevent-2.1-7 \
     libevent-pthreads-2.1-7 \
-    libdb5.3++ \
     libzmq5 \
     libqrencode4 \
+    libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy BDB 18 libraries from builder
+COPY --from=builder /taler/db18/lib /usr/local/lib/
+RUN ldconfig
 
 # Copy binaries from builder (from src/ not /usr/local/bin)
 COPY --from=builder /taler/src/talerd /usr/local/bin/
