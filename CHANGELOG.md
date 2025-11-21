@@ -1,3 +1,20 @@
+# Taler 0.18.20.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Docker build failing with "cannot find univalue/.libs/libunivalue.a"
+- Root cause: Overly broad .dockerignore patterns were excluding source files needed for build
+- Pattern `Makefile` matched ALL Makefiles including source `Makefile.am` files
+- Solution: Use leading `/` for root-only patterns (e.g., `/Makefile` instead of `Makefile`)
+- Now correctly excludes ONLY generated files while keeping source files
+- Binary artifacts (*.o, *.a, *.la) still excluded everywhere to prevent cross-platform conflicts
+
+## Previous Releases
+
 # Taler 0.18.19.7
 
 ## Release Date
