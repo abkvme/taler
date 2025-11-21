@@ -1,3 +1,15 @@
+# Taler 0.18.13.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed Berkeley DB 18.1.40 case-sensitive include issue for Windows cross-compilation (WinIoCtl.h → winioctl.h)
+
+## Previous Releases
+
 # Taler 0.18.12.7
 
 ## Release Date

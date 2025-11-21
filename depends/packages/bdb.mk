@@ -4,6 +4,7 @@ $(package)_download_path=http://download.oracle.com/berkeley-db
 $(package)_file_name=db-$($(package)_version).tar.gz
 $(package)_sha256_hash=0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8
 $(package)_build_subdir=build_unix
+$(package)_patches=fix_winioctl_case.patch
 
 define $(package)_set_vars
 $(package)_config_opts=--disable-shared --enable-cxx --disable-replication
@@ -13,7 +14,8 @@ $(package)_cxxflags=-std=c++11
 endef
 
 define $(package)_preprocess_cmds
-  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub dist
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub dist && \
+  patch -p1 -i $($(package)_patch_dir)/fix_winioctl_case.patch
 endef
 
 define $(package)_config_cmds

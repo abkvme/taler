@@ -1,0 +1,11 @@
+--- a/src/dbinc/win_db.h
++++ b/src/dbinc/win_db.h
+@@ -53,7 +53,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+
+-#include <WinIoCtl.h>
++#include <winioctl.h>
+ #include <process.h>
+
+ /*
