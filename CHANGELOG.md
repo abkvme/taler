@@ -1,4 +1,4 @@
-# Taler 0.18.6.7
+# Taler 0.18.7.7
 
 ## Release Date
 November 2025
@@ -11,6 +11,7 @@ November 2025
 - All platforms now use Berkeley DB 18.x with --with-incompatible-bdb flag
 
 ### Build Fixes
+- Fixed missing `<deque>` header in httpserver.cpp for Linux builds
 - Fixed GitHub Actions macOS build compatibility
 - Removed macOS version-specific endian header dependency in scrypt.cpp
 - Now uses portable endian implementations across all platforms
