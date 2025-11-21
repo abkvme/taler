@@ -34,20 +34,6 @@
 #include <string.h>
 #include <openssl/sha.h>
 
-#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-#include <crypto/scrypt-sse2.cpp>
-#endif
-
-#if defined(USE_SSE2) && !defined(USE_SSE2_ALWAYS)
-#ifdef _MSC_VER
-// MSVC 64bit is unable to use inline asm
-#include <intrin.h>
-#elif defined(__i386__) || defined(__x86_64__)
-// GCC Linux or i686-w64-mingw32 on x86
-#include <cpuid.h>
-#endif
-#endif
-
 static inline uint32_t le32dec(const void *pp)
 {
 	const uint8_t *p = (uint8_t const *)pp;
@@ -79,6 +65,20 @@ static inline void be32enc(void *pp, uint32_t x)
 	p[1] = (x >> 16) & 0xff;
 	p[0] = (x >> 24) & 0xff;
 }
+
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+#include <crypto/scrypt-sse2.cpp>
+#endif
+
+#if defined(USE_SSE2) && !defined(USE_SSE2_ALWAYS)
+#ifdef _MSC_VER
+// MSVC 64bit is unable to use inline asm
+#include <intrin.h>
+#elif defined(__i386__) || defined(__x86_64__)
+// GCC Linux or i686-w64-mingw32 on x86
+#include <cpuid.h>
+#endif
+#endif
 
 typedef struct HMAC_SHA256Context {
 	SHA256_CTX ictx;
