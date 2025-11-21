@@ -70,14 +70,14 @@ COPY --from=builder /taler/src/talerd /usr/local/bin/
 COPY --from=builder /taler/src/taler-cli /usr/local/bin/
 COPY --from=builder /taler/src/taler-tx /usr/local/bin/
 
+# Copy entrypoint script from builder (where git repo was cloned)
+COPY --from=builder /taler/docker/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Create taler user and data directory
 RUN useradd -r -m -u 1000 taler && \
     mkdir -p /data && \
     chown -R taler:taler /data
-
-# Copy entrypoint script
-COPY docker/entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch to taler user
 USER taler

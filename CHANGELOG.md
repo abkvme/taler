@@ -1,3 +1,18 @@
+# Taler 0.18.22.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed entrypoint.sh permission denied error
+- Root cause: Entrypoint script was copied from wrong stage (runtime instead of builder)
+- Solution: Copy entrypoint.sh from builder stage where git repo was cloned
+- Changed `COPY docker/entrypoint.sh` to `COPY --from=builder /taler/docker/entrypoint.sh`
+
+## Previous Releases
+
 # Taler 0.18.21.7
 
 ## Release Date
