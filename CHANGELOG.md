@@ -1,3 +1,18 @@
+# Taler 0.18.28.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed gmtime_r issue for MinGW cross-compilation in utiltime.cpp
+- Added __MINGW32__ and __MINGW64__ checks to use gmtime_s on Windows
+- Previously only checked _MSC_VER which doesn't cover MinGW
+- Fixes "gmtime_r was not declared in this scope" compilation error
+
+## Previous Releases
+
 # Taler 0.18.27.7
 
 ## Release Date
