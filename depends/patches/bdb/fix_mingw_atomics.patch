@@ -1,0 +1,15 @@
+--- a/src/mutex/mut_win32.c
++++ b/src/mutex/mut_win32.c
+@@ -10,6 +10,12 @@
+
+ #include "db_int.h"
+
++#ifndef DB_WINCE
++#define WINCE_ATOMIC_MAGIC(x)
++typedef LONG volatile *interlocked_val;
++#define atomic_read(p) (*(p))
++#endif
++
+ /*
+  * This is where we load in the actual test-and-set mutex code.
+  */

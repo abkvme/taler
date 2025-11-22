@@ -224,7 +224,7 @@ bool WalletInit::Verify() const
 std::string datetime_str (int64_t nTime) {
     struct tm ts;
     time_t time_val = nTime;
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
     gmtime_s(&ts, &time_val);
 #else
     gmtime_r(&time_val, &ts);

@@ -842,7 +842,13 @@ bool BerkeleyDatabase::Backup(const std::string& strDest)
                         return false;
                     }
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+                    // MinGW/Windows: Use Boost v2 API without copy_options
+                    fs::copy_file(pathSrc, pathDest, fs::copy_option::overwrite_if_exists);
+#else
+                    // POSIX: Use Boost v3 API with copy_options
                     fs::copy_file(pathSrc, pathDest, fs::copy_options::overwrite_existing);
+#endif
                     LogPrintf("copied %s to %s\n", strFile, pathDest.string());
                     return true;
                 } catch (const fs::filesystem_error& e) {

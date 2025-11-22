@@ -1,0 +1,95 @@
+# Taler Configuration File for Docker
+# Place this file in your Docker volume as taler.conf
+
+##
+## Network Settings
+##
+
+# Run on mainnet (default)
+# testnet=0
+# regtest=0
+
+# Listen for incoming connections
+listen=1
+
+# Maximum number of peer connections
+maxconnections=128
+
+##
+## RPC Server Settings
+##
+
+# Enable JSON-RPC server
+server=1
+
+# Bind RPC to all interfaces (required for Docker)
+rpcbind=0.0.0.0
+
+# RPC port (mainnet default: 23333)
+rpcport=23333
+
+# RPC credentials (CHANGE THESE!)
+rpcuser=rpcuser
+rpcpassword=changeme
+
+# Allow RPC connections from all IPs (use with caution)
+rpcallowip=0.0.0.0/0
+
+# Enable all RPC commands
+# rpcwhitelist=*
+
+##
+## Wallet Settings
+##
+
+# Enable wallet functionality
+disablewallet=0
+
+##
+## Logging
+##
+
+# Log IP addresses in debug output
+logips=1
+
+# Shrink debug.log on startup
+shrinkdebugfile=1
+
+# Log timestamp format
+logtimestamps=1
+
+##
+## Performance & Storage
+##
+
+# Database cache size in MB (increase for better performance)
+dbcache=450
+
+# Prune blockchain to save disk space (value in MB, 550 minimum)
+# prune=550
+
+# Number of threads for script verification
+par=4
+
+##
+## Network Performance
+##
+
+# Maintain at minimum this many connections
+# minconnections=8
+
+# Enable bloom filters
+peerbloomfilters=1
+
+##
+## Advanced Options
+##
+
+# Run as daemon (handled by Docker)
+# daemon=1
+
+# PID file (not typically needed in Docker)
+# pid=/data/taler.pid
+
+# Data directory (set by Docker)
+# datadir=/data

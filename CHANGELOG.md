@@ -1,4 +1,265 @@
-# Taler 0.18.8.7
+# Taler 0.18.29.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed gmtime_r in wallet/init.cpp (same MinGW issue as utiltime.cpp)
+- Fixed Boost filesystem copy_options API incompatibility in wallet/db.cpp
+- MinGW uses Boost v2 API: `fs::copy_option::overwrite_if_exists`
+- POSIX uses Boost v3 API: `fs::copy_options::overwrite_existing`
+
+## Previous Releases
+
+# Taler 0.18.28.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed gmtime_r issue for MinGW cross-compilation in utiltime.cpp
+- Added __MINGW32__ and __MINGW64__ checks to use gmtime_s on Windows
+- Previously only checked _MSC_VER which doesn't cover MinGW
+- Fixes "gmtime_r was not declared in this scope" compilation error
+
+## Previous Releases
+
+# Taler 0.18.27.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed BDB 18 MinGW patch to target correct file (mut_win32.c instead of atomic.h)
+- Patch now applies cleanly by adding macros directly to mut_win32.c
+- Defines WINCE_ATOMIC_MAGIC, interlocked_val, and atomic_read for non-WinCE builds
+
+## Previous Releases
+
+# Taler 0.18.26.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed BDB 18 compilation for Windows MinGW cross-compilation
+- Added fix_mingw_atomics.patch to define missing WINCE_ATOMIC_MAGIC and interlocked_val macros
+- Resolves "implicit declaration of function 'WINCE_ATOMIC_MAGIC'" error
+- Resolves "interlocked_val undeclared" error in mut_win32.c
+
+## Previous Releases
+
+# Taler 0.18.25.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed BDB 18 installation script to skip missing documentation files
+- Changed from `make install` to `make install_setup install_include install_lib`
+- Avoids error: "cannot stat 'bdb-sql': No such file or directory"
+
+## Previous Releases
+
+# Taler 0.18.24.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Berkeley DB Standardization
+- All platforms now use Berkeley DB 18.1.40 for wallet compatibility
+- Added contrib/install_db18.sh script to build BDB 18 from source
+- Docker now builds BDB 18 from source and links statically
+- GitHub Actions Linux builds (x64 and ARM64) now build BDB 18 from source
+- macOS already uses BDB 18 from Homebrew
+- Ensures wallet files are compatible across all platforms
+- Replaced system libdb5.3++ with custom-built BDB 18.1.40
+
+## Previous Releases
+
+# Taler 0.18.23.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed missing runtime dependencies (libzmq.so.5, libqrencode)
+- Added libzmq5 and libqrencode4 to runtime stage dependencies
+- Binaries now have all required shared libraries to run
+
+## Previous Releases
+
+# Taler 0.18.22.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed entrypoint.sh permission denied error
+- Root cause: Entrypoint script was copied from wrong stage (runtime instead of builder)
+- Solution: Copy entrypoint.sh from builder stage where git repo was cloned
+- Changed `COPY docker/entrypoint.sh` to `COPY --from=builder /taler/docker/entrypoint.sh`
+
+## Previous Releases
+
+# Taler 0.18.21.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Architecture Change
+- Complete redesign: Docker now clones from git repository instead of copying local files
+- Eliminated all .dockerignore complexity and cross-platform build artifact issues
+- Docker automatically finds and checks out latest git tag
+- Docker build now gets exact same source tree as GitHub Actions
+- Solution: `git clone https://github.com/abkvme/taler.git . && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))`
+- No more macOS ARM64 artifacts contaminating Linux builds
+
+## Previous Releases
+
+# Taler 0.18.20.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Docker build failing with "cannot find univalue/.libs/libunivalue.a"
+- Root cause: Overly broad .dockerignore patterns were excluding source files needed for build
+- Pattern `Makefile` matched ALL Makefiles including source `Makefile.am` files
+- Solution: Use leading `/` for root-only patterns (e.g., `/Makefile` instead of `Makefile`)
+- Now correctly excludes ONLY generated files while keeping source files
+- Binary artifacts (*.o, *.a, *.la) still excluded everywhere to prevent cross-platform conflicts
+
+## Previous Releases
+
+# Taler 0.18.19.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed UniValue linking errors by excluding build artifacts from Docker context
+- Root cause: COPY . . was copying macOS ARM64 compiled objects (.o, .a, .la files)
+- Added comprehensive build artifact exclusions to .dockerignore
+- Docker now gets clean source tree like GitHub Actions checkout
+- Excludes: *.o, *.a, *.la, .libs/, config.status, Makefile, libtool, etc.
+
+## Previous Releases
+
+# Taler 0.18.18.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Qt moc compilation error by excluding platform-specific generated files from Docker
+- Added src/qt/moc_*.cpp and src/qt/*.moc to .dockerignore
+- Root cause: macOS-generated moc files were being copied to Linux container
+- Docker now regenerates moc files for target platform, matching GitHub Actions behavior
+
+## Previous Releases
+
+# Taler 0.18.17.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Dockerfile to match GitHub Actions Linux build exactly
+- Build includes Qt libraries (same as GitHub Actions) but only daemon binaries are shipped in container
+- Removed .git/ from .dockerignore to ensure correct source tree is used
+- Configure flags: --with-incompatible-bdb --with-gui CXXFLAGS="-O2"
+
+## Previous Releases
+
+# Taler 0.18.16.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Fixes
+- Fixed Dockerfile build by removing manual univalue compilation
+- Root cause: Pre-building univalue caused autoconf to treat it as external library instead of embedded
+- Now uses same build process as GitHub Actions (autogen.sh → configure → make)
+- Removed Qt/GUI dependencies from Docker build (daemon-only)
+
+## Previous Releases
+
+# Taler 0.18.15.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed BDB 18.1.40 patch for Windows (corrected line numbers for win_db.h)
+- Fixed Dockerfile to match working GitHub Actions Linux build configuration
+- Optimized .dockerignore to include necessary build files
+- Removed Travis CI configuration (replaced by GitHub Actions)
+- Fixed trailing whitespace in src/Makefile.am causing automake errors
+
+## Previous Releases
+
+# Taler 0.18.14.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Docker Support
+- Added Dockerfile with multi-stage build for optimized container size
+- Added docker-compose.yml for easy node deployment
+- Support for both amd64 and arm64 architectures
+- Daemon-only build (no GUI) for containers
+- Comprehensive Docker documentation in README-DOCKER.md
+- Example configuration file for Docker environments
+- Automated entrypoint script with configuration management
+
+## Previous Releases
+
+# Taler 0.18.13.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed Berkeley DB 18.1.40 case-sensitive include issue for Windows cross-compilation (WinIoCtl.h → winioctl.h)
+
+## Previous Releases
+
+# Taler 0.18.12.7
 
 ## Release Date
 November 2025
@@ -6,11 +267,15 @@ November 2025
 ## Major Changes
 
 ### CI/CD Enhancements
-- Added GitHub Actions workflows for Linux x64 and ARM64 builds
-- Automated multi-platform binary releases (macOS ARM64, Linux x64, Linux ARM64)
+- Added GitHub Actions workflows for all major platforms
+- Automated multi-platform binary releases (macOS ARM64, Linux x64, Linux ARM64, Windows x64)
 - All platforms now use Berkeley DB 18.x with --with-incompatible-bdb flag
+- Windows builds use MinGW cross-compilation with depends system
 
 ### Build Fixes
+- Fixed Qt 5.9.6 patch application in depends build system (GCC 11+ compatibility)
+- Added Qt 5.9.6 patch for GCC 11+ compatibility (missing <limits> header)
+- Fixed executable permissions on depends/config.guess and depends/config.sub for Windows builds
 - Fixed function ordering in scrypt.cpp for Linux x64 SSE2 compilation
 - Fixed missing `<deque>` header in httpserver.cpp for Linux builds
 - Added Xvfb for headless Qt GUI testing in Linux CI/CD

@@ -1,0 +1,38 @@
+services:
+  taler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: taler:latest
+    container_name: taler-node
+    restart: unless-stopped
+
+    ports:
+      - "23153:23153"  # P2P network port
+      - "23333:23333"  # RPC port
+
+    volumes:
+      - taler-data:/data
+      - ./docker/taler.conf.example:/data/taler.conf:ro
+
+    environment:
+      - TALER_RPCUSER=${TALER_RPCUSER:-rpcuser}
+      - TALER_RPCPASSWORD=${TALER_RPCPASSWORD:-changeme}
+      - TALER_RPCALLOWIP=${TALER_RPCALLOWIP:-0.0.0.0/0}
+
+    healthcheck:
+      test: ["CMD", "taler-cli", "getblockchaininfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  taler-data:
+    driver: local

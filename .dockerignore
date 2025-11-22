@@ -1,0 +1,83 @@
+# Git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Local build outputs (will be rebuilt in container)
+bin/
+build/
+src/taler-qt
+src/talerd
+src/taler-cli
+src/taler-tx
+src/qt/taler-qt
+
+# Qt moc generated files (must be regenerated for target platform)
+src/qt/moc_*.cpp
+src/qt/*.moc
+
+# Build artifacts and generated files (must be excluded for cross-platform Docker builds)
+
+# Compiled binary artifacts ANYWHERE
+*.o
+*.lo
+*.a
+*.la
+.libs/
+.deps/
+
+# Root-level generated files ONLY
+/Makefile
+/config.status
+/config.log
+/libtool
+/stamp-h1
+/autom4te.cache/
+
+# Specific subdirectory generated files
+src/Makefile
+src/config.status
+src/univalue/Makefile
+src/univalue/config.status
+src/univalue/libtool
+src/secp256k1/Makefile
+src/secp256k1/config.status
+src/secp256k1/libtool
+
+# Local database and blockchain data
+db4/
+*.dat
+blocks/
+chainstate/
+
+# Documentation (keep what's needed for build)
+*.md
+!README-DOCKER.md
+
+# Logs
+*.log
+debug.log
+
+# macOS
+.DS_Store
+*.app
+
+# Windows
+*.exe
+*.dll
+
+# Temporary files
+*.tmp
+*.bak
+*.old
