@@ -1,3 +1,18 @@
+# Taler 0.18.26.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed BDB 18 compilation for Windows MinGW cross-compilation
+- Added fix_mingw_atomics.patch to define missing WINCE_ATOMIC_MAGIC and interlocked_val macros
+- Resolves "implicit declaration of function 'WINCE_ATOMIC_MAGIC'" error
+- Resolves "interlocked_val undeclared" error in mut_win32.c
+
+## Previous Releases
+
 # Taler 0.18.25.7
 
 ## Release Date
