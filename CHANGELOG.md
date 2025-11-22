@@ -1,3 +1,18 @@
+# Taler 0.18.29.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed gmtime_r in wallet/init.cpp (same MinGW issue as utiltime.cpp)
+- Fixed Boost filesystem copy_options API incompatibility in wallet/db.cpp
+- MinGW uses Boost v2 API: `fs::copy_option::overwrite_if_exists`
+- POSIX uses Boost v3 API: `fs::copy_options::overwrite_existing`
+
+## Previous Releases
+
 # Taler 0.18.28.7
 
 ## Release Date
