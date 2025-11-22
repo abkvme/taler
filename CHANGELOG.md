@@ -1,3 +1,17 @@
+# Taler 0.18.25.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Build Fixes
+- Fixed BDB 18 installation script to skip missing documentation files
+- Changed from `make install` to `make install_setup install_include install_lib`
+- Avoids error: "cannot stat 'bdb-sql': No such file or directory"
+
+## Previous Releases
+
 # Taler 0.18.24.7
 
 ## Release Date

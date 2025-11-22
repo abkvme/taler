@@ -70,7 +70,8 @@ cd build_unix/
   --enable-cxx --disable-shared --disable-replication --with-pic --prefix="${BDB_PREFIX}" \
   "${@}"
 
-make install
+make
+make install_setup install_include install_lib
 
 echo
 echo "db18 build complete."
