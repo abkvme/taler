@@ -1,3 +1,17 @@
+# Taler 0.18.27.7
+
+## Release Date
+November 2025
+
+## Major Changes
+
+### Windows Build Fixes
+- Fixed BDB 18 MinGW patch to target correct file (mut_win32.c instead of atomic.h)
+- Patch now applies cleanly by adding macros directly to mut_win32.c
+- Defines WINCE_ATOMIC_MAGIC, interlocked_val, and atomic_read for non-WinCE builds
+
+## Previous Releases
+
 # Taler 0.18.26.7
 
 ## Release Date

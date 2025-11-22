@@ -1,33 +1,15 @@
---- a/src/dbinc/atomic.h
-+++ b/src/dbinc/atomic.h
-@@ -144,7 +144,7 @@ typedef LONG volatile *interlocked_val;
- #define	atomic_inc(env, p)	__atomic_inc(p)
- #define	atomic_dec(env, p)	__atomic_dec(p)
- #define	atomic_compare_exchange(env, p, o, n)	\
- 	__atomic_compare_exchange((p), (o), (n))
--static inline int __atomic_inc(db_atomic_t *p)
-+static inline int __atomic_inc(interlocked_val p)
- {
- 	int	temp;
+--- a/src/mutex/mut_win32.c
++++ b/src/mutex/mut_win32.c
+@@ -10,6 +10,12 @@
 
-@@ -164,7 +164,7 @@ static inline int __atomic_inc(db_atomic_t *p)
-  * http://msdn.microsoft.com/en-us/library/ms684122(VS.85).aspx
-  * which configure could test for.
-  */
--static inline int __atomic_dec(db_atomic_t *p)
-+static inline int __atomic_dec(interlocked_val p)
- {
- 	int	temp;
-
-@@ -176,6 +176,11 @@ static inline int __atomic_dec(db_atomic_t *p)
- 	return temp;
- }
+ #include "db_int.h"
 
 +#ifndef DB_WINCE
 +#define WINCE_ATOMIC_MAGIC(x)
 +typedef LONG volatile *interlocked_val;
++#define atomic_read(p) (*(p))
 +#endif
 +
  /*
-  * These have no interlocked API support on Windows CE.
+  * This is where we load in the actual test-and-set mutex code.
   */
