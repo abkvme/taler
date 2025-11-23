@@ -54,3 +54,39 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Update GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          append_body: true
+          body: |
+
+            ## Docker Images
+
+            Pre-built multi-architecture Docker images are available on GitHub Container Registry:
+
+            **Pull this version:**
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+            ```
+
+            **Pull latest:**
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:latest
+            ```
+
+            **Quick start with Docker Compose:**
+            ```bash
+            curl -O https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/docker-compose.yml
+            docker-compose up -d
+            ```
+
+            Supported architectures: `linux/amd64`, `linux/arm64`
+          files: docker-compose.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
