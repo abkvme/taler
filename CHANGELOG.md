@@ -1,4 +1,4 @@
-# Taler 0.18.29.7
+# Taler 0.18.43.7
 
 ## Release Date
 November 2025
