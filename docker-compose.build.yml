@@ -16,12 +16,13 @@ services:
       # - ./taler.conf:/taler.conf:ro  # Uncomment to use custom config file
       # - ./wallet:/wallet  # Uncomment to enable wallet (also set TALER_WALLETDIR=/wallet in .env)
 
-    healthcheck:
-      test: ["CMD", "taler-cli", "getblockchaininfo"]
-      interval: 60s
-      timeout: 30s
-      retries: 5
-      start_period: 1800s
+    # Healthcheck disabled by default (requires RPC to be enabled via custom taler.conf)
+    # healthcheck:
+    #   test: ["CMD", "taler-cli", "getblockchaininfo"]
+    #   interval: 60s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 1800s
 
     logging:
       driver: "json-file"

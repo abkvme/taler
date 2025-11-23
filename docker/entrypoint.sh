@@ -49,6 +49,9 @@ ARGS="-datadir=$TALER_DATA"
 # Add config file if it exists
 if [ -f "$TALER_CONF" ]; then
     ARGS="$ARGS -conf=$TALER_CONF"
+else
+    # No config file - explicitly disable RPC server for security
+    ARGS="$ARGS -server=0"
 fi
 
 # Handle wallet configuration
