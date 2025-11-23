@@ -114,6 +114,8 @@ public:
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
         vSeeds.clear();
+        vSeeds.emplace_back("talerseed01.taler.tech");
+        vSeeds.emplace_back("talerseed02.taler.tech");
         vSeeds.emplace_back("dnsseed.talercrypto.com");
         vSeeds.emplace_back("talerseed1.vovanchik.net");
         vSeeds.emplace_back("talerseed2.vovanchik.net");
