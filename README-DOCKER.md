@@ -4,52 +4,98 @@ Run a Taler cryptocurrency node in Docker with support for both **amd64** and **
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Using Pre-built Docker Image (Recommended)
 
-1. **Clone the repository:**
+1. **Download the docker-compose.yml:**
    ```bash
-   git clone https://github.com/yourusername/taler.git
-   cd taler
+   curl -O https://raw.githubusercontent.com/abkvme/taler/main/docker-compose.yml
    ```
 
-2. **Start the node:**
+2. **Optional - Configure environment variables:**
+   ```bash
+   # Download example environment file
+   curl -O https://raw.githubusercontent.com/abkvme/taler/main/deploy/.env.example
+   cp .env.example .env
+   # Edit .env with your settings
+   nano .env
+   ```
+
+3. **Start the node:**
    ```bash
    docker-compose up -d
    ```
 
-3. **Check logs:**
+4. **Check logs:**
    ```bash
    docker-compose logs -f taler
    ```
 
-4. **Interact with the node:**
+5. **Interact with the node:**
    ```bash
    docker-compose exec taler taler-cli getblockchaininfo
    ```
 
+### Using Host Path for Data
+
+If you prefer to use a host directory for data instead of a Docker volume, edit `docker-compose.yml`:
+
+```yaml
+volumes:
+  - ./data:/data  # Change from taler-data:/data
+  # - ./taler.conf:/taler.conf:ro
+```
+
+Then:
+```bash
+mkdir -p ./data
+docker-compose up -d
+```
+
+### Building from Source
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/abkvme/taler.git
+   cd taler
+   ```
+
+2. **Build and start:**
+   ```bash
+   docker-compose -f docker-compose.build.yml up -d
+   ```
+
 ### Using Docker CLI
 
-1. **Build the image:**
-   ```bash
-   docker build -t taler:latest .
-   ```
+**Pull and run the pre-built image:**
 
-2. **Run the container:**
-   ```bash
-   docker run -d \
-     --name taler-node \
-     -p 23153:23153 \
-     -p 23333:23333 \
-     -v taler-data:/data \
-     -e TALER_RPCUSER=yourusername \
-     -e TALER_RPCPASSWORD=yourpassword \
-     taler:latest
-   ```
+```bash
+docker run -d \
+  --name taler-node \
+  -p 23153:23153 \
+  -p 23333:23333 \
+  -v taler-data:/data \
+  ghcr.io/abkvme/taler:latest
+```
 
-3. **View logs:**
-   ```bash
-   docker logs -f taler-node
-   ```
+**With environment variables (optional):**
+
+```bash
+docker run -d \
+  --name taler-node \
+  -p 23153:23153 \
+  -p 23333:23333 \
+  -v taler-data:/data \
+  -e TALER_RPCUSER=yourusername \
+  -e TALER_RPCPASSWORD=yourpassword \
+  -e TALER_RPCALLOWIP=192.168.1.0/24 \
+  ghcr.io/abkvme/taler:latest
+```
+
+**View logs:**
+
+```bash
+docker logs -f taler-node
+```
 
 ## Architecture Support
 
@@ -62,39 +108,108 @@ Docker will automatically select the correct image for your platform.
 
 ## Configuration
 
+The Taler daemon **does not require a configuration file** and works with sensible defaults.
+
+**IMPORTANT:** By default, **RPC is disabled** for security. The container runs a basic P2P node only. To enable RPC or customize other settings, you must provide a custom `taler.conf` file.
+
 ### Environment Variables
+
+Only three environment variables are supported:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TALER_RPCUSER` | `rpcuser` | RPC username |
-| `TALER_RPCPASSWORD` | `changeme` | RPC password |
-| `TALER_RPCALLOWIP` | `0.0.0.0/0` | IP range allowed to connect to RPC |
 | `TALER_DATA` | `/data` | Data directory inside container |
+| `TALER_CONF` | `/taler.conf` | Config file path inside container |
+| `TALER_WALLETDIR` | *(unset)* | Wallet directory (wallet **DISABLED** if not set) |
+
+All other configuration (RPC, network settings, etc.) must be done via a custom `taler.conf` file.
+
+### Wallet Configuration
+
+**IMPORTANT:** Wallet functionality is **DISABLED by default** in the Docker setup for security and simplicity. This differs from the Taler daemon's native behavior (which enables wallet by default).
+
+To enable wallet functionality:
+
+1. **Create wallet directory:**
+   ```bash
+   mkdir -p ./wallet
+   ```
+
+2. **Edit docker-compose.yml** and uncomment the wallet volume line:
+   ```yaml
+   volumes:
+     - taler-data:/data
+     # - ./taler.conf:/taler.conf:ro
+     - ./wallet:/wallet  # Uncomment this line
+   ```
+
+3. **Set the environment variable:**
+
+   Create or edit `.env` file:
+   ```bash
+   TALER_WALLETDIR=/wallet
+   ```
+
+4. **Start the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+The wallet directory can hold multiple wallet files. By default, if wallet is enabled without specifying individual wallet files, the daemon will use `wallet.dat` in the wallet directory.
 
 ### Custom Configuration File
 
-Create your own `taler.conf`:
+To enable RPC or customize node settings, create a custom `taler.conf`:
+
+**Step 1: Download the example config**
 
 ```bash
-# Copy example configuration
-cp docker/taler.conf.example my-taler.conf
-
-# Edit configuration
-nano my-taler.conf
-
-# Mount it in docker-compose.yml
-volumes:
-  - ./my-taler.conf:/data/taler.conf:ro
+curl -O https://raw.githubusercontent.com/abkvme/taler/main/docker/taler.conf.example
+mv taler.conf.example taler.conf
 ```
 
-Or for Docker CLI:
+**Step 2: Edit the config file**
+
+```bash
+nano taler.conf
+```
+
+At minimum, to enable RPC, ensure these lines are present:
+```conf
+server=1
+rpcbind=0.0.0.0
+rpcport=23333
+rpcuser=your_secure_username
+rpcpassword=your_secure_password
+rpcallowip=192.168.1.0/24  # Restrict to your network
+```
+
+**Step 3: Mount the config file**
+
+**Using Docker Compose:**
+
+Edit `docker-compose.yml` and uncomment the config volume line:
+```yaml
+volumes:
+  - taler-data:/data
+  - ./taler.conf:/taler.conf:ro  # Uncomment this line
+```
+
+Then start:
+```bash
+docker-compose up -d
+```
+
+**Using Docker CLI:**
 
 ```bash
 docker run -d \
   --name taler-node \
-  -v $(pwd)/my-taler.conf:/data/taler.conf:ro \
+  -p 23153:23153 \
+  -p 23333:23333 \
   -v taler-data:/data \
-  taler:latest
+  -v $(pwd)/taler.conf:/taler.conf:ro \
+  ghcr.io/abkvme/taler:latest
 ```
 
 ## Exposed Ports

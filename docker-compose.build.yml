@@ -1,6 +1,9 @@
 services:
   taler:
-    image: ghcr.io/abkvme/taler:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: taler:latest
     container_name: taler-node
     restart: unless-stopped
 
@@ -9,7 +12,7 @@ services:
       - "23333:23333"  # RPC port
 
     volumes:
-      - taler-data:/data  # Or use host path: ./data:/data
+      - taler-data:/data
       # - ./taler.conf:/taler.conf:ro  # Uncomment to use custom config file
       # - ./wallet:/wallet  # Uncomment to enable wallet (also set TALER_WALLETDIR=/wallet in .env)
 
