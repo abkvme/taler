@@ -10,7 +10,7 @@ services:
 
     volumes:
       - ./data:/data
-      - ./docker/taler.conf.example:/data/taler.conf:ro
+      # - ./taler.conf:/data/taler.conf  # Uncomment to use custom config file
 
     healthcheck:
       test: ["CMD", "taler-cli", "getblockchaininfo"]
