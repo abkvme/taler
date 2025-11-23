@@ -4,52 +4,101 @@ Run a Taler cryptocurrency node in Docker with support for both **amd64** and **
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Using Pre-built Docker Image (Recommended)
 
-1. **Clone the repository:**
+1. **Download the docker-compose.yml:**
    ```bash
-   git clone https://github.com/yourusername/taler.git
-   cd taler
+   curl -O https://raw.githubusercontent.com/abkvme/taler/main/docker-compose.yml
    ```
 
-2. **Start the node:**
+2. **Optional - Configure environment variables:**
+   ```bash
+   # Download example environment file
+   curl -O https://raw.githubusercontent.com/abkvme/taler/main/deploy/.env.example
+   cp .env.example .env
+   # Edit .env with your settings
+   nano .env
+   ```
+
+3. **Start the node:**
    ```bash
    docker-compose up -d
    ```
 
-3. **Check logs:**
+4. **Check logs:**
    ```bash
    docker-compose logs -f taler
    ```
 
-4. **Interact with the node:**
+5. **Interact with the node:**
    ```bash
    docker-compose exec taler taler-cli getblockchaininfo
    ```
 
+### Using Docker Compose with Host Path
+
+If you prefer to use a host directory for data instead of a Docker volume:
+
+1. **Download the host-based compose file:**
+   ```bash
+   curl -O https://raw.githubusercontent.com/abkvme/taler/main/deploy/docker-compose.host.yml
+   ```
+
+2. **Create data directory:**
+   ```bash
+   mkdir -p ./data
+   ```
+
+3. **Start the node:**
+   ```bash
+   docker-compose -f docker-compose.host.yml up -d
+   ```
+
+### Building from Source
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/abkvme/taler.git
+   cd taler
+   ```
+
+2. **Build and start:**
+   ```bash
+   docker-compose -f docker-compose.build.yml up -d
+   ```
+
 ### Using Docker CLI
 
-1. **Build the image:**
-   ```bash
-   docker build -t taler:latest .
-   ```
+**Pull and run the pre-built image:**
 
-2. **Run the container:**
-   ```bash
-   docker run -d \
-     --name taler-node \
-     -p 23153:23153 \
-     -p 23333:23333 \
-     -v taler-data:/data \
-     -e TALER_RPCUSER=yourusername \
-     -e TALER_RPCPASSWORD=yourpassword \
-     taler:latest
-   ```
+```bash
+docker run -d \
+  --name taler-node \
+  -p 23153:23153 \
+  -p 23333:23333 \
+  -v taler-data:/data \
+  ghcr.io/abkvme/taler:latest
+```
 
-3. **View logs:**
-   ```bash
-   docker logs -f taler-node
-   ```
+**With environment variables (optional):**
+
+```bash
+docker run -d \
+  --name taler-node \
+  -p 23153:23153 \
+  -p 23333:23333 \
+  -v taler-data:/data \
+  -e TALER_RPCUSER=yourusername \
+  -e TALER_RPCPASSWORD=yourpassword \
+  -e TALER_RPCALLOWIP=192.168.1.0/24 \
+  ghcr.io/abkvme/taler:latest
+```
+
+**View logs:**
+
+```bash
+docker logs -f taler-node
+```
 
 ## Architecture Support
 

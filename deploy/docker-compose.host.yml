@@ -9,7 +9,7 @@ services:
       - "23333:23333"  # RPC port
 
     volumes:
-      - taler-data:/data
+      - ./data:/data
       - ./docker/taler.conf.example:/data/taler.conf:ro
 
     healthcheck:
@@ -24,7 +24,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-volumes:
-  taler-data:
-    driver: local
