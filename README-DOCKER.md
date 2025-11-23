@@ -114,14 +114,48 @@ The Taler daemon **does not require a configuration file** and works with sensib
 
 ### Environment Variables
 
-Only two environment variables are supported:
+Only three environment variables are supported:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `TALER_DATA` | `/data` | Data directory inside container |
 | `TALER_CONF` | `/taler.conf` | Config file path inside container |
+| `TALER_WALLETDIR` | *(unset)* | Wallet directory (wallet **DISABLED** if not set) |
 
 All other configuration (RPC, network settings, etc.) must be done via a custom `taler.conf` file.
+
+### Wallet Configuration
+
+**IMPORTANT:** Wallet functionality is **DISABLED by default** in the Docker setup for security and simplicity. This differs from the Taler daemon's native behavior (which enables wallet by default).
+
+To enable wallet functionality:
+
+1. **Create wallet directory:**
+   ```bash
+   mkdir -p ./wallet
+   ```
+
+2. **Edit docker-compose.yml** and uncomment the wallet volume line:
+   ```yaml
+   volumes:
+     - taler-data:/data
+     # - ./taler.conf:/taler.conf:ro
+     - ./wallet:/wallet  # Uncomment this line
+   ```
+
+3. **Set the environment variable:**
+
+   Create or edit `.env` file:
+   ```bash
+   TALER_WALLETDIR=/wallet
+   ```
+
+4. **Start the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+The wallet directory can hold multiple wallet files. By default, if wallet is enabled without specifying individual wallet files, the daemon will use `wallet.dat` in the wallet directory.
 
 ### Custom Configuration File
 

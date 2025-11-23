@@ -11,6 +11,7 @@ services:
     volumes:
       - taler-data:/data  # Or use host path: ./data:/data
       # - ./taler.conf:/taler.conf:ro  # Uncomment to use custom config file
+      # - ./wallet:/wallet  # Uncomment to enable wallet (also set TALER_WALLETDIR=/wallet in .env)
 
     healthcheck:
       test: ["CMD", "taler-cli", "getblockchaininfo"]
