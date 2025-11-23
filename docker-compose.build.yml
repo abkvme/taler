@@ -13,12 +13,7 @@ services:
 
     volumes:
       - taler-data:/data
-      # - ./taler.conf:/data/taler.conf  # Uncomment to use custom config file
-
-    environment:
-      - TALER_RPCUSER=${TALER_RPCUSER:-rpcuser}
-      - TALER_RPCPASSWORD=${TALER_RPCPASSWORD:-changeme}
-      - TALER_RPCALLOWIP=${TALER_RPCALLOWIP:-0.0.0.0/0}
+      # - ./taler.conf:/taler.conf:ro  # Uncomment to use custom config file
 
     healthcheck:
       test: ["CMD", "taler-cli", "getblockchaininfo"]

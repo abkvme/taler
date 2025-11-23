@@ -35,24 +35,21 @@ Run a Taler cryptocurrency node in Docker with support for both **amd64** and **
    docker-compose exec taler taler-cli getblockchaininfo
    ```
 
-### Using Docker Compose with Host Path
+### Using Host Path for Data
 
-If you prefer to use a host directory for data instead of a Docker volume:
+If you prefer to use a host directory for data instead of a Docker volume, edit `docker-compose.yml`:
 
-1. **Download the host-based compose file:**
-   ```bash
-   curl -O https://raw.githubusercontent.com/abkvme/taler/main/deploy/docker-compose.host.yml
-   ```
+```yaml
+volumes:
+  - ./data:/data  # Change from taler-data:/data
+  # - ./taler.conf:/taler.conf:ro
+```
 
-2. **Create data directory:**
-   ```bash
-   mkdir -p ./data
-   ```
-
-3. **Start the node:**
-   ```bash
-   docker-compose -f docker-compose.host.yml up -d
-   ```
+Then:
+```bash
+mkdir -p ./data
+docker-compose up -d
+```
 
 ### Building from Source
 
@@ -111,62 +108,74 @@ Docker will automatically select the correct image for your platform.
 
 ## Configuration
 
-The Taler daemon **does not require a configuration file** and works with sensible defaults. Configuration can be done through environment variables or an optional custom config file.
+The Taler daemon **does not require a configuration file** and works with sensible defaults.
 
-### Environment Variables (Recommended)
+**IMPORTANT:** By default, **RPC is disabled** for security. The container runs a basic P2P node only. To enable RPC or customize other settings, you must provide a custom `taler.conf` file.
 
-The easiest way to customize your node is using environment variables. Download the example file:
+### Environment Variables
 
-```bash
-curl -O https://raw.githubusercontent.com/abkvme/taler/main/deploy/.env.example
-cp .env.example .env
-# Edit .env with your settings
-```
-
-Available variables:
+Only two environment variables are supported:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TALER_RPCUSER` | `rpcuser` | RPC username |
-| `TALER_RPCPASSWORD` | `changeme` | RPC password (change this!) |
-| `TALER_RPCALLOWIP` | `0.0.0.0/0` | IP range allowed to connect to RPC |
 | `TALER_DATA` | `/data` | Data directory inside container |
+| `TALER_CONF` | `/taler.conf` | Config file path inside container |
 
-Docker Compose will automatically load the `.env` file if present.
+All other configuration (RPC, network settings, etc.) must be done via a custom `taler.conf` file.
 
-### Custom Configuration File (Optional)
+### Custom Configuration File
 
-For advanced users who need a custom `taler.conf`:
+To enable RPC or customize node settings, create a custom `taler.conf`:
+
+**Step 1: Download the example config**
+
+```bash
+curl -O https://raw.githubusercontent.com/abkvme/taler/main/docker/taler.conf.example
+mv taler.conf.example taler.conf
+```
+
+**Step 2: Edit the config file**
+
+```bash
+nano taler.conf
+```
+
+At minimum, to enable RPC, ensure these lines are present:
+```conf
+server=1
+rpcbind=0.0.0.0
+rpcport=23333
+rpcuser=your_secure_username
+rpcpassword=your_secure_password
+rpcallowip=192.168.1.0/24  # Restrict to your network
+```
+
+**Step 3: Mount the config file**
 
 **Using Docker Compose:**
 
-1. Create your `taler.conf` in the same directory as `docker-compose.yml`
-2. Edit `docker-compose.yml` and uncomment the config volume line:
-   ```yaml
-   volumes:
-     - taler-data:/data
-     - ./taler.conf:/data/taler.conf  # Uncomment this line
-   ```
-3. Start the container:
-   ```bash
-   docker-compose up -d
-   ```
+Edit `docker-compose.yml` and uncomment the config volume line:
+```yaml
+volumes:
+  - taler-data:/data
+  - ./taler.conf:/taler.conf:ro  # Uncomment this line
+```
+
+Then start:
+```bash
+docker-compose up -d
+```
 
 **Using Docker CLI:**
 
 ```bash
 docker run -d \
   --name taler-node \
-  -v $(pwd)/taler.conf:/data/taler.conf \
+  -p 23153:23153 \
+  -p 23333:23333 \
   -v taler-data:/data \
+  -v $(pwd)/taler.conf:/taler.conf:ro \
   ghcr.io/abkvme/taler:latest
-```
-
-**Note:** You can download an example config from the repository:
-```bash
-curl -O https://raw.githubusercontent.com/abkvme/taler/main/docker/taler.conf.example
-mv taler.conf.example taler.conf
-# Edit taler.conf as needed
 ```
 
 ## Exposed Ports

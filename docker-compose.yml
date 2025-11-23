@@ -9,8 +9,8 @@ services:
       - "23333:23333"  # RPC port
 
     volumes:
-      - taler-data:/data
-      # - ./taler.conf:/data/taler.conf  # Uncomment to use custom config file
+      - taler-data:/data  # Or use host path: ./data:/data
+      # - ./taler.conf:/taler.conf:ro  # Uncomment to use custom config file
 
     healthcheck:
       test: ["CMD", "taler-cli", "getblockchaininfo"]
