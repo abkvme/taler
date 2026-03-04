@@ -1,9 +1,13 @@
-# Taler 0.19.1.8
+# Taler 0.19.2.8
 
 ## Release Date
 March 2026
 
 ## Major Changes
+
+### Build Fixes
+- Fixed Windows cross-compilation OpenSSL compatibility (TLS_client_method not available in OpenSSL 1.0.x)
+- Added compile-time version check to use SSLv23_client_method on OpenSSL 1.0.x and TLS_client_method on 1.1.0+
 
 ### UI Improvements
 - Added Nodes page showing hardcoded seeds, community seeds, and discovered peers

@@ -1609,7 +1609,11 @@ std::string CConnman::HttpsGet(const std::string& host, const std::string& path,
 {
     std::string result;
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
     SSL_CTX* ctx = SSL_CTX_new(TLS_client_method());
+#else
+    SSL_CTX* ctx = SSL_CTX_new(SSLv23_client_method());
+#endif
     if (!ctx)
         throw std::runtime_error("SSL_CTX_new failed");
 
