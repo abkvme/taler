@@ -1213,7 +1213,7 @@ std::string CopyrightHolders(const std::string& strPrefix)
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident
     if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Bitcoin Core") == std::string::npos) {
         // Taler copyright timeline
-        result += "Copyright (C) 2025-2025 abkv (https://github.com/abkvme)\n";
+        result += "Copyright (C) 2025-2026 abkv (https://github.com/abkvme)\n";
         result += "Copyright (C) 2019-2023 Uladzimir (https://t.me/cryptadev)\n";
         result += "Copyright (C) 2017-2019 The Taler Core developers\n";
         result += "Copyright (C) 2009-2017 The Bitcoin Core developers";

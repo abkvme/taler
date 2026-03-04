@@ -24,6 +24,8 @@
 #include <ui_interface.h>
 
 #include <qt/coinsview.h>
+#include <qt/infopage.h>
+#include <qt/aboutpage.h>
 
 #include <QAction>
 #include <QActionGroup>
@@ -63,6 +65,9 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     vboxCoins->addWidget(coinsView);
     coinsPage->setLayout(vboxCoins);
 
+    infoPage = new InfoPage(platformStyle, this);
+    aboutPage = new AboutPage(platformStyle, this);
+
     receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
     sendCoinsPage = new SendCoinsDialog(platformStyle);
 
@@ -74,6 +79,8 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     addWidget(coinsPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
+    addWidget(infoPage);
+    addWidget(aboutPage);
 
     // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
@@ -128,6 +135,8 @@ void WalletView::setClientModel(ClientModel *_clientModel)
 
     overviewPage->setClientModel(_clientModel);
     sendCoinsPage->setClientModel(_clientModel);
+    infoPage->setClientModel(_clientModel);
+    aboutPage->setClientModel(_clientModel);
 }
 
 void WalletView::setWalletModel(WalletModel *_walletModel)
@@ -200,6 +209,17 @@ void WalletView::gotoHistoryPage()
 void WalletView::gotoCoinsPage()
 {
     setCurrentWidget(coinsPage);
+}
+
+void WalletView::gotoNodesPage()
+{
+    setCurrentWidget(infoPage);
+    infoPage->refreshData();
+}
+
+void WalletView::gotoAboutPage()
+{
+    setCurrentWidget(aboutPage);
 }
 
 void WalletView::gotoReceiveCoinsPage()

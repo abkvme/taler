@@ -69,28 +69,31 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     QRect rGradient(QPoint(0,0), splashSize);
     pixPaint.fillRect(rGradient, gradient);
 
-    // draw the bitcoin icon, expected size of PNG: 1024x1024
-    QRect rectIcon(QPoint(-150,-122), QSize(430,430));
+    // draw the icon at top-left, scaled to fit nicely
+    QRect rectIcon(QPoint(16, 16), QSize(80, 80));
 
     const QSize requiredSize(1024,1024);
     QPixmap icon(networkStyle->getAppIcon().pixmap(requiredSize));
 
     pixPaint.drawPixmap(rectIcon, icon);
 
+    // text starts to the right of the icon
+    int textLeft = rectIcon.right() + 16;
+
     // check font size and drawing with
-    pixPaint.setFont(QFont(font, 33*fontFactor));
+    pixPaint.setFont(QFont(font, 28*fontFactor));
     QFontMetrics fm = pixPaint.fontMetrics();
     int titleTextWidth = fm.width(titleText);
-    if (titleTextWidth > 176) {
-        fontFactor = fontFactor * 176 / titleTextWidth;
+    if (titleTextWidth > 280) {
+        fontFactor = fontFactor * 280 / titleTextWidth;
     }
 
-    pixPaint.setFont(QFont(font, 30*fontFactor));
+    pixPaint.setFont(QFont(font, 26*fontFactor));
     fm = pixPaint.fontMetrics();
     titleTextWidth  = fm.width(titleText);
-    pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-6*paddingRight/4,paddingTop,titleText);
+    pixPaint.drawText(textLeft, paddingTop, titleText);
 
-    pixPaint.setFont(QFont(font, 15*fontFactor));
+    pixPaint.setFont(QFont(font, 13*fontFactor));
 
     // if the version string is too long, reduce size
     fm = pixPaint.fontMetrics();
@@ -99,14 +102,22 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
         pixPaint.setFont(QFont(font, 10*fontFactor));
         titleVersionVSpace -= 5;
     }
-    pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-2*paddingRight+2,paddingTop+titleVersionVSpace,versionText);
+    pixPaint.drawText(textLeft, paddingTop+titleVersionVSpace, versionText);
+
+    // draw website URL
+    {
+        pixPaint.setFont(QFont(font, 10*fontFactor));
+        pixPaint.setPen(QColor(27,143,186));
+        pixPaint.drawText(textLeft, paddingTop+titleVersionVSpace+16, QString("taler.tech"));
+        pixPaint.setPen(QColor(100,100,100));
+    }
 
     // draw copyright stuff
     {
         pixPaint.setFont(QFont(font, 10*fontFactor));
-        const int x = pixmap.width()/devicePixelRatio-titleTextWidth-2*paddingRight;
+        const int x = textLeft;
         const int y = paddingTop+titleCopyrightVSpace;
-        QRect copyrightRect(x, y, pixmap.width() - x - paddingRight/8, pixmap.height() - y);
+        QRect copyrightRect(x, y, pixmap.width()/devicePixelRatio - x - 10, pixmap.height()/devicePixelRatio - y);
         pixPaint.drawText(copyrightRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, copyrightText);
     }
 

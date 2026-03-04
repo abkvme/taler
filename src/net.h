@@ -339,6 +339,8 @@ private:
     void AcceptConnection(const ListenSocket& hListenSocket);
     void ThreadSocketHandler();
     void ThreadDNSAddressSeed();
+    void FetchRemoteSeeds();
+    static std::string HttpsGet(const std::string& host, const std::string& path, int timeoutSec = 10);
 
     uint64_t CalculateKeyedNetGroup(const CAddress& ad) const;
 
@@ -446,6 +448,12 @@ private:
 
     std::atomic<int64_t> m_next_send_inv_to_incoming{0};
 
+public:
+    /** Remote seeds fetched from GitHub bootstrap.json */
+    std::vector<std::pair<std::string, int>> m_remote_seeds;
+    bool m_remote_seeds_available{false};
+
+private:
     friend struct CConnmanTest;
 };
 extern std::unique_ptr<CConnman> g_connman;

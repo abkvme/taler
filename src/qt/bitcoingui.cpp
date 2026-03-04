@@ -268,6 +268,20 @@ void BitcoinGUI::createActions()
     coinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
   //  tabGroup->addAction(coinsAction);
 
+    nodesAction = new QAction(platformStyle->SingleColorIcon(":/icons/connect_4"), tr("&Nodes"), this);
+    nodesAction->setStatusTip(tr("Show network seed nodes and discovered peers"));
+    nodesAction->setToolTip(nodesAction->statusTip());
+    nodesAction->setCheckable(true);
+    nodesAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(nodesAction);
+
+    aboutPageAction = new QAction(platformStyle->SingleColorIcon(":/icons/info"), tr("&Info"), this);
+    aboutPageAction->setStatusTip(tr("Show project information and useful links"));
+    aboutPageAction->setToolTip(aboutPageAction->statusTip());
+    aboutPageAction->setCheckable(true);
+    aboutPageAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+    tabGroup->addAction(aboutPageAction);
+
 #ifdef ENABLE_WALLET
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
@@ -285,6 +299,10 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
   //  connect(coinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
   //  connect(coinsAction, SIGNAL(triggered()), this, SLOT(gotoCoinsPage()));
+    connect(nodesAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(nodesAction, SIGNAL(triggered()), this, SLOT(gotoNodesPage()));
+    connect(aboutPageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(aboutPageAction, SIGNAL(triggered()), this, SLOT(gotoAboutPage()));
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(platformStyle->TextColorIcon(":/icons/quit"), tr("E&xit"), this);
@@ -425,6 +443,8 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
   //      toolbar->addAction(coinsAction);
+        toolbar->addAction(nodesAction);
+        toolbar->addAction(aboutPageAction);
         overviewAction->setChecked(true);
 
 #ifdef ENABLE_WALLET
@@ -576,6 +596,8 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     receiveCoinsAction->setEnabled(enabled);
     receiveCoinsMenuAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
+    nodesAction->setEnabled(enabled);
+    aboutPageAction->setEnabled(enabled);
     encryptWalletAction->setEnabled(enabled);
     backupWalletAction->setEnabled(enabled);
     changePassphraseAction->setEnabled(enabled);
@@ -720,6 +742,18 @@ void BitcoinGUI::gotoCoinsPage()
 {
     coinsAction->setChecked(true);
     if (walletFrame) walletFrame->gotoCoinsPage();
+}
+
+void BitcoinGUI::gotoNodesPage()
+{
+    nodesAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoNodesPage();
+}
+
+void BitcoinGUI::gotoAboutPage()
+{
+    aboutPageAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoAboutPage();
 }
 
 void BitcoinGUI::gotoReceiveCoinsPage()

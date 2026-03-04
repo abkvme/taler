@@ -516,8 +516,8 @@ void SetupServerArgs()
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/cryptadev/taler>";
-    const std::string URL_WEBSITE = "<https://taler.vovanchik.net>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/abkvme/taler>";
+    const std::string URL_WEBSITE = "<https://taler.tech>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2009, COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +

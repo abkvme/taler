@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <TS language="tr" version="2.1">
 <context>
     <name>AddressBookPage</name>
@@ -227,7 +228,7 @@
         <source>Warning: The Caps Lock key is on!</source>
         <translation>Dikkat! Caps Lock tuşunuz açık!</translation>
     </message>
-</context>
+<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -577,7 +578,15 @@
         <source>A fatal error occurred. Taler can no longer continue safely and will quit.</source>
         <translation>Ölümcül bir hata oluştu. Taler yazılımı artık güvenli bir şekilde çalışmaya devam edemediği için kapatılacaktır.</translation>
     </message>
-</context>
+    <message>
+        <source>&amp;Nodes</source>
+        <translation>&amp;Dugumler</translation>
+    </message>
+    <message>
+        <source>Show network seed nodes and discovered peers</source>
+        <translation>Ag tohum dugumlerini ve kesif edilen esleri goster</translation>
+    </message>
+<message><source>&amp;Coins</source><translation /></message><message><source>Show your coins capacity</source><translation /></message><message><source>&amp;Info</source><translation>&amp;Bilgi</translation></message><message><source>Show project information and useful links</source><translation>Proje bilgilerini ve faydalı bağlantıları göster</translation></message></context>
 <context>
     <name>CoinControlDialog</name>
     <message>
@@ -783,7 +792,7 @@
         <source>New key generation failed.</source>
         <translation>Yeni anahtar üretimi başarısız.</translation>
     </message>
-</context>
+<message><source>New receiving address</source><translation /></message></context>
 <context>
     <name>FreespaceChecker</name>
     <message>
@@ -881,7 +890,7 @@
         <source>(of %n GB needed)</source>
         <translation><numerusform>(gereken %n GB alandan)</numerusform><numerusform>(gereken %n GB alandan)</numerusform></translation>
     </message>
-</context>
+<message><source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source><translation /></message><message><source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source><translation /></message><message><source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source><translation /></message><message><source>%1 will download and store a copy of the Taler block chain.</source><translation /></message></context>
 <context>
     <name>ModalOverlay</name>
     <message>
@@ -1950,7 +1959,7 @@
         <source>Copy amount</source>
         <translation>Tutarı kopyala</translation>
     </message>
-</context>
+<message><source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source><translation /></message></context>
 <context>
     <name>ReceiveRequestDialog</name>
     <message>
@@ -2303,7 +2312,9 @@
         <source>(no label)</source>
         <translation>(etiket yok)</translation>
     </message>
-</context>
+<message><source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source><translation /></message><message><source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source><translation /></message><message><source>Enable Replace-By-Fee</source><translation /></message><message><source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source><translation /></message><message><source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source><translation /></message><message><source>Not signalling Replace-By-Fee, BIP-125.</source><translation /></message><message><source>Warning: Invalid Bitcoin address</source><translation /></message></context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
@@ -3054,7 +3065,7 @@
         <source>Could not commit transaction</source>
         <translation>Alışveriş taahüt edilemedi.</translation>
     </message>
-</context>
+<message><source>Fee bump error</source><translation /></message><message><source>Confirm fee bump</source><translation /></message></context>
 <context>
     <name>WalletView</name>
     <message>
@@ -3585,4 +3596,59 @@
         <translation>Hata</translation>
     </message>
 </context>
-</TS>
+<context>
+    <name>InfoPage</name>
+    <message>
+        <source>Refresh</source>
+        <translation>Yenile</translation>
+    </message>
+    <message>
+        <source>Add Your Node</source>
+        <translation>Dugunuzu ekleyin</translation>
+    </message>
+    <message>
+        <source>Learn how to add your node to the seed list</source>
+        <translation>Dugumunuzu tohum listesine nasil ekleyeceginizi ogrenin</translation>
+    </message>
+    <message>
+        <source>Hardcoded Seeds</source>
+        <translation>Sabit tohumlar</translation>
+    </message>
+    <message>
+        <source>Community Seeds</source>
+        <translation>Topluluk tohumlari</translation>
+    </message>
+    <message>
+        <source>Discovered Peers</source>
+        <translation>Kesif edilen esler</translation>
+    </message>
+    <message>
+        <source>Unavailable - remote seed list could not be fetched</source>
+        <translation>Kullanilamiyor - uzak tohum listesi alinamadi</translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation>Dugum</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Durum</translation>
+    </message>
+    <message>
+        <source>Contribute Your Node</source>
+        <translation>Dugumunuzu katkin</translation>
+    </message>
+    <message>
+        <source>If you maintain a Taler node on a static IP address with reliable uptime, we encourage you to add your node to the community seed list on GitHub.
+
+This helps other Taler nodes discover peers and strengthens the network.
+
+Visit the repository to learn how to contribute:</source>
+        <translation>Statik bir IP adresinde guvenilir calisma suresiyle bir Taler dugumu isletiyorsaniz, dugumunuzu GitHub'daki topluluk tohum listesine eklemenizi tesvik ediyoruz.
+
+Bu, diger Taler dugumlerinin esleri kesfetmesine ve agi guclendirmesine yardimci olur.
+
+Nasil katki saglayacaginizi ogrenmek icin depoyu ziyaret edin:</translation>
+    </message>
+<message><source>Version</source><translation>Sürüm</translation></message></context>
+<context><name>AboutPage</name><message><source>Taler</source><translation>Taler</translation></message><message><source>Project</source><translation>Proje</translation></message><message><source>Website</source><translation>Web sitesi</translation></message><message><source>GitHub</source><translation>GitHub</translation></message><message><source>GitHub (legacy)</source><translation>GitHub (legacy)</translation></message><message><source>Community</source><translation>Topluluk</translation></message><message><source>Telegram: @talercommunity</source><translation>Telegram: @talercommunity</translation></message><message><source>Network</source><translation>Ağ</translation></message><message><source>Seed Nodes</source><translation>Seed Nodes</translation></message><message><source>Explorer (talercoin.org)</source><translation>Explorer (talercoin.org)</translation></message><message><source>Explorer (talercrypto.com)</source><translation>Explorer (talercrypto.com)</translation></message><message><source>Development</source><translation>Geliştirme</translation></message><message><source>Issue Tracker</source><translation>Sorun takipçisi</translation></message><message><source>Change Log</source><translation>Değişiklik günlüğü</translation></message><message><source>App Name</source><translation>Uygulama adı</translation></message><message><source>Version</source><translation>Sürüm</translation></message><message><source>Telegram</source><translation>Telegram</translation></message><message><source>Explorer</source><translation>Explorer</translation></message></context><context><name>CoinsTableModel</name><message><source>Transaction</source><translation /></message><message><source>Index</source><translation /></message><message><source>Address</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Destination address of the output.</source><translation /></message><message><source>Original transaction id.</source><translation /></message><message><source>Original transaction id index.</source><translation /></message><message><source>Age of the transaction in days.</source><translation /></message><message><source>Balance of the output.</source><translation /></message><message><source>Coin age in the output.</source><translation /></message></context><context><name>CoinsView</name><message><source>transaction is too young</source><translation /></message><message><source>transaction is mature</source><translation /></message><message><source>transaction has reached maximum probability</source><translation /></message><message><source>Copy address</source><translation /></message><message><source>Copy transaction id</source><translation /></message><message><source>Refresh</source><translation /></message><message><source>Export Minting Data</source><translation /></message><message><source>Comma separated file (*.csv)</source><translation /></message><message><source>Address</source><translation /></message><message><source>Transaction</source><translation /></message><message><source>Transaction Index</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Error exporting</source><translation /></message><message><source>Could not write to file %1.</source><translation /></message></context><context><name>bitcoin-core</name><message><source>Taler</source><translation /></message><message><source>abkv (https://github.com/abkvme) for %s</source><translation /></message><message><source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source><translation /></message><message><source>Can't generate a change-address key. Private keys are disabled for this wallet.</source><translation /></message><message><source>Cannot obtain a lock on data directory %s. %s is probably already running.</source><translation /></message><message><source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source><translation /></message><message><source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source><translation /></message><message><source>Distributed under the MIT software license, see the accompanying file %s or %s</source><translation /></message><message><source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source><translation /></message><message><source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source><translation /></message><message><source>Error: Listening for incoming connections failed (listen returned error %s)</source><translation /></message><message><source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source><translation /></message><message><source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source><translation /></message><message><source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source><translation /></message><message><source>Please contribute if you find %s useful. Visit %s for further information about the software.</source><translation /></message><message><source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source><translation /></message><message><source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source><translation /></message><message><source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source><translation /></message><message><source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source><translation /></message><message><source>The transaction amount is too small to send after the fee has been deducted</source><translation /></message><message><source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source><translation /></message><message><source>This is the transaction fee you may discard if change is smaller than dust at this level</source><translation /></message><message><source>This is the transaction fee you may pay when fee estimates are not available.</source><translation /></message><message><source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source><translation /></message><message><source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source><translation /></message><message><source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source><translation /></message><message><source>Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source><translation /></message><message><source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source><translation /></message><message><source>Warning: Private keys detected in wallet {%s} with disabled private keys</source><translation /></message><message><source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source><translation /></message><message><source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source><translation /></message><message><source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source><translation /></message><message><source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source><translation /></message><message><source>%s corrupt, salvage failed</source><translation /></message><message><source>%s is set very high!</source><translation /></message><message><source>-maxmempool must be at least %d MB</source><translation /></message><message><source>Cannot downgrade wallet</source><translation /></message><message><source>Cannot resolve -%s address: '%s'</source><translation /></message><message><source>Cannot write to data directory '%s'; check permissions.</source><translation /></message><message><source>Change index out of range</source><translation /></message><message><source>Copyright (C) %i-%i</source><translation /></message><message><source>Corrupted block database detected</source><translation /></message><message><source>Do you want to rebuild the block database now?</source><translation /></message><message><source>Done loading</source><translation /></message><message><source>Error creating %s: You can't create non-HD wallets with this version.</source><translation /></message><message><source>Error initializing block database</source><translation /></message><message><source>Error initializing wallet database environment %s!</source><translation /></message><message><source>Error loading %s</source><translation /></message><message><source>Error loading %s: Private keys can only be disabled during creation</source><translation /></message><message><source>Error loading %s: Wallet corrupted</source><translation /></message><message><source>Error loading %s: Wallet requires newer version of %s</source><translation /></message><message><source>Error loading %s: You can't disable HD on an already existing HD wallet</source><translation /></message><message><source>Error loading block database</source><translation /></message><message><source>Error loading wallet %s. Duplicate -wallet filename specified.</source><translation /></message><message><source>Error opening block database</source><translation /></message><message><source>Error reading from database, shutting down.</source><translation /></message><message><source>Error upgrading chainstate database</source><translation /></message><message><source>Error</source><translation /></message><message><source>Error: A fatal internal error occurred, see debug.log for details</source><translation /></message><message><source>Error: Disk space is low!</source><translation /></message><message><source>Failed to listen on any port. Use -listen=0 if you want this.</source><translation /></message><message><source>Failed to rescan the wallet during initialization</source><translation /></message><message><source>Fee exceeds maximum configured by -maxtxfee</source><translation /></message><message><source>Importing...</source><translation /></message><message><source>Incorrect or no genesis block found. Wrong datadir for network?</source><translation /></message><message><source>Information</source><translation /></message><message><source>Initialization sanity check failed. %s is shutting down.</source><translation /></message><message><source>Insufficient funds</source><translation /></message><message><source>Invalid -onion address or hostname: '%s'</source><translation /></message><message><source>Invalid -proxy address or hostname: '%s'</source><translation /></message><message><source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source><translation /></message><message><source>Invalid netmask specified in -whitelist: '%s'</source><translation /></message><message><source>Keypool ran out, please call keypoolrefill first</source><translation /></message><message><source>Loading P2P addresses...</source><translation /></message><message><source>Loading banlist...</source><translation /></message><message><source>Loading block index...</source><translation /></message><message><source>Loading wallet...</source><translation /></message><message><source>Need to specify a port with -whitebind: '%s'</source><translation /></message><message><source>Not enough file descriptors available.</source><translation /></message><message><source>Prune cannot be configured with a negative value.</source><translation /></message><message><source>Prune mode is incompatible with -txindex.</source><translation /></message><message><source>Pruning blockstore...</source><translation /></message><message><source>Reducing -maxconnections from %d to %d, because of system limitations.</source><translation /></message><message><source>Replaying blocks...</source><translation /></message><message><source>Rescanning...</source><translation /></message><message><source>Signing transaction failed</source><translation /></message><message><source>Specified -walletdir "%s" does not exist</source><translation /></message><message><source>Specified -walletdir "%s" is a relative path</source><translation /></message><message><source>Specified -walletdir "%s" is not a directory</source><translation /></message><message><source>Starting network threads...</source><translation /></message><message><source>The source code is available from %s.</source><translation /></message><message><source>The transaction amount is too small to pay the fee</source><translation /></message><message><source>The wallet will avoid paying less than the minimum relay fee.</source><translation /></message><message><source>This is experimental software.</source><translation /></message><message><source>This is the minimum transaction fee you pay on every transaction.</source><translation /></message><message><source>This is the transaction fee you will pay if you send a transaction.</source><translation /></message><message><source>Transaction amount too small</source><translation /></message><message><source>Transaction amounts must not be negative</source><translation /></message><message><source>Transaction fee and change calculation failed</source><translation /></message><message><source>Transaction has too long of a mempool chain</source><translation /></message><message><source>Transaction must have at least one recipient</source><translation /></message><message><source>Transaction too large for fee policy</source><translation /></message><message><source>Transaction too large</source><translation /></message><message><source>Unable to bind to %s on this computer (bind returned error %s)</source><translation /></message><message><source>Unable to bind to %s on this computer. %s is probably already running.</source><translation /></message><message><source>Unable to generate initial keys</source><translation /></message><message><source>Unable to generate keys</source><translation /></message><message><source>Unable to start HTTP server. See debug log for details.</source><translation /></message><message><source>Unknown network specified in -onlynet: '%s'</source><translation /></message><message><source>Unsupported argument -benchmark ignored, use -debug=bench.</source><translation /></message><message><source>Unsupported argument -debugnet ignored, use -debug=net.</source><translation /></message><message><source>Unsupported argument -tor found, use -onion.</source><translation /></message><message><source>Unsupported logging category %s=%s.</source><translation /></message><message><source>User Agent comment (%s) contains unsafe characters.</source><translation /></message><message><source>Verifying blocks...</source><translation /></message><message><source>Verifying wallet(s)...</source><translation /></message><message><source>Wallet %s resides outside wallet directory %s</source><translation /></message><message><source>Wallet needed to be rewritten: restart %s to complete</source><translation /></message><message><source>Warning</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -addressindex</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -txindex</source><translation /></message><message><source>Zapping all transactions from wallet...</source><translation /></message></context></TS>

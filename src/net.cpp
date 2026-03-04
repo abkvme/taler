@@ -11,6 +11,7 @@
 #include <net.h>
 
 #include <chainparams.h>
+#include <univalue.h>
 #include <clientversion.h>
 #include <consensus/consensus.h>
 #include <crypto/common.h>
@@ -34,6 +35,9 @@
 #include <miniupnpc/upnperrors.h>
 #endif
 
+#include <openssl/bio.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #include <math.h>
 
@@ -1601,8 +1605,186 @@ void StopMapPort()
 
 
 
+std::string CConnman::HttpsGet(const std::string& host, const std::string& path, int timeoutSec)
+{
+    std::string result;
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    SSL_CTX* ctx = SSL_CTX_new(TLS_client_method());
+#else
+    SSL_CTX* ctx = SSL_CTX_new(SSLv23_client_method());
+#endif
+    if (!ctx)
+        throw std::runtime_error("SSL_CTX_new failed");
+
+    // Set default verify paths for CA certificates
+    SSL_CTX_set_default_verify_paths(ctx);
+
+    BIO* bio = BIO_new_ssl_connect(ctx);
+    if (!bio) {
+        SSL_CTX_free(ctx);
+        throw std::runtime_error("BIO_new_ssl_connect failed");
+    }
+
+    std::string hostPort = host + ":443";
+    BIO_set_conn_hostname(bio, hostPort.c_str());
+
+    SSL* ssl = nullptr;
+    BIO_get_ssl(bio, &ssl);
+    if (ssl)
+        SSL_set_tlsext_host_name(ssl, host.c_str());
+
+    if (BIO_do_connect(bio) <= 0) {
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        throw std::runtime_error("BIO_do_connect failed for " + host);
+    }
+
+    if (BIO_do_handshake(bio) <= 0) {
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        throw std::runtime_error("SSL handshake failed for " + host);
+    }
+
+    // Send HTTP GET request
+    std::string request = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\nUser-Agent: Taler\r\n\r\n";
+    BIO_write(bio, request.c_str(), request.size());
+
+    // Read response
+    char buf[4096];
+    int len;
+    std::string response;
+    while ((len = BIO_read(bio, buf, sizeof(buf) - 1)) > 0) {
+        buf[len] = '\0';
+        response += buf;
+    }
+
+    BIO_free_all(bio);
+    SSL_CTX_free(ctx);
+
+    // Parse HTTP response - find body after \r\n\r\n
+    size_t headerEnd = response.find("\r\n\r\n");
+    if (headerEnd == std::string::npos)
+        throw std::runtime_error("Invalid HTTP response from " + host);
+
+    // Check status code
+    if (response.substr(0, 15).find("200") == std::string::npos)
+        throw std::runtime_error("HTTP non-200 response from " + host);
+
+    result = response.substr(headerEnd + 4);
+
+    // Handle chunked transfer encoding
+    std::string headerSection = response.substr(0, headerEnd);
+    if (headerSection.find("Transfer-Encoding: chunked") != std::string::npos) {
+        std::string decoded;
+        std::string& raw = result;
+        size_t pos = 0;
+        while (pos < raw.size()) {
+            size_t lineEnd = raw.find("\r\n", pos);
+            if (lineEnd == std::string::npos) break;
+            unsigned long chunkSize = strtoul(raw.substr(pos, lineEnd - pos).c_str(), nullptr, 16);
+            if (chunkSize == 0) break;
+            pos = lineEnd + 2;
+            if (pos + chunkSize > raw.size()) break;
+            decoded += raw.substr(pos, chunkSize);
+            pos += chunkSize + 2; // skip chunk data + \r\n
+        }
+        result = decoded;
+    }
+
+    return result;
+}
+
+void CConnman::FetchRemoteSeeds()
+{
+    try {
+        LogPrintf("Fetching remote bootstrap seeds from GitHub...\n");
+
+        std::string body = HttpsGet("raw.githubusercontent.com", "/abkvme/taler-seeds/main/bootstrap.json");
+
+        if (body.empty()) {
+            LogPrintf("Warning: Empty response from remote seed list\n");
+            return;
+        }
+
+        UniValue root;
+        if (!root.read(body)) {
+            LogPrintf("Warning: Failed to parse remote seed list JSON\n");
+            return;
+        }
+
+        if (!root.isObject() || !root.exists("nodes")) {
+            LogPrintf("Warning: Remote seed list has invalid structure\n");
+            return;
+        }
+
+        const UniValue& nodes = root["nodes"];
+        if (!nodes.isArray()) {
+            LogPrintf("Warning: Remote seed list 'nodes' is not an array\n");
+            return;
+        }
+
+        int added = 0;
+        for (unsigned int i = 0; i < nodes.size(); i++) {
+            try {
+                const UniValue& node = nodes[i];
+                if (!node.isObject()) continue;
+
+                if (!node.exists("host") || !node["host"].isStr()) continue;
+                std::string host = node["host"].get_str();
+                if (host.empty()) continue;
+
+                int port = Params().GetDefaultPort();
+                if (node.exists("port") && node["port"].isNum()) {
+                    port = node["port"].get_int();
+                    if (port < 1 || port > 65535) {
+                        LogPrintf("Warning: Remote seed entry %d has invalid port %d, skipping\n", i, port);
+                        continue;
+                    }
+                }
+
+                m_remote_seeds.push_back(std::make_pair(host, port));
+
+                // Resolve and add to addrman
+                std::vector<CNetAddr> vIPs;
+                if (LookupHost(host.c_str(), vIPs, 256, true)) {
+                    std::vector<CAddress> vAdd;
+                    for (const CNetAddr& ip : vIPs) {
+                        int nOneDay = 24 * 3600;
+                        CAddress addr = CAddress(CService(ip, port), NODE_NETWORK);
+                        addr.nTime = GetTime() - 3 * nOneDay - GetRand(4 * nOneDay);
+                        vAdd.push_back(addr);
+                    }
+                    CNetAddr resolveSource;
+                    resolveSource.SetInternal(host);
+                    addrman.Add(vAdd, resolveSource);
+                    added += vIPs.size();
+                } else {
+                    AddOneShot(host);
+                }
+            } catch (const std::exception& e) {
+                LogPrintf("Warning: Failed to process remote seed entry %d: %s\n", i, e.what());
+                continue;
+            }
+        }
+
+        m_remote_seeds_available = true;
+        LogPrintf("Loaded %d addresses from %d remote bootstrap seeds\n", added, (int)m_remote_seeds.size());
+
+    } catch (const std::exception& e) {
+        LogPrintf("Warning: Failed to fetch remote bootstrap seeds: %s\n", e.what());
+    }
+}
+
 void CConnman::ThreadDNSAddressSeed()
 {
+    // Try to fetch remote seeds from GitHub before DNS seeding
+    try {
+        FetchRemoteSeeds();
+    } catch (...) {
+        LogPrintf("Warning: Unexpected error during remote seed fetch\n");
+    }
+
     // goal: only query DNS seeds if address need is acute
     // Avoiding DNS seeds when we don't need them improves user privacy by
     //  creating fewer identifying DNS requests, reduces trust by giving seeds
