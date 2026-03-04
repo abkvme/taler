@@ -1609,21 +1609,40 @@ std::string CConnman::HttpsGet(const std::string& host, const std::string& path,
 {
     std::string result;
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    static bool sslInitialized = false;
+    if (!sslInitialized) {
+        SSL_library_init();
+        OpenSSL_add_all_algorithms();
+        SSL_load_error_strings();
+        sslInitialized = true;
+    }
+#endif
+
+    LogPrintf("HTTPS: connecting to %s%s (OpenSSL %s)\n", host, path, OPENSSL_VERSION_TEXT);
+
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
     SSL_CTX* ctx = SSL_CTX_new(TLS_client_method());
 #else
     SSL_CTX* ctx = SSL_CTX_new(SSLv23_client_method());
 #endif
-    if (!ctx)
-        throw std::runtime_error("SSL_CTX_new failed");
+    if (!ctx) {
+        unsigned long err = ERR_get_error();
+        std::string errStr = ERR_error_string(err, nullptr);
+        throw std::runtime_error("SSL_CTX_new failed: " + errStr + " (code=" + std::to_string(err) + ")");
+    }
 
     // Set default verify paths for CA certificates
-    SSL_CTX_set_default_verify_paths(ctx);
+    if (!SSL_CTX_set_default_verify_paths(ctx)) {
+        LogPrintf("HTTPS: warning - SSL_CTX_set_default_verify_paths failed, continuing anyway\n");
+    }
 
     BIO* bio = BIO_new_ssl_connect(ctx);
     if (!bio) {
+        unsigned long err = ERR_get_error();
+        std::string errStr = ERR_error_string(err, nullptr);
         SSL_CTX_free(ctx);
-        throw std::runtime_error("BIO_new_ssl_connect failed");
+        throw std::runtime_error("BIO_new_ssl_connect failed: " + errStr);
     }
 
     std::string hostPort = host + ":443";
@@ -1631,24 +1650,46 @@ std::string CConnman::HttpsGet(const std::string& host, const std::string& path,
 
     SSL* ssl = nullptr;
     BIO_get_ssl(bio, &ssl);
-    if (ssl)
+    if (ssl) {
         SSL_set_tlsext_host_name(ssl, host.c_str());
-
-    if (BIO_do_connect(bio) <= 0) {
-        BIO_free_all(bio);
-        SSL_CTX_free(ctx);
-        throw std::runtime_error("BIO_do_connect failed for " + host);
+    } else {
+        LogPrintf("HTTPS: warning - BIO_get_ssl returned null, SNI not set\n");
     }
 
-    if (BIO_do_handshake(bio) <= 0) {
+    LogPrintf("HTTPS: connecting to %s:443...\n", host);
+    if (BIO_do_connect(bio) <= 0) {
+        unsigned long err = ERR_get_error();
+        std::string errStr = ERR_error_string(err, nullptr);
         BIO_free_all(bio);
         SSL_CTX_free(ctx);
-        throw std::runtime_error("SSL handshake failed for " + host);
+        throw std::runtime_error("BIO_do_connect failed for " + host + ": " + errStr);
+    }
+    LogPrintf("HTTPS: TCP connected, performing TLS handshake...\n");
+
+    if (BIO_do_handshake(bio) <= 0) {
+        unsigned long err = ERR_get_error();
+        std::string errStr = ERR_error_string(err, nullptr);
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        throw std::runtime_error("SSL handshake failed for " + host + ": " + errStr);
+    }
+
+    if (ssl) {
+        LogPrintf("HTTPS: TLS handshake complete, protocol=%s cipher=%s\n",
+                  SSL_get_version(ssl), SSL_get_cipher_name(ssl));
     }
 
     // Send HTTP GET request
     std::string request = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\nUser-Agent: Taler\r\n\r\n";
-    BIO_write(bio, request.c_str(), request.size());
+    int written = BIO_write(bio, request.c_str(), request.size());
+    if (written <= 0) {
+        unsigned long err = ERR_get_error();
+        std::string errStr = ERR_error_string(err, nullptr);
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        throw std::runtime_error("BIO_write failed for " + host + ": " + errStr);
+    }
+    LogPrintf("HTTPS: request sent (%d bytes), reading response...\n", written);
 
     // Read response
     char buf[4096];
@@ -1662,14 +1703,17 @@ std::string CConnman::HttpsGet(const std::string& host, const std::string& path,
     BIO_free_all(bio);
     SSL_CTX_free(ctx);
 
+    LogPrintf("HTTPS: received %d bytes from %s\n", (int)response.size(), host);
+
     // Parse HTTP response - find body after \r\n\r\n
     size_t headerEnd = response.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
-        throw std::runtime_error("Invalid HTTP response from " + host);
+        throw std::runtime_error("Invalid HTTP response from " + host + " (no header terminator in " + std::to_string(response.size()) + " bytes)");
 
     // Check status code
+    std::string statusLine = response.substr(0, response.find("\r\n"));
     if (response.substr(0, 15).find("200") == std::string::npos)
-        throw std::runtime_error("HTTP non-200 response from " + host);
+        throw std::runtime_error("HTTP non-200 response from " + host + ": " + statusLine);
 
     result = response.substr(headerEnd + 4);
 
