@@ -110,6 +110,8 @@ private:
     QAction* overviewAction = nullptr;
     QAction* historyAction = nullptr;
     QAction *coinsAction = nullptr;
+    QAction *nodesAction = nullptr;
+    QAction *aboutPageAction = nullptr;
     QAction* quitAction = nullptr;
     QAction* sendCoinsAction = nullptr;
     QAction* sendCoinsMenuAction = nullptr;
@@ -233,6 +235,10 @@ private Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to coins page */
     void gotoCoinsPage();
+    /** Switch to nodes page */
+    void gotoNodesPage();
+    /** Switch to about page */
+    void gotoAboutPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
