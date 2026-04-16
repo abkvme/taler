@@ -157,6 +157,15 @@ public:
     bool setWalletLocked(bool locked, const SecureString &passPhrase=SecureString());
     bool changePassphrase(const SecureString &oldPass, const SecureString &newPass);
 
+    // Staking (timed wallet unlock). Non-persistent: state lives only in memory.
+    // startStaking unlocks the wallet for seconds_to_stake and arms a QTimer
+    // that relocks it when the duration ends. stopStaking locks the wallet and
+    // cancels the pending auto-relock.
+    bool startStaking(const SecureString &passPhrase, int64_t seconds_to_stake);
+    bool stopStaking();
+    int64_t getStakingSecondsRemaining() const;
+    bool isStaking() const;
+
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext
     {
@@ -223,6 +232,7 @@ private:
     int cachedNumBlocks;
 
     QTimer *pollTimer;
+    QTimer *stakingAutoRelockTimer = nullptr;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();

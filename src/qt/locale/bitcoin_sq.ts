@@ -188,7 +188,22 @@
         <source>Wallet decryption failed</source>
         <translation>Dekriptimi i portofolit dështoi</translation>
     </message>
-    <message><source>Passphrase Dialog</source><translation /></message><message><source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message></context>
+    <message><source>Passphrase Dialog</source><translation /></message><message><source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>Fut fjalëkalimin e portofolit për të filluar staking-un. Portofoli do të kyçet automatikisht kur kohëzgjatja të përfundojë.</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>Fillimi i staking-ut dështoi</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>Kohëzgjatje staking-u e pavlefshme.</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message><source>IP/Netmask</source><translation /></message><message><source>Banned Until</source><translation /></message></context>
@@ -447,7 +462,82 @@
         <source>Form</source>
         <translation>Formilarë</translation>
     </message>
-    <message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message></context>
+    <message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message>    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>Staking</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>Fito shpërblime Proof-of-Stake duke e mbajtur portofolin të shkyçur.</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>Kohëzgjatja:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 orë</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 orë</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 orë</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 ditë</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 ditë</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>Fillo staking-un</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>Ndalo staking-un</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>Pa staking</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>Staking — mbetet %1</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>Ta ndaloj staking-un?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Jeni i sigurt që doni ta ndaloni staking-un?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>Fillimisht enkripto portofolin për të aktivizuar staking-un.</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     </context>

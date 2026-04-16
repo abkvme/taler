@@ -188,7 +188,22 @@
         <source>Wallet decryption failed</source>
         <translation>वॉलेट डिक्रिप्शन विफल</translation>
     </message>
-    <message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Are you sure you wish to encrypt your wallet?</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source><translation /></message><message><source>The supplied passphrases do not match.</source><translation /></message><message><source>The passphrase entered for the wallet decryption was incorrect.</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message></context>
+    <message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Are you sure you wish to encrypt your wallet?</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source><translation /></message><message><source>The supplied passphrases do not match.</source><translation /></message><message><source>The passphrase entered for the wallet decryption was incorrect.</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>स्टेकिंग शुरू करने के लिए अपना वॉलेट पासफ़्रेज़ दर्ज करें। अवधि समाप्त होने पर वॉलेट स्वचालित रूप से फिर से लॉक हो जाएगा।</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>स्टेकिंग शुरू करना विफल</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>अमान्य स्टेकिंग अवधि।</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message><source>IP/Netmask</source><translation /></message><message><source>Banned Until</source><translation /></message></context>
@@ -412,7 +427,82 @@
         <source>Form</source>
         <translation>फार्म</translation>
     </message>
-    <message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message></context>
+    <message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message>    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>स्टेकिंग</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>अपने वॉलेट को अनलॉक रखकर Proof-of-Stake पुरस्कार अर्जित करें।</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>अवधि:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 घंटा</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 घंटे</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 घंटे</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 दिन</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 दिन</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>स्टेकिंग शुरू करें</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>स्टेकिंग बंद करें</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>स्टेकिंग नहीं</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>स्टेकिंग — %1 शेष</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>क्या स्टेकिंग बंद करें?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>क्या आप वाकई स्टेकिंग बंद करना चाहते हैं?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>स्टेकिंग सक्षम करने के लिए पहले अपना वॉलेट एन्क्रिप्ट करें।</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     </context>

@@ -128,6 +128,19 @@ public:
     bool isCrypted() override { return m_wallet.IsCrypted(); }
     bool lock() override { return m_wallet.Lock(); }
     bool unlock(const SecureString& wallet_passphrase) override { return m_wallet.Unlock(wallet_passphrase); }
+    bool unlockForStaking(const SecureString& wallet_passphrase, int64_t timeout_seconds) override
+    {
+        if (!m_wallet.IsCrypted()) return false;
+        if (timeout_seconds < 0) return false;
+        constexpr int64_t MAX_SLEEP_TIME = 100000000;
+        if (timeout_seconds > MAX_SLEEP_TIME) timeout_seconds = MAX_SLEEP_TIME;
+        LOCK2(cs_main, m_wallet.cs_wallet);
+        if (!m_wallet.Unlock(wallet_passphrase)) return false;
+        m_wallet.TopUpKeyPool();
+        m_wallet.nRelockTime = GetTime() + timeout_seconds;
+        return true;
+    }
+    int64_t getUnlockedUntil() override { return m_wallet.nRelockTime; }
     bool isLocked() override { return m_wallet.IsLocked(); }
     bool changeWalletPassphrase(const SecureString& old_wallet_passphrase,
         const SecureString& new_wallet_passphrase) override

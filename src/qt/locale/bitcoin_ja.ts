@@ -228,7 +228,22 @@
         <source>Warning: The Caps Lock key is on!</source>
         <translation>警告: Caps Lock キーがオンになっています！</translation>
     </message>
-<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
+<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>ステーキングを開始するにはウォレットのパスフレーズを入力してください。期間が終了するとウォレットは自動的に再ロックされます。</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>ステーキングの開始に失敗しました</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>ステーキング期間が無効です。</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -1328,6 +1343,81 @@
     <message>
         <source>Current total balance in watch-only addresses</source>
         <translation>監視限定アドレス内の現在の全残高</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>ステーキング</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>ウォレットのロックを解除したままにすることで Proof-of-Stake の報酬を獲得できます。</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>期間:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 時間</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 時間</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 時間</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 日</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 日</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>ステーキングを開始</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>ステーキングを停止</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>ステーキング停止中</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>ステーキング — 残り %1</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>ステーキングを停止しますか?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>本当にステーキングを停止しますか?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>ステーキングを有効にするには、まずウォレットを暗号化してください。</translation>
     </message>
 </context>
 <context>

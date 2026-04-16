@@ -220,7 +220,22 @@
         <source>Warning: The Caps Lock key is on!</source>
         <translation>ማስጠንቀቂያ: የ "Caps Lock" ቁልፍ በርቷል!</translation>
     </message>
-<message><source>Show password</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
+<message><source>Show password</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>መወራረድ ለመጀመር የቦርሳዎን ይለፍ ቃል ያስገቡ። ጊዜው ሲያልቅ ቦርሳው በራስ-ሰር እንደገና ይቆለፋል።</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>መወራረድ መጀመር አልተሳካም</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>ልክ ያልሆነ የመወራረድ ጊዜ።</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -335,7 +350,82 @@
     <message><source>Options</source><translation /></message><message><source>&amp;Main</source><translation /></message><message><source>Automatically start %1 after logging in to the system.</source><translation /></message><message><source>&amp;Start %1 on system login</source><translation /></message><message><source>Size of &amp;database cache</source><translation /></message><message><source>MB</source><translation /></message><message><source>Number of script &amp;verification threads</source><translation /></message><message><source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source><translation /></message><message><source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source><translation /></message><message><source>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</source><translation /></message><message><source>Hide the icon from the system tray.</source><translation /></message><message><source>&amp;Hide tray icon</source><translation /></message><message><source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source><translation /></message><message><source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source><translation /></message><message><source>Active command-line options that override above options:</source><translation /></message><message><source>Open the %1 configuration file from the working directory.</source><translation /></message><message><source>Open Configuration File</source><translation /></message><message><source>Reset all client options to default.</source><translation /></message><message><source>&amp;Reset Options</source><translation /></message><message><source>&amp;Network</source><translation /></message><message><source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source><translation /></message><message><source>Prune &amp;block storage to</source><translation /></message><message><source>GB</source><translation /></message><message><source>Reverting this setting requires re-downloading the entire blockchain.</source><translation /></message><message><source>(0 = auto, &lt;0 = leave that many cores free)</source><translation /></message><message><source>W&amp;allet</source><translation /></message><message><source>Expert</source><translation /></message><message><source>Enable coin &amp;control features</source><translation /></message><message><source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source><translation /></message><message><source>&amp;Spend unconfirmed change</source><translation /></message><message><source>Automatically open the Taler client port on the router. This only works when your router supports UPnP and it is enabled.</source><translation /></message><message><source>Map port using &amp;UPnP</source><translation /></message><message><source>Accept connections from outside.</source><translation /></message><message><source>Allow incomin&amp;g connections</source><translation /></message><message><source>Connect to the Taler network through a SOCKS5 proxy.</source><translation /></message><message><source>&amp;Connect through SOCKS5 proxy (default proxy):</source><translation /></message><message><source>Proxy &amp;IP:</source><translation /></message><message><source>&amp;Port:</source><translation /></message><message><source>Port of the proxy (e.g. 9050)</source><translation /></message><message><source>Used for reaching peers via:</source><translation /></message><message><source>IPv4</source><translation /></message><message><source>IPv6</source><translation /></message><message><source>Tor</source><translation /></message><message><source>Connect to the Taler network through a separate SOCKS5 proxy for Tor hidden services.</source><translation /></message><message><source>&amp;Window</source><translation /></message><message><source>Show only a tray icon after minimizing the window.</source><translation /></message><message><source>&amp;Minimize to the tray instead of the taskbar</source><translation /></message><message><source>M&amp;inimize on close</source><translation /></message><message><source>&amp;Display</source><translation /></message><message><source>User Interface &amp;language:</source><translation /></message><message><source>The user interface language can be set here. This setting will take effect after restarting %1.</source><translation /></message><message><source>&amp;Unit to show amounts in:</source><translation /></message><message><source>Choose the default subdivision unit to show in the interface and when sending coins.</source><translation /></message><message><source>Whether to show coin control features or not.</source><translation /></message><message><source>&amp;Third party transaction URLs</source><translation /></message><message><source>&amp;OK</source><translation /></message><message><source>&amp;Cancel</source><translation /></message><message><source>default</source><translation /></message><message><source>none</source><translation /></message><message><source>Confirm options reset</source><translation /></message><message><source>Client restart required to activate changes.</source><translation /></message><message><source>Client will be shut down. Do you want to proceed?</source><translation /></message><message><source>Configuration options</source><translation /></message><message><source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source><translation /></message><message><source>Error</source><translation /></message><message><source>The configuration file could not be opened.</source><translation /></message><message><source>This change would require a client restart.</source><translation /></message><message><source>The supplied proxy address is invalid.</source><translation /></message></context>
 <context>
     <name>OverviewPage</name>
-    <message><source>Form</source><translation /></message><message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message></context>
+    <message><source>Form</source><translation /></message><message><source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source><translation /></message><message><source>Watch-only:</source><translation /></message><message><source>Available:</source><translation /></message><message><source>Your current spendable balance</source><translation /></message><message><source>Pending:</source><translation /></message><message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Immature:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Total:</source><translation /></message><message><source>Your current total balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message>    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>መወራረድ</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>ቦርሳዎን ያልተቆለፈ በማድረግ የPoS ሽልማት ያግኙ።</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>ጊዜ:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 ሰዓት</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 ሰዓት</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 ሰዓት</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 ቀናት</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 ቀናት</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>መወራረድ ጀምር</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>መወራረድ አቁም</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>መወራረድ የለም</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>መወራረድ — %1 የቀረ</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>መወራረድ ይቁም?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>መወራረድን ማቆም እንደፈለጉ እርግጠኛ ነዎት?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>መወራረድን ለማንቃት መጀመሪያ ቦርሳዎን ያመስጥሩ።</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     </context>

@@ -56,6 +56,14 @@ AskPassphraseDialog::AskPassphraseDialog(Mode _mode, QWidget *parent) :
             ui->passEdit3->hide();
             setWindowTitle(tr("Unlock wallet"));
             break;
+        case UnlockStaking: // Ask passphrase, unlock wallet for a timed staking window
+            ui->warningLabel->setText(tr("Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends."));
+            ui->passLabel2->hide();
+            ui->passEdit2->hide();
+            ui->passLabel3->hide();
+            ui->passEdit3->hide();
+            setWindowTitle(tr("Start staking"));
+            break;
         case Decrypt:   // Ask passphrase
             ui->warningLabel->setText(tr("This operation needs your wallet passphrase to decrypt the wallet."));
             ui->passLabel2->hide();
@@ -162,6 +170,22 @@ void AskPassphraseDialog::accept()
             QDialog::accept(); // Success
         }
         break;
+    case UnlockStaking:
+        if (stakingDurationSeconds <= 0) {
+            QMessageBox::critical(this, tr("Start staking failed"),
+                                  tr("Invalid staking duration."));
+            break;
+        }
+        if (!model->startStaking(oldpass, stakingDurationSeconds))
+        {
+            QMessageBox::critical(this, tr("Start staking failed"),
+                                  tr("The passphrase entered for the wallet decryption was incorrect."));
+        }
+        else
+        {
+            QDialog::accept(); // Success
+        }
+        break;
     case Decrypt:
         if(!model->setWalletEncrypted(false, oldpass))
         {
@@ -207,6 +231,7 @@ void AskPassphraseDialog::textChanged()
         acceptable = !ui->passEdit2->text().isEmpty() && !ui->passEdit3->text().isEmpty();
         break;
     case Unlock: // Old passphrase x1
+    case UnlockStaking:
     case Decrypt:
         acceptable = !ui->passEdit1->text().isEmpty();
         break;

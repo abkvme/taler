@@ -229,7 +229,22 @@ Kérem a kulcsmondatban használjon &lt;b&gt; tíz vagy több véletlenszerű ka
         <source>Warning: The Caps Lock key is on!</source>
         <translation>Vigyázat: a Caps Lock be van kapcsolva!</translation>
     </message>
-<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
+<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>Adja meg a tárca jelszavát a staking elindításához. A tárca automatikusan újra lezárul, amikor az időtartam lejár.</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>A staking indítása sikertelen</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>Érvénytelen staking-időtartam.</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -1300,6 +1315,81 @@ Kérem a kulcsmondatban használjon &lt;b&gt; tíz vagy több véletlenszerű ka
     <message>
         <source>Current total balance in watch-only addresses</source>
         <translation>A csak megfigyelt címek jelenlegi teljes egyenlege</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>Staking</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>Szerezzen Proof-of-Stake jutalmakat azzal, hogy feloldott állapotban tartja a tárcáját.</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>Időtartam:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 óra</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 óra</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 óra</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 nap</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 nap</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>Staking indítása</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>Staking leállítása</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>Nincs staking</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>Staking — %1 van hátra</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>Leállítja a stakinget?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Biztosan le szeretné állítani a stakinget?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>Előbb titkosítsa a tárcáját a staking engedélyezéséhez.</translation>
     </message>
 </context>
 <context>

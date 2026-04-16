@@ -142,27 +142,27 @@
     </message>
     <message>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Увядзіце новы пароль для Кашалька.&lt;br/&gt;Парольная фраза павинна складацца&lt;b&gt; не меньш чым з дзесяці сімвалаў&lt;/b&gt;, ці &lt;b&gt;больш чым з васьмі слоў&lt;/b&gt;.</translation>
+        <translation>Увядзіце новы пароль для Гаманца.&lt;br/&gt;Парольная фраза павинна складацца&lt;b&gt; не меньш чым з дзесяці сімвалаў&lt;/b&gt;, ці &lt;b&gt;больш чым з васьмі слоў&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>Зашыфраваць кашалёк.</translation>
+        <translation>Зашыфраваць гаманец.</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>Гэтая аперацыя патрабуе кодавую фразу, каб рзблакаваць кашалёк.</translation>
+        <translation>Гэтая аперацыя патрабуе кодавую фразу, каб рзблакаваць гаманец.</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>Разблакаваць кашалёк</translation>
+        <translation>Разблакаваць гаманец</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
-        <translation>Гэтая аперацыя патрабуе пароль каб расшыфраваць кашалёк.</translation>
+        <translation>Гэтая аперацыя патрабуе пароль каб расшыфраваць гаманец.</translation>
     </message>
     <message>
         <source>Decrypt wallet</source>
-        <translation>Рачшыфраваць кашалёк</translation>
+        <translation>Рачшыфраваць гаманец</translation>
     </message>
     <message>
         <source>Change passphrase</source>
@@ -170,39 +170,39 @@
     </message>
     <message>
         <source>Enter the old passphrase and new passphrase to the wallet.</source>
-        <translation>Увядзіце стары пароль і новы пароль для Кашалька.</translation>
+        <translation>Увядзіце стары пароль і новы пароль для Гаманца.</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
-        <translation>Пацвердзіце шыфраванне Кашалька</translation>
+        <translation>Пацвердзіце шыфраванне Гаманца</translation>
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALERS&lt;/b&gt;!</source>
-        <translation>Увага: калі вы зашыфруеце свой кашалёк і страціце парольную фразу, то &lt;b&gt;СТРАЦІЦЕ ЎСЕ СВАЕ ТАЛЕРЫ&lt;/b&gt;!</translation>
+        <translation>Увага: калі вы зашыфруеце свой гаманец і страціце парольную фразу, то &lt;b&gt;СТРАЦІЦЕ ЎСЕ СВАЕ ТАЛЕРЫ&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>Ці ўпэўненыя вы, што жадаеце зашыфраваць свой кашалёк?</translation>
+        <translation>Ці ўпэўненыя вы, што жадаеце зашыфраваць свой гаманец?</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>кашалёк зашыфраваны</translation>
+        <translation>гаманец зашыфраваны</translation>
     </message>
     <message>
         <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source>
-        <translation>%1 закрыецца зараз, каб скончыць працэс шыфравання. Памятаеце, што шыфраванне кашалька не можа ў поўнай меры абараніць талераў ад крадзяжу шкоднасных праграм, якія заражаюць ваш кампутар. </translation>
+        <translation>%1 закрыецца зараз, каб скончыць працэс шыфравання. Памятаеце, што шыфраванне гаманца не можа ў поўнай меры абараніць талераў ад крадзяжу шкоднасных праграм, якія заражаюць ваш кампутар. </translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>ВАЖНА: Усе папярэднія копіі Кашалька варта замяніць новым зашыфраваным файлам. У мэтах бяспекі папярэднія копіі незашыфраванага файла-Кашалька стануць неўжывальнымі, калі вы станеце карыстацца новым зашыфраваным Кашальком.</translation>
+        <translation>ВАЖНА: Усе папярэднія копіі Гаманца варта замяніць новым зашыфраваным файлам. У мэтах бяспекі папярэднія копіі незашыфраванага файла-Гаманца стануць неўжывальнымі, калі вы станеце карыстацца новым зашыфраваным Гаманцом.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
-        <translation>Шыфраванне Кашалька няўдалае</translation>
+        <translation>Шыфраванне Гаманца няўдалае</translation>
     </message>
     <message>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
-        <translation>Шыфраванне Кашалька не адбылося з-за ўнутранай памылкі. Кашалёк незашыфраваны.</translation>
+        <translation>Шыфраванне Гаманца не адбылося з-за ўнутранай памылкі. Гаманец незашыфраваны.</translation>
     </message>
     <message>
         <source>The supplied passphrases do not match.</source>
@@ -210,25 +210,40 @@
     </message>
     <message>
         <source>Wallet unlock failed</source>
-        <translation>Разблакаванне Кашалька няўдалае</translation>
+        <translation>Разблакаванне Гаманца няўдалае</translation>
     </message>
     <message>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
-        <translation>Уведзены пароль  для расшыфравання Кашалька памылковы</translation>
+        <translation>Уведзены пароль  для расшыфравання Гаманца памылковы</translation>
     </message>
     <message>
         <source>Wallet decryption failed</source>
-        <translation>Расшыфраванне Кашалька няўдалае</translation>
+        <translation>Расшыфраванне Гаманца няўдалае</translation>
     </message>
     <message>
         <source>Wallet passphrase was successfully changed.</source>
-        <translation>Парольная фраза Кашалька паспяхова зменена.</translation>
+        <translation>Парольная фраза Гаманца паспяхова зменена.</translation>
     </message>
     <message>
         <source>Warning: The Caps Lock key is on!</source>
         <translation>Увага: Caps Lock уключаны!</translation>
     </message>
-<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
+<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>Увядзіце пароль гаманца, каб запусціць стэйкінг. Гаманец аўтаматычна заблакіруецца пасля заканчэння часу.</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>Не атрымалася запусціць стэйкінг</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>Няправільная працягласць стэйкінгу.</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -256,7 +271,7 @@
     </message>
     <message>
         <source>Show general overview of wallet</source>
-        <translation>Паказвае агульныя звесткі аб Кашальцы</translation>
+        <translation>Паказвае агульныя звесткі аб Гаманцы</translation>
     </message>
     <message>
         <source>&amp;Transactions</source>
@@ -300,11 +315,11 @@
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>Зашыфраваць кашалёк...</translation>
+        <translation>Зашыфраваць гаманец...</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>Стварыць копію Кашалька...</translation>
+        <translation>Стварыць копію Гаманца...</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
@@ -324,11 +339,11 @@
     </message>
     <message>
         <source>Wallet:</source>
-        <translation>Кашалёк:</translation>
+        <translation>Гаманец:</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>Кашалёк па змаўчанні</translation>
+        <translation>Гаманец па змаўчанні</translation>
     </message>
     <message>
         <source>Click to disable network activity.</source>
@@ -360,11 +375,11 @@
     </message>
     <message>
         <source>Backup wallet to another location</source>
-        <translation>Зрабіце копію Кашалька ў іншае месца</translation>
+        <translation>Зрабіце копію Гаманца ў іншае месца</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
-        <translation>Змяніць пароль шыфравання Кашалька</translation>
+        <translation>Змяніць пароль шыфравання Гаманца</translation>
     </message>
     <message>
         <source>&amp;Debug window</source>
@@ -384,7 +399,7 @@
     </message>
     <message>
         <source>Wallet</source>
-        <translation>Кашалёк</translation>
+        <translation>Гаманец</translation>
     </message>
     <message>
         <source>&amp;Send</source>
@@ -404,7 +419,7 @@
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
-        <translation>Зашыфраваць прыватныя ключы, якия належаць вашаму Кашальку</translation>
+        <translation>Зашыфраваць прыватныя ключы, якия належаць вашаму Гаманцу</translation>
     </message>
     <message>
         <source>Sign messages with your Taler addresses to prove you own them</source>
@@ -516,7 +531,7 @@
     </message>
     <message>
         <source>Wallet: %1</source>
-        <translation>Кашалёк: %1</translation>
+        <translation>Гаманец: %1</translation>
     </message>
     <message>
         <source>Type: %1</source>
@@ -548,11 +563,11 @@
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
-        <translation>Кашалёк &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;разблакаваны&lt;/b&gt;</translation>
+        <translation>Гаманец &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;разблакаваны&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
-        <translation>Кашалёк &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;заблакаваны&lt;/b&gt;</translation>
+        <translation>Гаманец &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;заблакаваны&lt;/b&gt;</translation>
     </message>
     <message>
         <source>A fatal error occurred. Taler can no longer continue safely and will quit.</source>
@@ -776,7 +791,7 @@
     </message>
     <message>
         <source>Could not unlock wallet.</source>
-        <translation>Немагчыма разблакаваць кашалёк</translation>
+        <translation>Немагчыма разблакаваць гаманец</translation>
     </message>
     <message>
         <source>New key generation failed.</source>
@@ -873,7 +888,7 @@
     </message>
     <message>
         <source>The wallet will also be stored in this directory.</source>
-        <translation>Кашалёк таксама будзе захоўвацца ў гэтым каталогу.</translation>
+        <translation>Гаманец таксама будзе захоўвацца ў гэтым каталогу.</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -900,7 +915,7 @@
     </message>
     <message>
         <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the taler network, as detailed below.</source>
-        <translation>Нядаўнія транзакцыі яшчэ не бачныя, і таму баланс вашага кашалька можа быць няправільным. Гэтая інфармацыя будзе дакладнай пасля таго, як ваш кашалёк скончыў сінхранізацыю з талернай сеткай, як падрабязна ніжэй.</translation>
+        <translation>Нядаўнія транзакцыі яшчэ не бачныя, і таму баланс вашага гаманца можа быць няправільным. Гэтая інфармацыя будзе дакладнай пасля таго, як ваш гаманец скончыў сінхранізацыю з талернай сеткай, як падрабязна ніжэй.</translation>
     </message>
     <message>
         <source>Attempting to spend talers that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
@@ -1070,7 +1085,7 @@
     </message>
     <message>
         <source>W&amp;allet</source>
-        <translation>Кашалёк</translation>
+        <translation>Гаманец</translation>
     </message>
     <message>
         <source>Expert</source>
@@ -1249,7 +1264,7 @@
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source>
-        <translation>Інфармацыя, якая адлюстроўваецца, можа састарэць. Ваш кашалёк аўтаматычна сінхранізуецца з сеткай Taler пасля ўсталявання злучэння, але гэты працэс яшчэ не завершаны.</translation>
+        <translation>Інфармацыя, якая адлюстроўваецца, можа састарэць. Ваш гаманец аўтаматычна сінхранізуецца з сеткай Taler пасля ўсталявання злучэння, але гэты працэс яшчэ не завершаны.</translation>
     </message>
     <message>
         <source>Watch-only:</source>
@@ -1315,7 +1330,82 @@
         <source>Current total balance in watch-only addresses</source>
         <translation>Цяперашні агульны баланс у адрасах, якія толькі для прагляду</translation>
     </message>
-    </context>
+        <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>Стэйкінг</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>Атрымлівайце ўзнагароды Proof-of-Stake, трымаючы гаманец разблакіраваным.</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>Працягласць:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 гадзіна</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 гадзін</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 гадзіны</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 дзён</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 дзён</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>Запусціць стэйкінг</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>Спыніць стэйкінг</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>Стэйкінг неактыўны</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>Стэйкінг — засталося %1</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>Спыніць стэйкінг?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Сапраўды спыніць стэйкінг?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>Спачатку зашыфруйце гаманец, каб уключыць стэйкінг.</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     <message>
@@ -1631,7 +1721,7 @@
     </message>
     <message>
         <source>Wallet: </source>
-        <translation>Кашалёк:</translation>
+        <translation>Гаманец:</translation>
     </message>
     <message>
         <source>(none)</source>
@@ -1791,7 +1881,7 @@
     </message>
     <message>
         <source>default wallet</source>
-        <translation>Кашалёк па змаўчанні</translation>
+        <translation>Гаманец па змаўчанні</translation>
     </message>
     <message>
         <source>Welcome to the %1 RPC console.</source>
@@ -1811,7 +1901,7 @@
     </message>
     <message>
         <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
-        <translation>УВАГА: Аферысты актыўна працуюць, кажучы карыстальнікам ўводзіць тут каманды, крадучы змесціва іх кашалька. Не выкарыстоўвайце гэтую кансоль без поўнага разумення наступстваў каманды.</translation>
+        <translation>УВАГА: Аферысты актыўна працуюць, кажучы карыстальнікам ўводзіць тут каманды, крадучы змесціва іх гаманца. Не выкарыстоўвайце гэтую кансоль без поўнага разумення наступстваў каманды.</translation>
     </message>
     <message>
         <source>Network activity disabled</source>
@@ -1819,11 +1909,11 @@
     </message>
     <message>
         <source>Executing command without any wallet</source>
-        <translation>Выкананне каманды без кашалька</translation>
+        <translation>Выкананне каманды без гаманца</translation>
     </message>
     <message>
         <source>Executing command using "%1" wallet</source>
-        <translation>Выкананне каманды з дапамогай кашалька "%1"</translation>
+        <translation>Выкананне каманды з дапамогай гаманца "%1"</translation>
     </message>
     <message>
         <source>(node id: %1)</source>
@@ -1898,7 +1988,7 @@
     </message>
     <message>
         <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
-        <translation>Родныя адрасы segwit (ён жа Bech32 або BIP-173) зніжаюць плату за транзакцыі і пазней забяспечваюць лепшую абарону ад памылак памылак, але старыя кашалькі не падтрымліваюць іх. Пры зняцці галачкі замест гэтага будзе створаны адрас, сумяшчальны са старымі кашалькамі.</translation>
+        <translation>Родныя адрасы segwit (ён жа Bech32 або BIP-173) зніжаюць плату за транзакцыі і пазней забяспечваюць лепшую абарону ад памылак памылак, але старыя гаманцы не падтрымліваюць іх. Пры зняцці галачкі замест гэтага будзе створаны адрас, сумяшчальны са старымі гаманцамі.</translation>
     </message>
     <message>
         <source>Generate native segwit (Bech32) address</source>
@@ -1993,7 +2083,7 @@
     </message>
     <message>
         <source>Wallet</source>
-        <translation>Кашалёк</translation>
+        <translation>Гаманец</translation>
     </message>
     <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
@@ -2240,7 +2330,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>from wallet %1</source>
-        <translation>Ад кашалька %1</translation>
+        <translation>Ад гаманца %1</translation>
     </message>
     <message>
         <source>Please, review your transaction.</source>
@@ -2312,7 +2402,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
-        <translation>Адрас, абраны вамі для змены, не з'яўляецца часткай гэтага кашалька. Любы альбо ўсе сродкі ў вашым кашальку могуць быць адпраўлены на гэты адрас. Вы ўпэўнены?</translation>
+        <translation>Адрас, абраны вамі для змены, не з'яўляецца часткай гэтага гаманца. Любы альбо ўсе сродкі ў вашым гаманцы могуць быць адпраўлены на гэты адрас. Вы ўпэўнены?</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -2528,7 +2618,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Разблакоўка кашалька адменена.</translation>
+        <translation>Разблакоўка гаманца адменена.</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
@@ -3032,7 +3122,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <name>WalletFrame</name>
     <message>
         <source>No wallet has been loaded.</source>
-        <translation>Кашалёк не загружаны.</translation>
+        <translation>Гаманец не загружаны.</translation>
     </message>
     </context>
 <context>
@@ -3090,11 +3180,11 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Backup Wallet</source>
-        <translation>Рэзервовы кашалёк</translation>
+        <translation>Рэзервовы гаманец</translation>
     </message>
     <message>
         <source>Wallet Data (*.dat)</source>
-        <translation>Дадзеныя кашалька (*.dat)</translation>
+        <translation>Дадзеныя гаманца (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>
@@ -3110,7 +3200,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>The wallet data was successfully saved to %1.</source>
-        <translation>Дадзеныя кашалька паспяхова захаваны ў %1.</translation>
+        <translation>Дадзеныя гаманца паспяхова захаваны ў %1.</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -3129,7 +3219,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
-        <translation>Удаленне: сінхранізацыя апошняга кашалька выходзіць за рамкі падрэзаных дадзеных. Вам трэба -reindex (спампаваць увесь блокчейн у выпадку падрэзанага вузла)</translation>
+        <translation>Удаленне: сінхранізацыя апошняга гаманца выходзіць за рамкі падрэзаных дадзеных. Вам трэба -reindex (спампаваць увесь блокчейн у выпадку падрэзанага вузла)</translation>
     </message>
     <message>
         <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
@@ -3237,7 +3327,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Error creating %s: You can't create non-HD wallets with this version.</source>
-        <translation>Памылка стварэння %s: Вы не можаце ствараць кашалькі без HD з гэтай версіяй.</translation>
+        <translation>Памылка стварэння %s: Вы не можаце ствараць гаманцы без HD з гэтай версіяй.</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
@@ -3245,7 +3335,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Error initializing wallet database environment %s!</source>
-        <translation>Памалка ініцыялізацыі асяроддзя базы звестак Кашалька %s!</translation>
+        <translation>Памалка ініцыялізацыі асяроддзя базы звестак Гаманца %s!</translation>
     </message>
     <message>
         <source>Error loading %s</source>
@@ -3257,11 +3347,11 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Error loading %s: Wallet corrupted</source>
-        <translation>Памылка загрузкі %s: Кашалёк пашкоджаны</translation>
+        <translation>Памылка загрузкі %s: Гаманец пашкоджаны</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet requires newer version of %s</source>
-        <translation>Памылка загрузкі %s: Кашалёк патрабуе больш новай версіі %s</translation>
+        <translation>Памылка загрузкі %s: Гаманец патрабуе больш новай версіі %s</translation>
     </message>
     <message>
         <source>Error loading block database</source>
@@ -3281,7 +3371,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Failed to rescan the wallet during initialization</source>
-        <translation>Не атрымалася перагледзець кашалёк падчас ініцыялізацыі</translation>
+        <translation>Не атрымалася перагледзець гаманец падчас ініцыялізацыі</translation>
     </message>
     <message>
         <source>Importing...</source>
@@ -3389,7 +3479,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart %s to complete</source>
-        <translation>Кашалёк трэба было перапісаць: перазапусціць %s, каб скончыць.</translation>
+        <translation>Гаманец трэба было перапісаць: перазапусціць %s, каб скончыць.</translation>
     </message>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
@@ -3409,7 +3499,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Error loading %s: You can't disable HD on an already existing HD wallet</source>
-        <translation>Памылка загрузкі %s: Вы не можаце адключыць HD на ўжо існуючым кашальку HD</translation>
+        <translation>Памылка загрузкі %s: Вы не можаце адключыць HD на ўжо існуючым гаманцы HD</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
@@ -3493,11 +3583,11 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Verifying wallet(s)...</source>
-        <translation>Праверка кашалька...</translation>
+        <translation>Праверка гаманца...</translation>
     </message>
     <message>
         <source>Wallet %s resides outside wallet directory %s</source>
-        <translation>Кашалёк %s знаходзіцца па-за каталога даных %s</translation>
+        <translation>Гаманец %s знаходзіцца па-за каталога даных %s</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -3509,7 +3599,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
-        <translation>Адключэнне ўсіх транзакцый з кашалька...</translation>
+        <translation>Адключэнне ўсіх транзакцый з гаманца...</translation>
     </message>
     <message>
         <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
@@ -3545,7 +3635,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
-        <translation>Увага: файл кашалька пашкоджаны, дадзеныя выпраўлены! Арыгінал %s захаваны як %s у %s; калі ваш баланс або транзакцыі няправільныя, вам варта аднавіць рэзервовую копію.</translation>
+        <translation>Увага: файл гаманца пашкоджаны, дадзеныя выпраўлены! Арыгінал %s захаваны як %s у %s; калі ваш баланс або транзакцыі няправільныя, вам варта аднавіць рэзервовую копію.</translation>
     </message>
     <message>
         <source>%s is set very high!</source>
@@ -3553,7 +3643,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
-        <translation>Памылка загрузкі кашалька %s. Патрэбна -wallet назва_файла.</translation>
+        <translation>Памылка загрузкі гаманца %s. Патрэбна -wallet назва_файла.</translation>
     </message>
     <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
@@ -3565,7 +3655,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation>Кашалёк дазволіць пазбегнуць платы менш мінімальнай платы.</translation>
+        <translation>Гаманец дазволіць пазбегнуць платы менш мінімальнай платы.</translation>
     </message>
     <message>
         <source>This is the minimum transaction fee you pay on every transaction.</source>
@@ -3597,11 +3687,11 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Can't generate a change-address key. Private keys are disabled for this wallet.</source>
-        <translation>Немагчыма стварыць адрас змены. Прыватныя ключы адключаны для гэтага кашалька.</translation>
+        <translation>Немагчыма стварыць адрас змены. Прыватныя ключы адключаны для гэтага гаманца.</translation>
     </message>
     <message>
         <source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source>
-        <translation>Не ўдаецца абнавіць кашалёк, які не падзяляе HD, без абнаўлення, каб падтрымліваць папярэдне спліт клавіятуры. Калі ласка, выкарыстоўвайце -upgradewallet.</translation>
+        <translation>Не ўдаецца абнавіць гаманец, які не падзяляе HD, без абнаўлення, каб падтрымліваць папярэдне спліт клавіятуры. Калі ласка, выкарыстоўвайце -upgradewallet.</translation>
     </message>
     <message>
         <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
@@ -3621,11 +3711,11 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation>Загружаем Кашалёк...</translation>
+        <translation>Загружаем Гаманец...</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
-        <translation>Немагчыма рэгрэсаваць Кашалёк</translation>
+        <translation>Немагчыма рэгрэсаваць Гаманец</translation>
     </message>
     <message>
         <source>Rescanning...</source>

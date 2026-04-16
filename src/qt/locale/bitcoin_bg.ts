@@ -224,7 +224,22 @@
         <source>Warning: The Caps Lock key is on!</source>
         <translation>Внимание:Бутонът Caps Lock е включен.</translation>
     </message>
-<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message></context>
+<message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>Въведете паролата на портфейла, за да стартирате стейкинга. Портфейлът ще бъде автоматично заключен след изтичане на времето.</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>Стартирането на стейкинг е неуспешно</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>Невалидна продължителност на стейкинга.</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message>
@@ -1104,7 +1119,82 @@
         <source>Recent transactions</source>
         <translation>Последни транзакции</translation>
     </message>
-    <message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message></context>
+    <message><source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message>    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>Стейкинг</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>Печелете Proof-of-Stake награди, като държите портфейла си отключен.</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>Продължителност:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 час</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 часа</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 часа</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 дни</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 дни</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>Стартирай стейкинг</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>Спри стейкинг</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>Няма стейкинг</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>Стейкинг — остават %1</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>Да спрем ли стейкинга?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Сигурни ли сте, че искате да спрете стейкинга?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>Първо шифровайте портфейла си, за да активирате стейкинга.</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     <message>

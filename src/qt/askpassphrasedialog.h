@@ -5,6 +5,8 @@
 #ifndef BITCOIN_QT_ASKPASSPHRASEDIALOG_H
 #define BITCOIN_QT_ASKPASSPHRASEDIALOG_H
 
+#include <cstdint>
+
 #include <QDialog>
 
 class WalletModel;
@@ -21,10 +23,11 @@ class AskPassphraseDialog : public QDialog
 
 public:
     enum Mode {
-        Encrypt,    /**< Ask passphrase twice and encrypt */
-        Unlock,     /**< Ask passphrase and unlock */
-        ChangePass, /**< Ask old passphrase + new passphrase twice */
-        Decrypt     /**< Ask passphrase and decrypt wallet */
+        Encrypt,        /**< Ask passphrase twice and encrypt */
+        Unlock,         /**< Ask passphrase and unlock */
+        ChangePass,     /**< Ask old passphrase + new passphrase twice */
+        Decrypt,        /**< Ask passphrase and decrypt wallet */
+        UnlockStaking   /**< Ask passphrase, unlock, and arm auto-relock for staking */
     };
 
     explicit AskPassphraseDialog(Mode mode, QWidget *parent);
@@ -34,11 +37,15 @@ public:
 
     void setModel(WalletModel *model);
 
+    /** For mode=UnlockStaking, set the staking duration in seconds. */
+    void setStakingDuration(int64_t seconds) { stakingDurationSeconds = seconds; }
+
 private:
     Ui::AskPassphraseDialog *ui;
     Mode mode;
     WalletModel *model;
     bool fCapsLock;
+    int64_t stakingDurationSeconds = 0;
 
 private Q_SLOTS:
     void textChanged();
