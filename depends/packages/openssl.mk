@@ -6,6 +6,8 @@ $(package)_sha256_hash=002a2d6b30b58bf4bea46c43bdd96365aaf8daa6c428782aa4feee06d
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
+$(package)_config_env_mingw32=WINDRES="$(host)-windres"
+$(package)_build_env_mingw32=WINDRES="$(host)-windres"
 $(package)_config_opts=--prefix=$(host_prefix) --openssldir=$(host_prefix)/etc/openssl
 $(package)_config_opts+=no-comp
 $(package)_config_opts+=no-dso
