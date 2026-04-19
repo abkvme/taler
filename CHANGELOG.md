@@ -59,6 +59,9 @@ April 2026
 - Replaced raw-function-pointer signals2 disconnect with connection object in init.cpp (Ubuntu 24.04 Boost 1.83+)
 - Bumped Linux x64/ARM64 CI runners from ubuntu-22.04 to ubuntu-24.04
 - Linux CI and build_linux.sh now statically link Boost (libboost_*.a) so binaries run on any Ubuntu regardless of installed libboost version
+- All build workflows (Linux x64/ARM64, macOS, Windows) now also trigger on pull_request against main for compile-only verification; archive/upload/release steps remain gated on tag pushes
+- Bumped actions/checkout from v4 to v5 across all workflows to silence the Node.js 20 deprecation warning
+- build_linux.sh now pre-checks system libs via pkg-config (Qt5Core/Gui/Network/Widgets, openssl, libevent, libzmq, protobuf, libqrencode) plus boost/version.hpp, and points to --install-deps if missing
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
