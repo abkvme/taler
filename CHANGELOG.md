@@ -1,4 +1,4 @@
-# Taler 0.19.5.8
+# Taler 0.19.6.8
 
 ## Release Date
 April 2026
