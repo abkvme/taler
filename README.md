@@ -1,7 +1,3 @@
-# Taler (TLR) — Hybrid PoW/PoS Cryptocurrency
-
-Open-source peer-to-peer cryptocurrency with hybrid Proof-of-Work / Proof-of-Stake consensus. Website: **[taler.tech](https://taler.tech)**.
-
 [![Linux x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-x64.yml?event=push&label=Linux%20x64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-x64.yml)
 [![Linux ARM64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-arm64.yml?event=push&label=Linux%20ARM64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-arm64.yml)
 [![macOS](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-macos.yml?event=push&label=macOS&logo=apple&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-macos.yml)
@@ -11,6 +7,10 @@ Open-source peer-to-peer cryptocurrency with hybrid Proof-of-Work / Proof-of-Sta
 [![Release](https://img.shields.io/github/v/release/abkvme/taler?label=release)](https://github.com/abkvme/taler/releases)
 [![License](https://img.shields.io/github/license/abkvme/taler)](COPYING)
 [![Telegram](https://img.shields.io/badge/chat-Telegram-26A5E4?logo=telegram&logoColor=white)](https://t.me/talercommunity)
+
+# Taler (TLR) — Hybrid PoW/PoS Cryptocurrency
+
+## Website: **[taler.tech](https://taler.tech)**.
 
 ---
 
