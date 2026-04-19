@@ -7,6 +7,8 @@
 
 #include <interfaces/wallet.h>
 
+#include <cstdint>
+
 #include <QWidget>
 #include <memory>
 
@@ -22,6 +24,7 @@ namespace Ui {
 
 QT_BEGIN_NAMESPACE
 class QModelIndex;
+class QTimer;
 QT_END_NAMESPACE
 
 /** Overview ("home") page widget */
@@ -53,12 +56,21 @@ private:
     TxViewDelegate *txdelegate;
     std::unique_ptr<TransactionFilterProxy> filter;
 
+    QTimer *stakingTickTimer;
+    int64_t stakingDurationSeconds;
+
+    QString formatStakingRemaining(int64_t seconds) const;
+
 private Q_SLOTS:
     void updateDisplayUnit();
     void handleTransactionClicked(const QModelIndex &index);
     void updateAlerts(const QString &warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
     void handleOutOfSyncWarningClicks();
+    void onStartStakingClicked();
+    void onStopStakingClicked();
+    void updateStakingUi();
+    void tickStakingTimer();
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H

@@ -60,6 +60,16 @@ public:
     //! Unlock wallet.
     virtual bool unlock(const SecureString& wallet_passphrase) = 0;
 
+    //! Unlock wallet and set the timestamp after which it will auto-relock.
+    //! Mirrors the `walletpassphrase` RPC: Unlock + TopUpKeyPool + set
+    //! CWallet::nRelockTime. The caller is responsible for actually
+    //! scheduling the relock (the Qt WalletModel uses a QTimer).
+    virtual bool unlockForStaking(const SecureString& wallet_passphrase, int64_t timeout_seconds) = 0;
+
+    //! Return the absolute unix time at which the wallet will auto-relock
+    //! (CWallet::nRelockTime). Zero means no pending auto-relock.
+    virtual int64_t getUnlockedUntil() = 0;
+
     //! Return whether wallet is locked.
     virtual bool isLocked() = 0;
 

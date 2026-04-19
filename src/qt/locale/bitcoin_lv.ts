@@ -132,7 +132,22 @@
         <source>Wallet encryption failed</source>
         <translation>Maciņa šifrēšana neizdevās</translation>
     </message>
-    <message><source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source><translation /></message><message><source>This operation needs your wallet passphrase to unlock the wallet.</source><translation /></message><message><source>This operation needs your wallet passphrase to decrypt the wallet.</source><translation /></message><message><source>Change passphrase</source><translation /></message><message><source>Enter the old passphrase and new passphrase to the wallet.</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>Wallet encrypted</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source><translation /></message><message><source>The supplied passphrases do not match.</source><translation /></message><message><source>Wallet unlock failed</source><translation /></message><message><source>The passphrase entered for the wallet decryption was incorrect.</source><translation /></message><message><source>Wallet decryption failed</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message></context>
+    <message><source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source><translation /></message><message><source>This operation needs your wallet passphrase to unlock the wallet.</source><translation /></message><message><source>This operation needs your wallet passphrase to decrypt the wallet.</source><translation /></message><message><source>Change passphrase</source><translation /></message><message><source>Enter the old passphrase and new passphrase to the wallet.</source><translation /></message><message><source>Your wallet is now encrypted. Remember that encrypting your wallet cannot fully protect your talers from being stolen by malware infecting your computer.</source><translation /></message><message><source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source><translation /></message><message><source>Wallet encrypted</source><translation /></message><message><source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source><translation /></message><message><source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source><translation /></message><message><source>The supplied passphrases do not match.</source><translation /></message><message><source>Wallet unlock failed</source><translation /></message><message><source>The passphrase entered for the wallet decryption was incorrect.</source><translation /></message><message><source>Wallet decryption failed</source><translation /></message><message><source>Wallet passphrase was successfully changed.</source><translation /></message><message><source>Warning: The Caps Lock key is on!</source><translation /></message>    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
+        <translation>Ievadiet maka paroli, lai sāktu steikingu. Maks tiks automātiski bloķēts atkārtoti, kad ilgums beigsies.</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Start staking failed</source>
+        <translation>Steikinga sākšana neizdevās</translation>
+    </message>
+    <message>
+        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <source>Invalid staking duration.</source>
+        <translation>Nederīgs steikinga ilgums.</translation>
+    </message>
+</context>
 <context>
     <name>BanTableModel</name>
     <message><source>IP/Netmask</source><translation /></message><message><source>Banned Until</source><translation /></message></context>
@@ -707,7 +722,82 @@
         <source>Your current total balance</source>
         <translation>Jūsu kopējā tekošā bilance</translation>
     </message>
-    <message><source>Watch-only:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message></context>
+    <message><source>Watch-only:</source><translation /></message><message><source>Mined balance that has not yet matured</source><translation /></message><message><source>Balances</source><translation /></message><message><source>Your current balance in watch-only addresses</source><translation /></message><message><source>Spendable:</source><translation /></message><message><source>Recent transactions</source><translation /></message><message><source>Unconfirmed transactions to watch-only addresses</source><translation /></message><message><source>Mined balance in watch-only addresses that has not yet matured</source><translation /></message><message><source>Current total balance in watch-only addresses</source><translation /></message>    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking</source>
+        <translation>Steikings</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
+        <translation>Nopelni Proof-of-Stake atlīdzības, turot maku atbloķētu.</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Duration:</source>
+        <translation>Ilgums:</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>1 hour</source>
+        <translation>1 stunda</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>6 hours</source>
+        <translation>6 stundas</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>24 hours</source>
+        <translation>24 stundas</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>7 days</source>
+        <translation>7 dienas</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>30 days</source>
+        <translation>30 dienas</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Start staking</source>
+        <translation>Sākt steikingu</translation>
+    </message>
+    <message>
+        <location filename="../forms/overviewpage.ui" line="0"/>
+        <source>Stop staking</source>
+        <translation>Pārtraukt steikingu</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Not staking</source>
+        <translation>Steikings izslēgts</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Staking — %1 remaining</source>
+        <translation>Steikings — atlicis %1</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Stop staking?</source>
+        <translation>Pārtraukt steikingu?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Vai tiešām vēlaties pārtraukt steikingu?</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="0"/>
+        <source>Encrypt your wallet first to enable staking.</source>
+        <translation>Vispirms šifrējiet maku, lai iespējotu steikingu.</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     </context>

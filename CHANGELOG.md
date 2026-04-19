@@ -1,3 +1,87 @@
+# Taler 0.19.6.8
+
+## Release Date
+April 2026
+
+## Major Changes
+
+### Staking UI
+- Added "Start staking" panel to the Overview page with duration selector (1h / 6h / 24h / 7d / 30d)
+- Live countdown timer showing remaining staking time with progress bar
+- "Stop staking" button with confirmation dialog
+- Passphrase prompt via existing wallet unlock dialog (new UnlockStaking mode)
+- Auto-relock via QTimer when staking duration expires
+- Staking panel hidden for unencrypted wallets (staking is always-on without encryption)
+- Panel appears automatically after encrypting the wallet (no restart needed)
+- Non-persistent: staking state resets on app restart (wallet starts locked)
+- Full translations for all 34 supported languages
+
+### Icon Theme Fix
+- All icons now render in theme-adaptive color on both light and dark themes
+- Enabled icon colorization on macOS and Windows (previously only Linux)
+- Icons use WindowText palette color, matching the rest of the UI text
+
+### Static Linking for macOS Distribution
+- Switched macOS release builds from Homebrew dynamic libraries to fully static depends/ system
+- Release binaries no longer require Homebrew packages on user machines
+- Eliminates "dyld: Library not loaded" crashes for boost@1.85 and other libraries
+
+### Dependency Upgrades (depends/ system)
+- Boost: 1.64.0 → 1.88.0 (ARM64 macOS support, C++17)
+- OpenSSL: 1.0.1k → 3.4.1 (ARM64 macOS support, security fixes, modern TLS)
+- Qt: 5.9.6 → 5.15.16 (ARM64 macOS support, last Qt5 LTS)
+- libevent: 2.1.8 → 2.1.12
+- ZeroMQ: 4.3.1 → 4.3.5
+- protobuf: 2.6.1 → 3.21.12
+- qrencode: 3.4.4 → 4.1.1
+- zlib: 1.2.11 → 1.3.1
+- miniupnpc: 2.0.20180203 → 2.2.8
+- macOS minimum version: 10.10 → 11.0 (required for Apple Silicon)
+
+### Build System
+- macOS CI workflow rewritten to use depends/ static build (matches Windows CI)
+- build_macos.sh rewritten to use identical depends/ flow as CI
+- Only build tools (automake, libtool, pkg-config) needed from Homebrew
+- otool -L verification step in CI to catch dynamic linking regressions
+- Fixed dead Boost download URL (dl.bintray.com → archives.boost.io)
+- Replaced deprecated SSL_library_init() with OPENSSL_init_ssl() for OpenSSL 3.x
+- Fixed PATH word-splitting in depends/funcs.mk when user PATH contains spaces (e.g., VMware Fusion)
+- Added -isysroot to build_darwin_CC/CXX for macOS 15/26 SDKs
+- Updated Qt 5.15 patches (fix_qt_pkgconfig, fix_no_printer) for 5.15 source layout
+- Disabled OpenGL and Vulkan in Qt for macOS (AGL framework removed in macOS 26 SDK)
+- Patched Qt's bundled libpng to skip Classic Mac OS fp.h include (TARGET_OS_MAC clash)
+- Removed obsolete Qt configure flags: -no-qml-debug, -no-xinput2 (gone in Qt 5.15)
+- Made Qt5CglSupport an optional pkg-config dependency (not built without OpenGL)
+- Updated miniupnpc build/stage paths for 2.2.8 layout (build/libminiupnpc.a, include/)
+- Updated UPNP_GetValidIGD call in net.cpp for miniupnpc API 18 (7-arg signature)
+- Fixed build_linux.sh tool check (libtool → libtoolize, matches Debian/Ubuntu package layout)
+- Added missing <array> include in net_processing.cpp and qt/sendcoinsdialog.cpp, <stdexcept> in support/lockedpool.cpp (required by stricter modern GCC)
+- Replaced raw-function-pointer signals2 disconnect with connection object in init.cpp (Ubuntu 24.04 Boost 1.83+)
+- Bumped Linux x64/ARM64 CI runners from ubuntu-22.04 to ubuntu-24.04
+- Linux CI and build_linux.sh now statically link Boost (libboost_*.a) so binaries run on any Ubuntu regardless of installed libboost version
+- All build workflows (Linux x64/ARM64, macOS, Windows) now also trigger on pull_request against main for compile-only verification; archive/upload/release steps remain gated on tag pushes
+- Bumped actions/checkout from v4 to v5 across all workflows to silence the Node.js 20 deprecation warning
+- build_linux.sh now pre-checks system libs via pkg-config (Qt5Core/Gui/Network/Widgets, openssl, libevent, libzmq, protobuf, libqrencode) plus boost/version.hpp, and points to --install-deps if missing
+- Added build_windows.sh (cross-compile from Ubuntu via MinGW-w64), matching the Windows CI workflow step-for-step for local debugging
+- build_linux.sh and build_windows.sh: moved --install-deps handling ahead of the tool-availability check so it works on a fresh machine
+- depends/packages/openssl.mk: pass WINDRES=$(host)-windres for mingw32 so OpenSSL 3.4.1 finds the prefixed MinGW resource compiler on Ubuntu
+- depends/packages/qt.mk: added -no-feature-schannel for mingw32 (schannel wins by default on Windows and blocks -openssl-linked) and sed-patch qtbase/src/network/configure.json during preprocess to make the MinGW OpenSSL link test use OpenSSL 3.x lib names (-lssl -lcrypto) plus Windows system libs (-lws2_32 -lgdi32 -lcrypt32); Qt 5.15's four built-in openssl sources otherwise all fail on OpenSSL 3.x+MinGW
+- depends/packages/qt.mk: replaced -dbus-runtime with -no-dbus globally so Qt doesn't emit link-time dependencies on libQt5DBus.a from Qt5ServiceSupport/Qt5ThemeSupport/xdgdesktopportal; taler-qt doesn't use D-Bus on any platform, and depends/ targets (macOS, Windows) don't need it — Linux builds use apt Qt and are unaffected
+- Added retry-once to the depends/ build step in build_macos.sh, build_windows.sh and both CI workflows to work around an intermittent Qt 5.15 moc/plugin parallel-build race
+- build-aux/m4/bitcoin_qt.m4: link CoreVideo, IOSurface, Carbon, QuartzCore and Metal frameworks on darwin so Qt's static libqcocoa.a resolves CVDisplayLink*, IOSurface*, Carbon keyboard, CAMetalLayer/CAShapeLayer symbols on macOS 26 SDK
+- configure.ac: AC_CHECK_LIB bcrypt on Windows so Boost 1.88 filesystem's unique_path() BCrypt-based random generator links
+- src/wallet/db.cpp: dropped the __MINGW32__-branch using the removed Boost 1.85+ copy_option API; fs::copy_options::overwrite_existing works uniformly on Boost 1.68+ now that all platforms use modern Boost
+- build_macos.sh: added clean (keeps depends/ prefix) and clean-all (wipes everything) subcommands; always re-runs autogen.sh when configure.ac, any build-aux/m4/*.m4, or any Makefile.am is newer than configure so M4 edits take effect without manual steps
+- Rewrote README.md as a modern open-source project landing page: CI/metadata badges, SEO-oriented description, Docker and docker compose quick-start, cross-platform self-compile pointers, explorer and community links
+- build-aux/m4/bitcoin_qt.m4: link Windows system libs (wtsapi32, userenv, netapi32) and Qt's Qt5WindowsUIAutomationSupport static library before the -lqwindows static-plugin link test; without these four additions, Qt 5.15's libqwindows.a emitted undefined references (WTS*, NetShare*, GetUserProfileDirectoryW, QWindowsUiaWrapper::*), the link test silently failed, and taler-qt.exe wasn't built. Mirrors the darwin framework fix for libqcocoa.a shipped earlier.
+- build_windows.sh: auto-regenerate configure when configure.ac, any build-aux/m4/*.m4, or any Makefile.am is newer than configure (matches build_macos.sh); avoids stale-configure silent-failure footguns when M4 files change.
+- build-aux/m4/bitcoin_qt.m4: moved the per-platform library additions (Windows system libs + Qt5WindowsUIAutomationSupport on Windows, Cocoa frameworks on darwin) to run *before* the QMinimalIntegrationPlugin link test rather than after it. The qminimal plugin transitively pulls in Qt5Core/Qt5Gui, which reference those platform symbols on Windows; with additions running after qminimal, its link silently failed and the GUI was disabled before the qwindows check even ran.
+
+### Belarusian Translation Fix
+- Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
+
+---
+
 # Taler 0.19.2.8
 
 ## Release Date
@@ -173,11 +257,12 @@ November 2025
 ## Building on macOS
 
 ### Prerequisites
-Install dependencies via Homebrew:
+Install build tools via Homebrew:
 ```bash
-brew install automake libtool pkg-config berkeley-db boost@1.85 \
-             openssl qt@5 libevent qrencode zeromq
+brew install automake libtool pkg-config
 ```
+
+All library dependencies (Boost, OpenSSL, Qt, etc.) are built automatically from source as static libraries by the depends/ system.
 
 ### Build
 ```bash
@@ -185,7 +270,7 @@ chmod +x build_macos.sh
 ./build_macos.sh
 ```
 
-Binaries will be in `./bin/` directory.
+First run takes 15-30 minutes (building dependencies). Subsequent builds reuse cached dependencies. Binaries will be in `./bin/` directory.
 
 ## Migration Notes
 - Backup your wallet before upgrading

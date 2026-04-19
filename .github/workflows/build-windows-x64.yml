@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -17,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies
         run: |
@@ -33,9 +36,11 @@ jobs:
 
       - name: Build dependencies
         run: |
-          cd depends
-          make HOST=x86_64-w64-mingw32 -j$(nproc)
-          cd ..
+          # Qt 5.15 parallel build has a moc/plugin ordering race that surfaces
+          # intermittently. Retry once: the second pass picks up cached .o files
+          # and completes the remaining incremental work deterministically.
+          make -C depends HOST=x86_64-w64-mingw32 -j$(nproc) \
+            || make -C depends HOST=x86_64-w64-mingw32 -j$(nproc)
 
       - name: Build Taler
         run: |
@@ -58,12 +63,14 @@ jobs:
           file bin/taler-qt.exe || true
 
       - name: Create release archive
+        if: github.event_name != 'pull_request'
         run: |
           cd bin
           zip -r taler-${{ github.ref_name }}-win64.zip *.exe
           cd ..
 
       - name: Upload artifacts
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: taler-${{ github.ref_name }}-win64

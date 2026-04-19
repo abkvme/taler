@@ -5,6 +5,7 @@
 #include <qt/overviewpage.h>
 #include <qt/forms/ui_overviewpage.h>
 
+#include <qt/askpassphrasedialog.h>
 #include <qt/bitcoinunits.h>
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
@@ -15,8 +16,12 @@
 #include <qt/transactiontablemodel.h>
 #include <qt/walletmodel.h>
 
+#include <algorithm>
+
 #include <QAbstractItemDelegate>
+#include <QMessageBox>
 #include <QPainter>
+#include <QTimer>
 
 #define DECORATION_SIZE 54
 #define NUM_ITEMS 5
@@ -115,7 +120,9 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     ui(new Ui::OverviewPage),
     clientModel(0),
     walletModel(0),
-    txdelegate(new TxViewDelegate(platformStyle, this))
+    txdelegate(new TxViewDelegate(platformStyle, this)),
+    stakingTickTimer(nullptr),
+    stakingDurationSeconds(0)
 {
     ui->setupUi(this);
 
@@ -139,6 +146,21 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     showOutOfSyncWarning(true);
     connect(ui->labelWalletStatus, SIGNAL(clicked()), this, SLOT(handleOutOfSyncWarningClicks()));
     connect(ui->labelTransactionsStatus, SIGNAL(clicked()), this, SLOT(handleOutOfSyncWarningClicks()));
+
+    // Staking controls: seconds stored as userData on each combo entry.
+    ui->stakingDurationCombo->setItemData(0, static_cast<qlonglong>(3600));
+    ui->stakingDurationCombo->setItemData(1, static_cast<qlonglong>(6 * 3600));
+    ui->stakingDurationCombo->setItemData(2, static_cast<qlonglong>(24 * 3600));
+    ui->stakingDurationCombo->setItemData(3, static_cast<qlonglong>(7 * 24 * 3600));
+    ui->stakingDurationCombo->setItemData(4, static_cast<qlonglong>(30 * 24 * 3600));
+    ui->stakingDurationCombo->setCurrentIndex(2); // default 24 hours
+
+    stakingTickTimer = new QTimer(this);
+    stakingTickTimer->setInterval(1000);
+    connect(stakingTickTimer, SIGNAL(timeout()), this, SLOT(tickStakingTimer()));
+
+    connect(ui->startStakingButton, SIGNAL(clicked()), this, SLOT(onStartStakingClicked()));
+    connect(ui->stopStakingButton, SIGNAL(clicked()), this, SLOT(onStopStakingClicked()));
 }
 
 void OverviewPage::handleTransactionClicked(const QModelIndex &index)
@@ -233,10 +255,98 @@ void OverviewPage::setWalletModel(WalletModel *model)
 
         updateWatchOnlyLabels(wallet.haveWatchOnly());
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
+
+        connect(model, SIGNAL(encryptionStatusChanged()), this, SLOT(updateStakingUi()));
+        updateStakingUi();
     }
 
     // update the display unit, to not use the default ("BTC")
     updateDisplayUnit();
+}
+
+QString OverviewPage::formatStakingRemaining(int64_t seconds) const
+{
+    if (seconds < 0) seconds = 0;
+    const int days = seconds / 86400;
+    const int hours = (seconds % 86400) / 3600;
+    const int minutes = (seconds % 3600) / 60;
+    const int secs = seconds % 60;
+    return QString("%1d %2h %3m %4s")
+        .arg(days)
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'))
+        .arg(secs, 2, 10, QChar('0'));
+}
+
+void OverviewPage::onStartStakingClicked()
+{
+    if (!walletModel) return;
+    if (walletModel->getEncryptionStatus() == WalletModel::Unencrypted) return;
+
+    const int64_t seconds = ui->stakingDurationCombo->currentData().toLongLong();
+    if (seconds <= 0) return;
+
+    AskPassphraseDialog dlg(AskPassphraseDialog::UnlockStaking, this);
+    dlg.setModel(walletModel);
+    dlg.setStakingDuration(seconds);
+    if (dlg.exec() == QDialog::Accepted) {
+        stakingDurationSeconds = seconds;
+        stakingTickTimer->start();
+        updateStakingUi();
+    }
+}
+
+void OverviewPage::onStopStakingClicked()
+{
+    if (!walletModel) return;
+    if (QMessageBox::question(this, tr("Stop staking?"),
+            tr("Are you sure you want to stop staking?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+    walletModel->stopStaking();
+    updateStakingUi();
+}
+
+void OverviewPage::updateStakingUi()
+{
+    if (!walletModel) return;
+
+    const bool unencrypted = walletModel->getEncryptionStatus() == WalletModel::Unencrypted;
+    ui->stakingFrame->setVisible(!unencrypted);
+    if (unencrypted) {
+        stakingTickTimer->stop();
+        stakingDurationSeconds = 0;
+        return;
+    }
+
+    const int64_t remaining = walletModel->getStakingSecondsRemaining();
+    const bool staking = remaining > 0 && !walletModel->wallet().isLocked();
+
+    ui->startStakingButton->setVisible(!staking);
+    ui->stakingDurationCombo->setEnabled(!staking);
+    ui->stopStakingButton->setVisible(staking);
+
+    if (staking) {
+        ui->stakingStatusLabel->setText(tr("Staking — %1 remaining").arg(formatStakingRemaining(remaining)));
+        if (stakingDurationSeconds > 0) {
+            const int pct = static_cast<int>(100 * (stakingDurationSeconds - remaining) / stakingDurationSeconds);
+            ui->stakingProgressBar->setValue(std::max(0, std::min(100, pct)));
+        } else {
+            ui->stakingProgressBar->setValue(0);
+        }
+        if (!stakingTickTimer->isActive()) stakingTickTimer->start();
+    } else {
+        ui->stakingStatusLabel->setText(tr("Not staking"));
+        ui->stakingProgressBar->setValue(0);
+        stakingTickTimer->stop();
+        stakingDurationSeconds = 0;
+    }
+}
+
+void OverviewPage::tickStakingTimer()
+{
+    updateStakingUi();
 }
 
 void OverviewPage::updateDisplayUnit()

@@ -25,6 +25,7 @@
 #include <wallet/wallet.h>
 
 #include <stdint.h>
+#include <limits>
 
 #include <QDebug>
 #include <QMessageBox>
@@ -51,6 +52,14 @@ WalletModel::WalletModel(std::unique_ptr<interfaces::Wallet> wallet, interfaces:
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollBalanceChanged()));
     pollTimer->start(4*MODEL_UPDATE_DELAY);
+
+    // Auto-relock timer for staking (single-shot, armed on startStaking).
+    stakingAutoRelockTimer = new QTimer(this);
+    stakingAutoRelockTimer->setSingleShot(true);
+    connect(stakingAutoRelockTimer, &QTimer::timeout, this, [this]() {
+        if (m_wallet) m_wallet->lock();
+        Q_EMIT encryptionStatusChanged();
+    });
 
     subscribeToCoreSignals();
 }
@@ -335,6 +344,40 @@ bool WalletModel::changePassphrase(const SecureString &oldPass, const SecureStri
 {
     m_wallet->lock(); // Make sure wallet is locked before attempting pass change
     return m_wallet->changeWalletPassphrase(oldPass, newPass);
+}
+
+bool WalletModel::startStaking(const SecureString &passPhrase, int64_t seconds_to_stake)
+{
+    if (seconds_to_stake <= 0) return false;
+    if (!m_wallet->unlockForStaking(passPhrase, seconds_to_stake)) return false;
+    // Clamp Qt timer to int range (QTimer::start takes int ms).
+    constexpr int64_t MAX_MS = std::numeric_limits<int>::max();
+    int64_t ms = seconds_to_stake * 1000;
+    if (ms > MAX_MS) ms = MAX_MS;
+    stakingAutoRelockTimer->start(static_cast<int>(ms));
+    Q_EMIT encryptionStatusChanged();
+    return true;
+}
+
+bool WalletModel::stopStaking()
+{
+    stakingAutoRelockTimer->stop();
+    const bool ok = m_wallet->lock();
+    Q_EMIT encryptionStatusChanged();
+    return ok;
+}
+
+int64_t WalletModel::getStakingSecondsRemaining() const
+{
+    const int64_t until = m_wallet->getUnlockedUntil();
+    if (until <= 0) return 0;
+    const int64_t now = GetTime();
+    return (until > now) ? (until - now) : 0;
+}
+
+bool WalletModel::isStaking() const
+{
+    return !m_wallet->isLocked() && getStakingSecondsRemaining() > 0;
 }
 
 // Handlers for core signals

@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName("Bitcoin-Qt-test");
 
-    SSL_library_init();
+    OPENSSL_init_ssl(0, NULL);
 
     URITests test1;
     if (QTest::qExec(&test1) != 0) {

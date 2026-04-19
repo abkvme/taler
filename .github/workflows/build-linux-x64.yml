@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -13,11 +16,11 @@ concurrency:
 jobs:
   build-linux-x64:
     name: Build for Linux x64
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies
         run: |
@@ -46,6 +49,7 @@ jobs:
             BDB_LIBS="-L$(pwd)/db18/lib -ldb_cxx-18.1" \
             BDB_CFLAGS="-I$(pwd)/db18/include" \
             CXXFLAGS="-O2"
+          sed -i 's|-lboost_\([a-z_]*\)|-l:libboost_\1.a|g' src/Makefile
           make -j$(nproc)
 
       - name: Create bin directory and copy binaries
@@ -67,12 +71,14 @@ jobs:
           xvfb-run ./bin/taler-qt --version
 
       - name: Create release archive
+        if: github.event_name != 'pull_request'
         run: |
           cd bin
           tar -czf taler-${{ github.ref_name }}-linux-x64.tar.gz talerd taler-cli taler-tx taler-qt
           cd ..
 
       - name: Upload artifacts
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: taler-${{ github.ref_name }}-linux-x64
