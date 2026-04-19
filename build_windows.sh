@@ -55,10 +55,18 @@ echo "Using $NCPU parallel jobs, HOST=$HOST"
 # pass uses cached .o files and completes the remaining work deterministically.
 make -C depends HOST=$HOST -j${NCPU} || make -C depends HOST=$HOST -j${NCPU}
 
-# Generate configure if needed
+# Regenerate configure if the scripts or M4 macros changed (or if configure is missing)
+NEED_AUTOGEN=0
 if [ ! -f configure ]; then
+  NEED_AUTOGEN=1
+else
+  for src in configure.ac configure.in build-aux/m4/*.m4 $(find . -name Makefile.am -not -path './depends/*' 2>/dev/null); do
+    [ -f "$src" ] && [ "$src" -nt configure ] && { NEED_AUTOGEN=1; break; }
+  done
+fi
+if [ "$NEED_AUTOGEN" = "1" ]; then
   echo ""
-  echo "Running autogen.sh..."
+  echo "Running autogen.sh (configure or its inputs changed)..."
   ./autogen.sh
 fi
 
