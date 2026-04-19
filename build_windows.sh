@@ -7,6 +7,21 @@ HOST=x86_64-w64-mingw32
 echo "=== Taler Windows x64 Build (cross-compile from Linux via MinGW-w64) ==="
 echo ""
 
+# Install cross-compile dependencies (matches .github/workflows/build-windows-x64.yml)
+# This block must run before the tool check so --install-deps works on a fresh machine.
+if [ "$1" = "--install-deps" ]; then
+  echo "Installing cross-compile dependencies..."
+  sudo apt-get update
+  sudo apt-get install -y \
+    build-essential libtool autotools-dev automake pkg-config \
+    bsdmainutils curl git \
+    g++-mingw-w64-x86-64 nsis
+  echo ""
+  echo "Setting MinGW POSIX threading model..."
+  sudo update-alternatives --set ${HOST}-g++ /usr/bin/${HOST}-g++-posix
+  echo ""
+fi
+
 # Check build tools
 echo "Checking build tools..."
 MISSING=""
@@ -22,20 +37,6 @@ if [ -n "$MISSING" ]; then
   exit 1
 fi
 echo "All build tools found."
-
-# Install cross-compile dependencies (matches .github/workflows/build-windows-x64.yml)
-if [ "$1" = "--install-deps" ]; then
-  echo ""
-  echo "Installing cross-compile dependencies..."
-  sudo apt-get update
-  sudo apt-get install -y \
-    build-essential libtool autotools-dev automake pkg-config \
-    bsdmainutils curl git \
-    g++-mingw-w64-x86-64 nsis
-  echo ""
-  echo "Setting MinGW POSIX threading model..."
-  sudo update-alternatives --set ${HOST}-g++ /usr/bin/${HOST}-g++-posix
-fi
 
 # Ensure MinGW alternatives point to the POSIX variant (threads needed by Boost)
 CURRENT_GXX=$(update-alternatives --query ${HOST}-g++ 2>/dev/null | awk '/^Value:/ {print $2}')

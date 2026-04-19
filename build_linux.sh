@@ -6,24 +6,9 @@ NCPU=$(nproc)
 echo "=== Taler Linux Build (BDB 18, system Qt/Boost) ==="
 echo ""
 
-# Check build tools
-echo "Checking build tools..."
-MISSING=""
-for tool in autoconf automake libtoolize pkg-config make g++; do
-  if ! command -v $tool >/dev/null 2>&1; then
-    MISSING="$MISSING $tool"
-  fi
-done
-if [ -n "$MISSING" ]; then
-  echo "Missing build tools:$MISSING"
-  echo "Install with: sudo apt-get install build-essential libtool autotools-dev automake pkg-config"
-  exit 1
-fi
-echo "All build tools found."
-
 # Install system dependencies (matches .github/workflows/build-linux-x64.yml)
+# This block must run before the tool check so --install-deps works on a fresh machine.
 if [ "$1" = "--install-deps" ]; then
-  echo ""
   echo "Installing system dependencies..."
   sudo apt-get update
   sudo apt-get install -y \
@@ -35,7 +20,26 @@ if [ "$1" = "--install-deps" ]; then
     protobuf-compiler libprotobuf-dev \
     libqrencode-dev libzmq3-dev \
     xvfb
-else
+  echo ""
+fi
+
+# Check build tools
+echo "Checking build tools..."
+MISSING=""
+for tool in autoconf automake libtoolize pkg-config make g++; do
+  if ! command -v $tool >/dev/null 2>&1; then
+    MISSING="$MISSING $tool"
+  fi
+done
+if [ -n "$MISSING" ]; then
+  echo "Missing build tools:$MISSING"
+  echo "Re-run the script with --install-deps to install them automatically:"
+  echo "  ./build_linux.sh --install-deps"
+  exit 1
+fi
+echo "All build tools found."
+
+if [ "$1" != "--install-deps" ]; then
   echo ""
   echo "Checking system libraries..."
   MISSING_PC=""
