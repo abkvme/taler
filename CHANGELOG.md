@@ -1,3 +1,65 @@
+# Taler 0.19.5.8
+
+## Release Date
+April 2026
+
+## Major Changes
+
+### Staking UI
+- Added "Start staking" panel to the Overview page with duration selector (1h / 6h / 24h / 7d / 30d)
+- Live countdown timer showing remaining staking time with progress bar
+- "Stop staking" button with confirmation dialog
+- Passphrase prompt via existing wallet unlock dialog (new UnlockStaking mode)
+- Auto-relock via QTimer when staking duration expires
+- Staking panel hidden for unencrypted wallets (staking is always-on without encryption)
+- Panel appears automatically after encrypting the wallet (no restart needed)
+- Non-persistent: staking state resets on app restart (wallet starts locked)
+- Full translations for all 34 supported languages
+
+### Icon Theme Fix
+- All icons now render in theme-adaptive color on both light and dark themes
+- Enabled icon colorization on macOS and Windows (previously only Linux)
+- Icons use WindowText palette color, matching the rest of the UI text
+
+### Static Linking for macOS Distribution
+- Switched macOS release builds from Homebrew dynamic libraries to fully static depends/ system
+- Release binaries no longer require Homebrew packages on user machines
+- Eliminates "dyld: Library not loaded" crashes for boost@1.85 and other libraries
+
+### Dependency Upgrades (depends/ system)
+- Boost: 1.64.0 → 1.88.0 (ARM64 macOS support, C++17)
+- OpenSSL: 1.0.1k → 3.4.1 (ARM64 macOS support, security fixes, modern TLS)
+- Qt: 5.9.6 → 5.15.16 (ARM64 macOS support, last Qt5 LTS)
+- libevent: 2.1.8 → 2.1.12
+- ZeroMQ: 4.3.1 → 4.3.5
+- protobuf: 2.6.1 → 3.21.12
+- qrencode: 3.4.4 → 4.1.1
+- zlib: 1.2.11 → 1.3.1
+- miniupnpc: 2.0.20180203 → 2.2.8
+- macOS minimum version: 10.10 → 11.0 (required for Apple Silicon)
+
+### Build System
+- macOS CI workflow rewritten to use depends/ static build (matches Windows CI)
+- build_macos.sh rewritten to use identical depends/ flow as CI
+- Only build tools (automake, libtool, pkg-config) needed from Homebrew
+- otool -L verification step in CI to catch dynamic linking regressions
+- Fixed dead Boost download URL (dl.bintray.com → archives.boost.io)
+- Replaced deprecated SSL_library_init() with OPENSSL_init_ssl() for OpenSSL 3.x
+- Fixed PATH word-splitting in depends/funcs.mk when user PATH contains spaces (e.g., VMware Fusion)
+- Added -isysroot to build_darwin_CC/CXX for macOS 15/26 SDKs
+- Updated Qt 5.15 patches (fix_qt_pkgconfig, fix_no_printer) for 5.15 source layout
+- Disabled OpenGL and Vulkan in Qt for macOS (AGL framework removed in macOS 26 SDK)
+- Patched Qt's bundled libpng to skip Classic Mac OS fp.h include (TARGET_OS_MAC clash)
+- Removed obsolete Qt configure flags: -no-qml-debug, -no-xinput2 (gone in Qt 5.15)
+- Made Qt5CglSupport an optional pkg-config dependency (not built without OpenGL)
+- Updated miniupnpc build/stage paths for 2.2.8 layout (build/libminiupnpc.a, include/)
+- Updated UPNP_GetValidIGD call in net.cpp for miniupnpc API 18 (7-arg signature)
+
+### Belarusian Translation Fix
+- Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
+
+---
+
 # Taler 0.19.2.8
 
 ## Release Date
@@ -173,11 +235,12 @@ November 2025
 ## Building on macOS
 
 ### Prerequisites
-Install dependencies via Homebrew:
+Install build tools via Homebrew:
 ```bash
-brew install automake libtool pkg-config berkeley-db boost@1.85 \
-             openssl qt@5 libevent qrencode zeromq
+brew install automake libtool pkg-config
 ```
+
+All library dependencies (Boost, OpenSSL, Qt, etc.) are built automatically from source as static libraries by the depends/ system.
 
 ### Build
 ```bash
@@ -185,7 +248,7 @@ chmod +x build_macos.sh
 ./build_macos.sh
 ```
 
-Binaries will be in `./bin/` directory.
+First run takes 15-30 minutes (building dependencies). Subsequent builds reuse cached dependencies. Binaries will be in `./bin/` directory.
 
 ## Migration Notes
 - Backup your wallet before upgrading

@@ -19,30 +19,43 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Homebrew dependencies
+      - name: Install build tools
         run: |
-          brew install automake libtool pkg-config berkeley-db boost@1.85 \
-                       openssl qt@5 libevent qrencode zeromq protobuf
+          brew install automake libtool pkg-config
 
-      - name: Set up environment variables
+      - name: Build dependencies
         run: |
-          echo "BDB_PREFIX=$(brew --prefix berkeley-db)" >> $GITHUB_ENV
-          echo "BOOST_ROOT=$(brew --prefix boost@1.85)" >> $GITHUB_ENV
-          echo "OPENSSL_ROOT=$(brew --prefix openssl)" >> $GITHUB_ENV
-          echo "QT5_ROOT=$(brew --prefix qt@5)" >> $GITHUB_ENV
+          make -C depends -j$(sysctl -n hw.ncpu)
 
       - name: Build Taler
         run: |
-          chmod +x build_macos.sh
-          ./build_macos.sh
+          ./autogen.sh
+          HOST_TRIPLET=$(cd depends && ./config.guess)
+          CONFIG_SITE=$PWD/depends/${HOST_TRIPLET}/share/config.site \
+            ./configure --prefix=/ --with-incompatible-bdb
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Create bin directory and copy binaries
+        run: |
+          mkdir -p bin
+          cp src/talerd bin/ || true
+          cp src/taler-cli bin/ || true
+          cp src/taler-tx bin/ || true
+          cp src/qt/taler-qt bin/ || true
 
       - name: Verify binaries
         run: |
           ls -lh bin/
           file bin/talerd
           file bin/taler-qt
-          ./bin/talerd --version
-          ./bin/taler-qt --version
+          echo "=== Checking dynamic library dependencies ==="
+          otool -L bin/taler-qt | head -20
+          echo "=== Verifying no Homebrew library dependencies ==="
+          if otool -L bin/taler-qt | grep -q "/opt/homebrew\|/usr/local/opt"; then
+            echo "ERROR: Non-system dynamic libraries found!"
+            exit 1
+          fi
+          echo "OK: All libraries are system-only"
 
       - name: Create release archive
         run: |
