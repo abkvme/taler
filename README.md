@@ -3,16 +3,14 @@
 > A cryptocurrency inspired by the historic European Thaler — trusted currency
 > of the 15th–19th centuries, reimagined for the digital age.
 
-[![Linux x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-x64.yml?branch=main&label=Linux%20x64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-x64.yml)
-[![Linux ARM64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-arm64.yml?branch=main&label=Linux%20ARM64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-arm64.yml)
-[![macOS](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-macos.yml?branch=main&label=macOS&logo=apple&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-macos.yml)
-[![Windows x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-windows-x64.yml?branch=main&label=Windows%20x64&logo=windows&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-windows-x64.yml)
-[![Docker](https://img.shields.io/github/actions/workflow/status/abkvme/taler/docker-publish.yml?branch=main&label=Docker&logo=docker&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/docker-publish.yml)
+[![Linux x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-x64.yml?event=push&label=Linux%20x64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-x64.yml)
+[![Linux ARM64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-arm64.yml?event=push&label=Linux%20ARM64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-arm64.yml)
+[![macOS](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-macos.yml?event=push&label=macOS&logo=apple&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-macos.yml)
+[![Windows x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-windows-x64.yml?event=push&label=Windows%20x64&logo=windows&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-windows-x64.yml)
+[![Docker](https://img.shields.io/github/actions/workflow/status/abkvme/taler/docker-publish.yml?event=push&label=Docker&logo=docker&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/docker-publish.yml)
 
 [![Release](https://img.shields.io/github/v/release/abkvme/taler?label=release)](https://github.com/abkvme/taler/releases)
 [![License](https://img.shields.io/github/license/abkvme/taler)](COPYING)
-[![Last commit](https://img.shields.io/github/last-commit/abkvme/taler)](https://github.com/abkvme/taler/commits/main)
-[![Stars](https://img.shields.io/github/stars/abkvme/taler?style=social)](https://github.com/abkvme/taler/stargazers)
 [![Telegram](https://img.shields.io/badge/chat-Telegram-26A5E4?logo=telegram&logoColor=white)](https://t.me/talercommunity)
 
 ---
