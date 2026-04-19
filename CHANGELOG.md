@@ -62,6 +62,11 @@ April 2026
 - All build workflows (Linux x64/ARM64, macOS, Windows) now also trigger on pull_request against main for compile-only verification; archive/upload/release steps remain gated on tag pushes
 - Bumped actions/checkout from v4 to v5 across all workflows to silence the Node.js 20 deprecation warning
 - build_linux.sh now pre-checks system libs via pkg-config (Qt5Core/Gui/Network/Widgets, openssl, libevent, libzmq, protobuf, libqrencode) plus boost/version.hpp, and points to --install-deps if missing
+- Added build_windows.sh (cross-compile from Ubuntu via MinGW-w64), matching the Windows CI workflow step-for-step for local debugging
+- build_linux.sh and build_windows.sh: moved --install-deps handling ahead of the tool-availability check so it works on a fresh machine
+- depends/packages/openssl.mk: pass WINDRES=$(host)-windres for mingw32 so OpenSSL 3.4.1 finds the prefixed MinGW resource compiler on Ubuntu
+- depends/packages/qt.mk: added -no-feature-schannel and OPENSSL_LIBS for mingw32 so Qt 5.15's -openssl-linked precondition passes (schannel wins by default on Windows and blocks openssl-linked)
+- Added retry-once to the depends/ build step in build_macos.sh, build_windows.sh and both CI workflows to work around an intermittent Qt 5.15 moc/plugin parallel-build race
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
