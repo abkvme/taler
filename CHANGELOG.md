@@ -73,6 +73,7 @@ April 2026
 - src/wallet/db.cpp: dropped the __MINGW32__-branch using the removed Boost 1.85+ copy_option API; fs::copy_options::overwrite_existing works uniformly on Boost 1.68+ now that all platforms use modern Boost
 - build_macos.sh: added clean (keeps depends/ prefix) and clean-all (wipes everything) subcommands; always re-runs autogen.sh when configure.ac, any build-aux/m4/*.m4, or any Makefile.am is newer than configure so M4 edits take effect without manual steps
 - Rewrote README.md as a modern open-source project landing page: CI/metadata badges, SEO-oriented description, Docker and docker compose quick-start, cross-platform self-compile pointers, explorer and community links
+- build-aux/m4/bitcoin_qt.m4: link Windows system libs (wtsapi32, userenv, netapi32) and Qt's Qt5WindowsUIAutomationSupport static library before the -lqwindows static-plugin link test; without these four additions, Qt 5.15's libqwindows.a emitted undefined references (WTS*, NetShare*, GetUserProfileDirectoryW, QWindowsUiaWrapper::*), the link test silently failed, and taler-qt.exe wasn't built. Mirrors the darwin framework fix for libqcocoa.a shipped earlier.
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
