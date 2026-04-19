@@ -10,7 +10,7 @@
 
 # Taler (TLR) — Hybrid PoW/PoS Cryptocurrency
 
-### Website: **[taler.tech](https://taler.tech)**.
+### Website: **[taler.tech](https://taler.tech)**
 
 ---
 
