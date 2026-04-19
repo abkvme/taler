@@ -65,7 +65,7 @@ April 2026
 - Added build_windows.sh (cross-compile from Ubuntu via MinGW-w64), matching the Windows CI workflow step-for-step for local debugging
 - build_linux.sh and build_windows.sh: moved --install-deps handling ahead of the tool-availability check so it works on a fresh machine
 - depends/packages/openssl.mk: pass WINDRES=$(host)-windres for mingw32 so OpenSSL 3.4.1 finds the prefixed MinGW resource compiler on Ubuntu
-- depends/packages/qt.mk: added -no-feature-schannel and OPENSSL_LIBS for mingw32 so Qt 5.15's -openssl-linked precondition passes (schannel wins by default on Windows and blocks openssl-linked)
+- depends/packages/qt.mk: added -no-feature-schannel for mingw32 (schannel wins by default on Windows and blocks -openssl-linked) and sed-patch qtbase/src/network/configure.json during preprocess to make the MinGW OpenSSL link test use OpenSSL 3.x lib names (-lssl -lcrypto) plus Windows system libs (-lws2_32 -lgdi32 -lcrypt32); Qt 5.15's four built-in openssl sources otherwise all fail on OpenSSL 3.x+MinGW
 - Added retry-once to the depends/ build step in build_macos.sh, build_windows.sh and both CI workflows to work around an intermittent Qt 5.15 moc/plugin parallel-build race
 
 ### Belarusian Translation Fix

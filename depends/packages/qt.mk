@@ -96,8 +96,6 @@ $(package)_config_opts_aarch64_linux = -xplatform linux-aarch64-gnu-g++
 $(package)_config_opts_mingw32  = -no-opengl -xplatform win32-g++ -device-option CROSS_COMPILE="$(host)-"
 $(package)_config_opts_mingw32 += -no-feature-schannel
 $(package)_config_opts_mingw32 += -I $(host_prefix)/include -L $(host_prefix)/lib
-$(package)_config_env_mingw32  = OPENSSL_LIBS="-L$(host_prefix)/lib -lssl -lcrypto -lws2_32 -lcrypt32"
-$(package)_config_env_mingw32 += OPENSSL_INCDIR="$(host_prefix)/include"
 $(package)_build_env  = QT_RCC_TEST=1
 $(package)_build_env += QT_RCC_SOURCE_DATE_OVERRIDE=1
 endef
@@ -125,6 +123,7 @@ endef
 define $(package)_preprocess_cmds
   sed -i.old "s|FT_Get_Font_Format|FT_Get_X11_Font_Format|" qtbase/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp && \
   sed -i.old 's|defined(TARGET_OS_MAC)|0 \&\& defined(TARGET_OS_MAC)|' qtbase/src/3rdparty/libpng/pngpriv.h && \
+  sed -i.old 's|"-lssleay32 -llibeay32 -lUser32 -lWs2_32 -lAdvapi32 -lGdi32"|"-lssl -lcrypto -lws2_32 -lgdi32 -lcrypt32"|' qtbase/src/network/configure.json && \
   sed -i.old "s|updateqm.commands = \$$$$\$$$$LRELEASE|updateqm.commands = $($(package)_extract_dir)/qttools/bin/lrelease|" qttranslations/translations/translations.pro && \
   sed -i.old "/updateqm.depends =/d" qttranslations/translations/translations.pro && \
   sed -i.old "s/src_plugins.depends = src_sql src_network/src_plugins.depends = src_network/" qtbase/src/src.pro && \
