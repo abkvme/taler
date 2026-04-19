@@ -25,7 +25,9 @@ echo "All build tools found."
 echo ""
 echo "Building dependencies from source (first run takes 15-30 min)..."
 echo "Using $NCPU parallel jobs"
-make -C depends -j${NCPU}
+# Retry once on failure: Qt 5.15 has a moc/plugin parallel race; the second
+# pass uses cached .o files and completes the remaining work deterministically.
+make -C depends -j${NCPU} || make -C depends -j${NCPU}
 
 # Detect host triplet
 HOST_TRIPLET=$(cd depends && ./config.guess)

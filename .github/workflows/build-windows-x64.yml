@@ -36,9 +36,11 @@ jobs:
 
       - name: Build dependencies
         run: |
-          cd depends
-          make HOST=x86_64-w64-mingw32 -j$(nproc)
-          cd ..
+          # Qt 5.15 parallel build has a moc/plugin ordering race that surfaces
+          # intermittently. Retry once: the second pass picks up cached .o files
+          # and completes the remaining incremental work deterministically.
+          make -C depends HOST=x86_64-w64-mingw32 -j$(nproc) \
+            || make -C depends HOST=x86_64-w64-mingw32 -j$(nproc)
 
       - name: Build Taler
         run: |

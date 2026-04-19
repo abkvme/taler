@@ -28,7 +28,10 @@ jobs:
 
       - name: Build dependencies
         run: |
-          make -C depends -j$(sysctl -n hw.ncpu)
+          # Qt 5.15 parallel build has a moc/plugin ordering race that surfaces
+          # intermittently. Retry once: the second pass picks up cached .o files
+          # and completes the remaining incremental work deterministically.
+          make -C depends -j$(sysctl -n hw.ncpu) || make -C depends -j$(sysctl -n hw.ncpu)
 
       - name: Build Taler
         run: |
