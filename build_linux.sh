@@ -35,6 +35,25 @@ if [ "$1" = "--install-deps" ]; then
     protobuf-compiler libprotobuf-dev \
     libqrencode-dev libzmq3-dev \
     xvfb
+else
+  echo ""
+  echo "Checking system libraries..."
+  MISSING_PC=""
+  for pc in Qt5Core Qt5Gui Qt5Network Qt5Widgets openssl libevent libzmq protobuf libqrencode; do
+    if ! pkg-config --exists "$pc" 2>/dev/null; then
+      MISSING_PC="$MISSING_PC $pc"
+    fi
+  done
+  if [ ! -f /usr/include/boost/version.hpp ]; then
+    MISSING_PC="$MISSING_PC boost"
+  fi
+  if [ -n "$MISSING_PC" ]; then
+    echo "Missing system libraries:$MISSING_PC"
+    echo "Re-run the script with --install-deps to install them automatically:"
+    echo "  ./build_linux.sh --install-deps"
+    exit 1
+  fi
+  echo "All system libraries found."
 fi
 
 # Build Berkeley DB 18.1.40 if not already present
