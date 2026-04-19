@@ -17,16 +17,24 @@ define $(package)_preprocess_cmds
   sed -i.old "s|miniupnpcstrings.h: miniupnpcstrings.h.in wingenminiupnpcstrings|miniupnpcstrings.h: miniupnpcstrings.h.in|" Makefile.mingw
 endef
 
+ifeq ($(host_os),mingw32)
 define $(package)_build_cmds
-	if [ "$(host_os)" = "mingw32" ]; then \
-		$(MAKE) libminiupnpc.a $($(package)_build_opts); \
-	else \
-		$(MAKE) build/libminiupnpc.a $($(package)_build_opts); \
-	fi
+	$(MAKE) libminiupnpc.a $($(package)_build_opts)
 endef
 
 define $(package)_stage_cmds
 	mkdir -p $($(package)_staging_prefix_dir)/include/miniupnpc $($(package)_staging_prefix_dir)/lib &&\
-	if [ -d include ]; then install include/*.h $($(package)_staging_prefix_dir)/include/miniupnpc; else install *.h $($(package)_staging_prefix_dir)/include/miniupnpc; fi &&\
-	if [ -f build/libminiupnpc.a ]; then install build/libminiupnpc.a $($(package)_staging_prefix_dir)/lib; else install libminiupnpc.a $($(package)_staging_prefix_dir)/lib; fi
+	install *.h $($(package)_staging_prefix_dir)/include/miniupnpc &&\
+	install libminiupnpc.a $($(package)_staging_prefix_dir)/lib
 endef
+else
+define $(package)_build_cmds
+	$(MAKE) build/libminiupnpc.a $($(package)_build_opts)
+endef
+
+define $(package)_stage_cmds
+	mkdir -p $($(package)_staging_prefix_dir)/include/miniupnpc $($(package)_staging_prefix_dir)/lib &&\
+	install include/*.h $($(package)_staging_prefix_dir)/include/miniupnpc &&\
+	install build/libminiupnpc.a $($(package)_staging_prefix_dir)/lib
+endef
+endif
