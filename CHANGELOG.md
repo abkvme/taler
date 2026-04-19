@@ -54,6 +54,9 @@ April 2026
 - Made Qt5CglSupport an optional pkg-config dependency (not built without OpenGL)
 - Updated miniupnpc build/stage paths for 2.2.8 layout (build/libminiupnpc.a, include/)
 - Updated UPNP_GetValidIGD call in net.cpp for miniupnpc API 18 (7-arg signature)
+- Fixed build_linux.sh tool check (libtool → libtoolize, matches Debian/Ubuntu package layout)
+- Added missing <array> include in net_processing.cpp (required by stricter modern GCC)
+- Replaced raw-function-pointer signals2 disconnect with connection object in init.cpp (Ubuntu 24.04 Boost 1.83+)
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
