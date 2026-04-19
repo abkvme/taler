@@ -57,6 +57,7 @@ April 2026
 - Fixed build_linux.sh tool check (libtool → libtoolize, matches Debian/Ubuntu package layout)
 - Added missing <array> include in net_processing.cpp and qt/sendcoinsdialog.cpp, <stdexcept> in support/lockedpool.cpp (required by stricter modern GCC)
 - Replaced raw-function-pointer signals2 disconnect with connection object in init.cpp (Ubuntu 24.04 Boost 1.83+)
+- Bumped Linux x64/ARM64 CI runners from ubuntu-22.04 to ubuntu-24.04
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
