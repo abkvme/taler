@@ -71,12 +71,14 @@ jobs:
           xvfb-run ./bin/taler-qt --version
 
       - name: Create release archive
+        if: github.event_name != 'pull_request'
         run: |
           cd bin
           tar -czf taler-${{ github.ref_name }}-linux-arm64.tar.gz talerd taler-cli taler-tx taler-qt
           cd ..
 
       - name: Upload artifacts
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: taler-${{ github.ref_name }}-linux-arm64
