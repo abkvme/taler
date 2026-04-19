@@ -8,7 +8,7 @@ define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
 $(package)_config_env_mingw32=WINDRES="$(host)-windres"
 $(package)_build_env_mingw32=WINDRES="$(host)-windres"
-$(package)_config_opts=--prefix=$(host_prefix) --openssldir=$(host_prefix)/etc/openssl
+$(package)_config_opts=--prefix=$(host_prefix) --openssldir=$(host_prefix)/etc/openssl --libdir=lib
 $(package)_config_opts+=no-comp
 $(package)_config_opts+=no-dso
 $(package)_config_opts+=no-shared
