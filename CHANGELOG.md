@@ -66,8 +66,13 @@ April 2026
 - build_linux.sh and build_windows.sh: moved --install-deps handling ahead of the tool-availability check so it works on a fresh machine
 - depends/packages/openssl.mk: pass WINDRES=$(host)-windres for mingw32 so OpenSSL 3.4.1 finds the prefixed MinGW resource compiler on Ubuntu
 - depends/packages/qt.mk: added -no-feature-schannel for mingw32 (schannel wins by default on Windows and blocks -openssl-linked) and sed-patch qtbase/src/network/configure.json during preprocess to make the MinGW OpenSSL link test use OpenSSL 3.x lib names (-lssl -lcrypto) plus Windows system libs (-lws2_32 -lgdi32 -lcrypt32); Qt 5.15's four built-in openssl sources otherwise all fail on OpenSSL 3.x+MinGW
-- depends/packages/qt.mk: added -no-dbus for mingw32 so Qt doesn't build the Linux-only xdgdesktopportal plugin (which requires libQt5DBus.a that we don't include in qt_libs) during the Windows cross-build
+- depends/packages/qt.mk: replaced -dbus-runtime with -no-dbus globally so Qt doesn't emit link-time dependencies on libQt5DBus.a from Qt5ServiceSupport/Qt5ThemeSupport/xdgdesktopportal; taler-qt doesn't use D-Bus on any platform, and depends/ targets (macOS, Windows) don't need it — Linux builds use apt Qt and are unaffected
 - Added retry-once to the depends/ build step in build_macos.sh, build_windows.sh and both CI workflows to work around an intermittent Qt 5.15 moc/plugin parallel-build race
+- build-aux/m4/bitcoin_qt.m4: link CoreVideo, IOSurface, Carbon, QuartzCore and Metal frameworks on darwin so Qt's static libqcocoa.a resolves CVDisplayLink*, IOSurface*, Carbon keyboard, CAMetalLayer/CAShapeLayer symbols on macOS 26 SDK
+- configure.ac: AC_CHECK_LIB bcrypt on Windows so Boost 1.88 filesystem's unique_path() BCrypt-based random generator links
+- src/wallet/db.cpp: dropped the __MINGW32__-branch using the removed Boost 1.85+ copy_option API; fs::copy_options::overwrite_existing works uniformly on Boost 1.68+ now that all platforms use modern Boost
+- build_macos.sh: added clean (keeps depends/ prefix) and clean-all (wipes everything) subcommands; always re-runs autogen.sh when configure.ac, any build-aux/m4/*.m4, or any Makefile.am is newer than configure so M4 edits take effect without manual steps
+- Rewrote README.md as a modern open-source project landing page: CI/metadata badges, SEO-oriented description, Docker and docker compose quick-start, cross-platform self-compile pointers, explorer and community links
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
