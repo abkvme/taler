@@ -1,7 +1,6 @@
 # Taler (TLR) — Hybrid PoW/PoS Cryptocurrency
 
-> A cryptocurrency inspired by the historic European Thaler — trusted currency
-> of the 15th–19th centuries, reimagined for the digital age.
+Open-source peer-to-peer cryptocurrency with hybrid Proof-of-Work / Proof-of-Stake consensus. Website: **[taler.tech](https://taler.tech)**.
 
 [![Linux x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-x64.yml?event=push&label=Linux%20x64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-x64.yml)
 [![Linux ARM64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-arm64.yml?event=push&label=Linux%20ARM64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-arm64.yml)
