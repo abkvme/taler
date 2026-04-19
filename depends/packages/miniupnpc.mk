@@ -18,11 +18,15 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_build_cmds
-	$(MAKE) build/libminiupnpc.a $($(package)_build_opts)
+	if [ "$(host_os)" = "mingw32" ]; then \
+		$(MAKE) libminiupnpc.a $($(package)_build_opts); \
+	else \
+		$(MAKE) build/libminiupnpc.a $($(package)_build_opts); \
+	fi
 endef
 
 define $(package)_stage_cmds
 	mkdir -p $($(package)_staging_prefix_dir)/include/miniupnpc $($(package)_staging_prefix_dir)/lib &&\
-	install include/*.h $($(package)_staging_prefix_dir)/include/miniupnpc &&\
-	install build/libminiupnpc.a $($(package)_staging_prefix_dir)/lib
+	if [ -d include ]; then install include/*.h $($(package)_staging_prefix_dir)/include/miniupnpc; else install *.h $($(package)_staging_prefix_dir)/include/miniupnpc; fi &&\
+	if [ -f build/libminiupnpc.a ]; then install build/libminiupnpc.a $($(package)_staging_prefix_dir)/lib; else install libminiupnpc.a $($(package)_staging_prefix_dir)/lib; fi
 endef
