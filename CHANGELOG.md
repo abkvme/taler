@@ -75,6 +75,7 @@ April 2026
 - Rewrote README.md as a modern open-source project landing page: CI/metadata badges, SEO-oriented description, Docker and docker compose quick-start, cross-platform self-compile pointers, explorer and community links
 - build-aux/m4/bitcoin_qt.m4: link Windows system libs (wtsapi32, userenv, netapi32) and Qt's Qt5WindowsUIAutomationSupport static library before the -lqwindows static-plugin link test; without these four additions, Qt 5.15's libqwindows.a emitted undefined references (WTS*, NetShare*, GetUserProfileDirectoryW, QWindowsUiaWrapper::*), the link test silently failed, and taler-qt.exe wasn't built. Mirrors the darwin framework fix for libqcocoa.a shipped earlier.
 - build_windows.sh: auto-regenerate configure when configure.ac, any build-aux/m4/*.m4, or any Makefile.am is newer than configure (matches build_macos.sh); avoids stale-configure silent-failure footguns when M4 files change.
+- build-aux/m4/bitcoin_qt.m4: moved the per-platform library additions (Windows system libs + Qt5WindowsUIAutomationSupport on Windows, Cocoa frameworks on darwin) to run *before* the QMinimalIntegrationPlugin link test rather than after it. The qminimal plugin transitively pulls in Qt5Core/Qt5Gui, which reference those platform symbols on Windows; with additions running after qminimal, its link silently failed and the GUI was disabled before the qwindows check even ran.
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections
