@@ -65,6 +65,9 @@ echo "Configuring..."
   BDB_CFLAGS="-I$PWD/db18/include" \
   CXXFLAGS="-O2"
 
+# Force static Boost linking (portable binary across Ubuntu versions)
+sed -i 's|-lboost_\([a-z_]*\)|-l:libboost_\1.a|g' src/Makefile
+
 # Build
 echo ""
 echo "Building Taler with $NCPU parallel jobs..."

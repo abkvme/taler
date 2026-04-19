@@ -58,6 +58,7 @@ April 2026
 - Added missing <array> include in net_processing.cpp and qt/sendcoinsdialog.cpp, <stdexcept> in support/lockedpool.cpp (required by stricter modern GCC)
 - Replaced raw-function-pointer signals2 disconnect with connection object in init.cpp (Ubuntu 24.04 Boost 1.83+)
 - Bumped Linux x64/ARM64 CI runners from ubuntu-22.04 to ubuntu-24.04
+- Linux CI and build_linux.sh now statically link Boost (libboost_*.a) so binaries run on any Ubuntu regardless of installed libboost version
 
 ### Belarusian Translation Fix
 - Standardized wallet terminology: "кашалёк" → "гаманец" across all inflections

@@ -46,6 +46,7 @@ jobs:
             BDB_LIBS="-L$(pwd)/db18/lib -ldb_cxx-18.1" \
             BDB_CFLAGS="-I$(pwd)/db18/include" \
             CXXFLAGS="-O2"
+          sed -i 's|-lboost_\([a-z_]*\)|-l:libboost_\1.a|g' src/Makefile
           make -j$(nproc)
 
       - name: Create bin directory and copy binaries
