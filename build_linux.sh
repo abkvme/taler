@@ -9,7 +9,7 @@ echo ""
 # Check build tools
 echo "Checking build tools..."
 MISSING=""
-for tool in autoconf automake libtool pkg-config make g++; do
+for tool in autoconf automake libtoolize pkg-config make g++; do
   if ! command -v $tool >/dev/null 2>&1; then
     MISSING="$MISSING $tool"
   fi
