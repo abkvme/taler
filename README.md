@@ -8,14 +8,36 @@
 [![License](https://img.shields.io/github/license/abkvme/taler)](COPYING)
 [![Telegram](https://img.shields.io/badge/chat-Telegram-26A5E4?logo=telegram&logoColor=white)](https://t.me/talercommunity)
 
-# Taler (TLR) — Hybrid PoW/PoS Cryptocurrency
+# Taler Blockchain (TLR) — Hybrid PoW/PoS Cryptocurrency
 
 ### Website: **[taler.tech](https://taler.tech)**
 
 ---
 
+## ⚠️ Trademark Notice — Not Affiliated with GNU Taler
+
+**Taler Blockchain** and **Taler Coin** are trademarks of this open-source,
+community-driven cryptocurrency project, launched on **13 September 2017**.
+
+This project is **not affiliated** with — and has **no connection** to —
+**[GNU Taler](https://taler.net/)**, a separate digital payment system
+developed by the GNU Project. The two projects share a similar name but
+have entirely different goals, codebases, technologies, and origins.
+
+| Project | What it is | Where to find it |
+| --- | --- | --- |
+| **Taler Blockchain** *(this project)* | Hybrid PoW/PoS blockchain network | [taler.tech](https://taler.tech) |
+| **Taler Coin (TLR)** *(this project)* | Cryptocurrency unit on the Taler Blockchain network | [taler.tech](https://taler.tech) |
+| **GNU Taler** *(unrelated)* | Digital payment system by the GNU Project | [taler.net](https://taler.net/) |
+
+If you came here looking for **GNU Taler**, please visit
+**[taler.net](https://taler.net/)**.
+
+---
+
 ## Table of Contents
 
+- [Trademark Notice — Not Affiliated with GNU Taler](#-trademark-notice--not-affiliated-with-gnu-taler)
 - [About](#about)
 - [Key Features](#key-features)
 - [GUI Wallet (taler-qt)](#gui-wallet-taler-qt)
@@ -32,21 +54,23 @@
 
 ## About
 
-**Taler (ticker: TLR)** is a decentralized, open-source cryptocurrency that
-secures its blockchain with a hybrid **Proof-of-Work / Proof-of-Stake**
-consensus: ASIC-resistant Lyra2Z mining produces blocks while Proof-of-Stake
-(active from block 130,000) lets any coin holder earn rewards simply by
-running a staking wallet. Transactions are fast, fees are minimal, and the
-network is governed by its users — no central authority, no gatekeepers.
+**Taler Blockchain** is a decentralized, open-source hybrid
+**Proof-of-Work / Proof-of-Stake** network. ASIC-resistant Lyra2Z mining
+produces blocks while Proof-of-Stake (active from block 130,000) lets any
+**Taler Coin** holder earn rewards simply by running a staking wallet.
+Transactions are fast, fees are minimal, and the network is governed by its
+users — no central authority, no gatekeepers.
 
-Taler is a **maintained fork of Bitcoin Core** and inherits its battle-tested
-transaction engine, wallet, and peer-to-peer stack. On top of that foundation
-it adds PoS, Lyra2Z PoW, a modern desktop GUI with one-click staking, and
-cross-platform builds for Linux x64 / ARM64, macOS (Apple Silicon), and
-Windows x64. This repository is the continuation of the original
-[cryptadev/taler](https://github.com/cryptadev/taler) codebase — actively
-developed, CI-tested on every pull request, and released under the MIT
-license.
+**Taler Coin** (ticker: **TLR**) is the native cryptocurrency of the network.
+
+Taler Blockchain is a **maintained fork of Bitcoin Core** and inherits its
+battle-tested transaction engine, wallet, and peer-to-peer stack. On top of
+that foundation it adds PoS, Lyra2Z PoW, a modern desktop GUI with one-click
+staking, and cross-platform builds for Linux x64 / ARM64, macOS (Apple
+Silicon), and Windows x64. This repository is the continuation of the
+original [cryptadev/taler](https://github.com/cryptadev/taler) codebase —
+actively developed, CI-tested on every pull request, and released under the
+MIT license.
 
 Learn more on the project website: **[taler.tech](https://taler.tech)**.
 
@@ -55,16 +79,16 @@ Learn more on the project website: **[taler.tech](https://taler.tech)**.
 - **Hybrid PoW/PoS consensus** — Lyra2Z Proof-of-Work (ASIC-resistant,
   memory-hard) with Proof-of-Stake active from block 130,000
 - **1-minute block target** (PoW; ~2.3 minutes in PoS phase)
-- **Max supply: 23,333,333 TLR**
+- **Max Taler Coin supply**: 23,333,333 TLR
 - **Genesis block**: September 13, 2017
 - **Cross-platform**: Linux x64/ARM64, macOS arm64, Windows x64
 - **Bitcoin Core heritage** — forked codebase, MIT licensed
 
 ## GUI Wallet (taler-qt)
 
-`taler-qt` is the desktop wallet. It ships with every release for Linux,
-macOS, and Windows; you can also build it from source with the scripts in
-[Self-Compile](#self-compile).
+`taler-qt` is the desktop **Taler Coin** wallet. It ships with every release
+for Linux, macOS, and Windows; you can also build it from source with the
+scripts in [Self-Compile](#self-compile).
 
 - **Send / Receive / Transactions** — Bitcoin-Core-class wallet: HD keys,
   coin control, address book, QR codes for receive addresses, labeled
@@ -83,9 +107,10 @@ macOS, and Windows; you can also build it from source with the scripts in
 
 ## Quick Start — Docker (daemon only)
 
-The published Docker image contains the headless daemon (`talerd`) and CLI
-(`taler-cli`). For the GUI wallet, grab a binary from
-[Releases](https://github.com/abkvme/taler/releases) or build from source.
+The published Docker image contains the headless **Taler Blockchain** daemon
+(`talerd`) and CLI (`taler-cli`). For the **Taler Coin** GUI wallet, grab a
+binary from [Releases](https://github.com/abkvme/taler/releases) or build
+from source.
 
 ```bash
 docker run -d --name taler \

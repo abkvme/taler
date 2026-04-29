@@ -1,6 +1,9 @@
-# Taler Docker Deployment Guide
+# Taler Blockchain Docker Deployment Guide
 
-Run a Taler cryptocurrency node in Docker with support for both **amd64** and **arm64** architectures.
+Run a Taler Blockchain node in Docker with support for both **amd64** and
+**arm64** architectures. The container ships the headless daemon that
+participates in the Taler Blockchain network and validates Taler Coin
+(ticker: **TLR**) transactions.
 
 ## Quick Start
 
@@ -108,7 +111,7 @@ Docker will automatically select the correct image for your platform.
 
 ## Configuration
 
-The Taler daemon **does not require a configuration file** and works with sensible defaults.
+The Taler Blockchain daemon **does not require a configuration file** and works with sensible defaults.
 
 **IMPORTANT:** By default, **RPC is disabled** for security. The container runs a basic P2P node only. To enable RPC or customize other settings, you must provide a custom `taler.conf` file.
 
@@ -126,7 +129,7 @@ All other configuration (RPC, network settings, etc.) must be done via a custom 
 
 ### Wallet Configuration
 
-**IMPORTANT:** Wallet functionality is **DISABLED by default** in the Docker setup for security and simplicity. This differs from the Taler daemon's native behavior (which enables wallet by default).
+**IMPORTANT:** Wallet functionality is **DISABLED by default** in the Docker setup for security and simplicity. This differs from the Taler Blockchain daemon's native behavior (which enables wallet by default).
 
 To enable wallet functionality:
 
@@ -404,4 +407,4 @@ docker push yourusername/taler:latest
 
 ## License
 
-Same as Taler - see LICENSE file in repository root.
+Same as Taler Blockchain — see LICENSE file in repository root.
