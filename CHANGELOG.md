@@ -1,3 +1,77 @@
+# Taler 0.20.0
+
+## Release Date
+Unreleased - targeting September 2026
+
+## Major Changes
+
+### Recovery-Phrase Wallets (BIP-39 + BIP-44)
+- Wallets can be created from, and restored from, a 24-word BIP-39 recovery phrase (English wordlist, no passphrase)
+- Derivation is `m/44'/1524'/0'/{0,1}/i` - BIP-44 with SLIP-44 coin type 1524 (1 on testnet and regtest), hardened down to the account so an account xpub can derive receive addresses on its own
+- Derivation is published as a spec with shared test vectors at https://github.com/abkvme/taler.spec; the node verifies itself against those vectors in CI, so any wallet built to the spec derives the same addresses from the same words
+- The phrase entropy is stored in the wallet, encrypted with the wallet's master key when the wallet is encrypted, so the words can be shown again later
+- Encrypting a phrase wallet no longer rotates the HD seed (as it does for legacy wallets), because rotating it would strand the phrase
+- `sethdseed` is refused on a phrase wallet; unchanged on every other wallet
+- Importing a private key into a phrase wallet is allowed but sets `has_imported_keys`, so its owner is told the words alone are no longer a complete backup
+- The BIP-44 wallet flag is non-tolerable (bit 33): an older client refuses such a wallet rather than misreading it as legacy
+- New RPCs: `getnewmnemonic`, `getwalletmnemonic`, `restorewallet`, `listwalletdir`; `createwallet` gained `mnemonic` and `passphrase` arguments
+- `getwalletinfo` gained `hdscheme` (`legacy` or `bip44`), `has_imported_keys`, and `coin_type` / `account` for phrase wallets
+- Restore derives 1000 addresses ahead per chain and extends the window automatically when used addresses appear near its edge, so a wallet used elsewhere before the restore is found in full
+- Restore accepts an optional wallet birthday to skip scanning history from before the wallet existed
+- Restore is refused on a pruned node, and while the node is still syncing, rather than reporting a balance that is only part of the story
+- Headless: `-newwalletmnemonic=<file>` creates the wallet from a fresh phrase on a first start with no wallet, writing the words with mode 0600; it refuses to overwrite an existing file, is ignored with a log line when a wallet already exists, and never writes the phrase to `debug.log`
+- Headless: `-createwalletonstart=0` lets the node start with no wallet at all (the GUI uses this so its creation wizard can genuinely be cancelled)
+
+### Multi-Wallet Management
+- Wallet selector and a Manage wallets button on the Overview page, above the balance, rather than buried in menus
+- Manage wallets dialog lists every wallet on disk with its type (seed phrase or legacy), balance, default marker and absolute path, and can create, restore, rename, remove and set the default
+- The default wallet is remembered and opened on start
+- Wallet names are validated as directory names (latin letters, digits and `-`), and a name already in use is rejected
+- Wallet operations run on a worker thread behind a modal progress dialog; `unloadwallet` blocks until every reference is released and deadlocked the GUI when called on its own thread
+- The pre-0.20.0 wallet is shown as `legacy` and cannot be renamed, since it lives in the datadir root rather than in a directory of its own
+- `listwalletdir` identifies wallets by file content (Berkeley DB magic) rather than by name, and reports which ones are loaded by comparing normalized wallet-file paths
+
+### Desktop Wallet Interface
+- Theme selector in Settings: follow the system, light, or dark, applied without a restart; both themes are built from one stylesheet template and two colour sets so they cannot drift apart
+- One card style across the whole application - same border, radius and surface for every panel, table and group box
+- Available balance shown in an accent badge above the Balances card, to two decimals; the exact figure stays on the rows below
+- Recovery phrase shown as a numbered 24-word grid, with a verification step before the wallet is created
+- Overview and transaction views gained empty states, larger date and amount columns, and accent-coloured transaction icons
+- Toolbar icons use the brand accent colour rather than a palette colour sampled once at startup, which made them invisible after a theme switch
+- About page links to `explorer.taler.tech`
+- Translations for the new interface in Russian, Ukrainian and Belarusian
+
+### Versioning
+- Version numbers are now three components (`0.20.0`), not four; `getnetworkinfo` reports `200000` and `/Taler:0.20.0/`
+- CI verifies that the built binary's version matches the tag before publishing a release
+
+### Network
+- Removed dead DNS seeds: `dnsseed.talercrypto.com`, `talerseed2.vovanchik.net`, `talerseed3.vovanchik.net` (mainnet and testnet)
+
+### Node Fixes
+These were found by building and running the test suite, which had never been enabled in this fork:
+- `CChain::FindEarliestAtLeast` could hang the node: its binary search set the low bound to the midpoint instead of the midpoint plus one, so it stopped making progress once the window narrowed to two blocks and spun forever. Reached by `importmulti` and `importprivkey` with a timestamp, by `pruneblockchain`, and by a restore with a birthday
+- Phrase wallets derived addresses that did not match the published spec: the stored seed key *is* the BIP-32 master key, but it was passed through `MasterKeyFromSeed` a second time, hashing it into an unrelated master. The addresses were stable, so nothing looked wrong - they simply were not the addresses the same phrase produces anywhere else
+- A phrase wallet's first address was not recoverable from its phrase: the HD upgrade path ran before wallet creation, gave the wallet a random legacy seed and left one key derived from it at the head of the keypool
+- `-newwalletmnemonic` never fired for the default unnamed wallet: `WalletLocation("").Exists()` tests the wallet *directory*, which always exists, so the flag was skipped as "wallet already exists". Added `WalletLocation::HasWalletData()`
+- Regtest could not start: it carried Bitcoin's genesis block and asserted Bitcoin's genesis hash, every difficulty limit sat below the target its own blocks use, and eleven staking and difficulty parameters were left at zero, so the first `generate()` divided by a zero-length averaging window
+- Regtest could not be mined past a dozen blocks: `fPowNoRetargeting` was honoured only on the legacy retarget path, not by the difficulty algorithm in use, so instantly-minted blocks tripled the difficulty each time and `generate(30)` silently returned 24 blocks
+- Regtest changes affect only that local test chain; mainnet and testnet consensus parameters are untouched
+
+### Test Infrastructure
+- The inherited test suite had never been built: `configure.ac` defaults `use_tests=no` in this fork, so no build or CI job had ever compiled a test and the code had drifted away from the tests unnoticed
+- `test_bitcoin.cpp` and several suites ported to this fork's APIs: `CheckProofOfWork(header, height, params)`, `CBlockIndex::nChainWork()`, `CWallet::GetBalance().Immature`, `GetDifficulty(isPoS, index)`, `CFeeRate::ToString()`
+- `skiplist_tests` rewritten against block times, since this chain has no `nTimeMax`; it is now the regression test for the `FindEarliestAtLeast` hang
+- New unit suites `bip39_tests` and `bip44_tests` check the wordlist hash, the official BIP-39 vectors, and every address in the shared Taler vectors for mainnet and regtest
+- New functional suites: `wallet_mnemonic.py` (spec vectors, restore, encryption, rejections, imported keys, funds recovered from address index 150) and `wallet_mnemonic_startup.py` (the headless flag, file permissions, overwrite refusal, phrase absent from the log)
+- New upgrade gate `test/compat/wallet_compat.py` drives a real build of the previous release: a 0.19 wallet through 0.20 and back to 0.19 with seed, addresses, balance and file location intact, and a phrase wallet refused by 0.19 without damage. It runs on mainnet parameters with networking off, because 0.19 cannot start regtest at all
+- The functional test framework was writing `bitcoin.conf`, which the node never reads, and looked for `bitcoind`/`bitcoin-cli`; every functional test had been silently starting an unconfigured mainnet node
+- `policyestimator_tests`, `pow_tests`, `txindex_tests` and `versionbits_tests` are no longer built - they test subsystems this fork does not have
+- 55 unit suites and both functional suites pass; 13 inherited suites still carry Bitcoin's keys, addresses or subsidy schedule and are listed with reasons in `test/unit-test-suites.txt`
+- New `.github/workflows/test.yml` runs the unit suites, the functional suites and a check that the vendored derivation vectors still match the published spec on every push, plus the upgrade gate before a release is tagged
+
+---
+
 # Taler 0.19.6.8
 
 ## Release Date
