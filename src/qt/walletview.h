@@ -88,6 +88,9 @@ public Q_SLOTS:
     void gotoCoinsPage();
     /** Switch to nodes page */
     void gotoNodesPage();
+
+    //! Host the shared wallet selector bar at the top of the overview page.
+    void setWalletBar(QWidget* bar);
     /** Switch to about page */
     void gotoAboutPage();
     /** Switch to receive coins page */

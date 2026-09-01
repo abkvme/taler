@@ -143,6 +143,21 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     view->installEventFilter(this);
 
     transactionView = view;
+    // Column widths are managed by TableViewLastColumnResizingFixer once a model
+    // exists (see setModel). Setting resize modes here crashes: with no model the
+    // header has no sections, and setSectionResizeMode indexes past the end.
+    view->verticalHeader()->setDefaultSectionSize(34);
+    view->setShowGrid(false);
+    view->setAlternatingRowColors(true);
+
+    // Parented to the view: as a child of the page its geometry would be in the
+    // page's coordinates and the message would be drawn in the wrong place.
+    m_empty_state = new QLabel(tr("No transactions to show.\nOnce this wallet sends or receives, its history appears here."), view);
+    m_empty_state->setAlignment(Qt::AlignCenter);
+    m_empty_state->setProperty("class", "emptyState");
+    m_empty_state->setWordWrap(true);
+    m_empty_state->hide();
+
     transactionView->setObjectName("transactionView");
 
     // Actions
@@ -200,6 +215,17 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     connect(showDetailsAction, SIGNAL(triggered()), this, SLOT(showDetails()));
 }
 
+void TransactionView::updateEmptyState()
+{
+    if (!m_empty_state || !transactionView) return;
+    const bool empty = !transactionView->model() || transactionView->model()->rowCount() == 0;
+    m_empty_state->setVisible(empty);
+    if (empty) {
+        m_empty_state->setGeometry(transactionView->rect());
+        m_empty_state->raise();
+    }
+}
+
 void TransactionView::setModel(WalletModel *_model)
 {
     this->model = _model;
@@ -215,6 +241,10 @@ void TransactionView::setModel(WalletModel *_model)
 
         transactionView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         transactionView->setModel(transactionProxyModel);
+        connect(transactionProxyModel, &QAbstractItemModel::rowsInserted, this, &TransactionView::updateEmptyState);
+        connect(transactionProxyModel, &QAbstractItemModel::rowsRemoved, this, &TransactionView::updateEmptyState);
+        connect(transactionProxyModel, &QAbstractItemModel::modelReset, this, &TransactionView::updateEmptyState);
+        updateEmptyState();
         transactionView->setAlternatingRowColors(true);
         transactionView->setSelectionBehavior(QAbstractItemView::SelectRows);
         transactionView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -619,6 +649,7 @@ void TransactionView::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
     columnResizingFixer->stretchColumnWidth(TransactionTableModel::ToAddress);
+    updateEmptyState();
 }
 
 // Need to override default Ctrl+C action for amount as default behaviour is just to copy DisplayRole text

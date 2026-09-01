@@ -11,6 +11,8 @@
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
+#include <qt/mnemonicdialog.h>
+#include <qt/walletmanagerdialog.h>
 #include <qt/modaloverlay.h>
 #include <qt/networkstyle.h>
 #include <qt/notificator.h>
@@ -56,7 +58,9 @@
 #include <QStatusBar>
 #include <QStyle>
 #include <QTimer>
+#include <QPainter>
 #include <QToolBar>
+#include <QToolButton>
 #include <QUrlQuery>
 #include <QVBoxLayout>
 
@@ -326,6 +330,14 @@ void BitcoinGUI::createActions()
     encryptWalletAction = new QAction(platformStyle->TextColorIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
     encryptWalletAction->setStatusTip(tr("Encrypt the private keys that belong to your wallet"));
     encryptWalletAction->setCheckable(true);
+    createWalletAction = new QAction(tr("Create &wallet..."), this);
+    createWalletAction->setStatusTip(tr("Create a new wallet backed up by a 24-word recovery phrase"));
+    restoreWalletAction = new QAction(tr("&Restore wallet..."), this);
+    restoreWalletAction->setStatusTip(tr("Restore a wallet from its 24-word recovery phrase"));
+    showMnemonicAction = new QAction(tr("Show recovery &phrase..."), this);
+    showMnemonicAction->setStatusTip(tr("Show the 24 words that back up this wallet"));
+    manageWalletsAction = new QAction(platformStyle->SingleColorIcon(":/icons/tab_coins"), tr("&Manage wallets..."), this);
+    manageWalletsAction->setStatusTip(tr("List, rename or remove wallets, and see where they are stored"));
     backupWalletAction = new QAction(platformStyle->TextColorIcon(":/icons/filesave"), tr("&Backup Wallet..."), this);
     backupWalletAction->setStatusTip(tr("Backup wallet to another location"));
     changePassphraseAction = new QAction(platformStyle->TextColorIcon(":/icons/key"), tr("&Change Passphrase..."), this);
@@ -365,6 +377,14 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
     if(walletFrame)
     {
+        // Creating or restoring a wallet does not need one to be open, so these two
+        // stay enabled even when the wallet UI is hidden.
+        connect(walletFrame, &WalletFrame::createWalletRequested, this, &BitcoinGUI::createWalletFromMnemonic);
+        connect(walletFrame, &WalletFrame::restoreWalletRequested, this, &BitcoinGUI::restoreWalletFromMnemonic);
+        connect(createWalletAction, &QAction::triggered, this, &BitcoinGUI::createWalletFromMnemonic);
+        connect(restoreWalletAction, &QAction::triggered, this, &BitcoinGUI::restoreWalletFromMnemonic);
+        connect(showMnemonicAction, &QAction::triggered, this, &BitcoinGUI::showWalletMnemonic);
+        connect(manageWalletsAction, &QAction::triggered, this, &BitcoinGUI::manageWallets);
         connect(encryptWalletAction, SIGNAL(triggered(bool)), walletFrame, SLOT(encryptWallet(bool)));
         connect(backupWalletAction, SIGNAL(triggered()), walletFrame, SLOT(backupWallet()));
         connect(changePassphraseAction, SIGNAL(triggered()), walletFrame, SLOT(changePassphrase()));
@@ -396,9 +416,14 @@ void BitcoinGUI::createMenuBar()
     QMenu *file = appMenuBar->addMenu(tr("&File"));
     if(walletFrame)
     {
+        file->addAction(createWalletAction);
+        file->addAction(restoreWalletAction);
+        file->addAction(manageWalletsAction);
+        file->addSeparator();
         file->addAction(openAction);
         file->addSeparator();
         file->addAction(backupWalletAction);
+        file->addAction(showMnemonicAction);
         file->addSeparator();
         file->addAction(signMessageAction);
         file->addAction(verifyMessageAction);
@@ -448,22 +473,27 @@ void BitcoinGUI::createToolBars()
         overviewAction->setChecked(true);
 
 #ifdef ENABLE_WALLET
-        QWidget *spacer = new QWidget();
-        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        toolbar->addWidget(spacer);
+        // Which wallet is in use, and the way to manage wallets, live on the
+        // overview page rather than the toolbar: they belong with the balance they
+        // describe, and the toolbar is for navigation. One bar is built here and
+        // moved to whichever wallet's overview page is on screen.
+        m_wallet_bar = new QWidget();
+        QHBoxLayout* wallet_bar_layout = new QHBoxLayout(m_wallet_bar);
+        wallet_bar_layout->setContentsMargins(0, 0, 0, 0);
+        wallet_bar_layout->setSpacing(8);
 
         m_wallet_selector = new QComboBox();
         connect(m_wallet_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentWalletBySelectorIndex(int)));
+        m_wallet_selector->setMinimumWidth(220);
+        m_wallet_selector->setToolTip(tr("Wallet in use"));
+        wallet_bar_layout->addWidget(m_wallet_selector);
 
-        m_wallet_selector_label = new QLabel();
-        m_wallet_selector_label->setText(tr("Wallet:") + " ");
-        m_wallet_selector_label->setBuddy(m_wallet_selector);
-
-        m_wallet_selector_label_action = appToolBar->addWidget(m_wallet_selector_label);
-        m_wallet_selector_action = appToolBar->addWidget(m_wallet_selector);
-
-        m_wallet_selector_label_action->setVisible(false);
-        m_wallet_selector_action->setVisible(false);
+        QToolButton* manage = new QToolButton();
+        manage->setDefaultAction(manageWalletsAction);
+        manage->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        wallet_bar_layout->addWidget(manage);
+        wallet_bar_layout->addStretch();
+        m_wallet_bar->hide(); // shown by OverviewPage once it has been placed
 #endif
     }
 }
@@ -539,13 +569,9 @@ bool BitcoinGUI::addWallet(WalletModel *walletModel)
     if(!walletFrame)
         return false;
     const QString name = walletModel->getWalletName();
-    QString display_name = name.isEmpty() ? "["+tr("default wallet")+"]" : name;
+    QString display_name = GUIUtil::walletDisplayName(name);
     setWalletActionsEnabled(true);
     m_wallet_selector->addItem(display_name, name);
-    if (m_wallet_selector->count() == 2) {
-        m_wallet_selector_label_action->setVisible(true);
-        m_wallet_selector_action->setVisible(true);
-    }
     rpcConsole->addWallet(walletModel);
     return walletFrame->addWallet(walletModel);
 }
@@ -558,9 +584,6 @@ bool BitcoinGUI::removeWallet(WalletModel* walletModel)
     m_wallet_selector->removeItem(index);
     if (m_wallet_selector->count() == 0) {
         setWalletActionsEnabled(false);
-    } else if (m_wallet_selector->count() == 1) {
-        m_wallet_selector_label_action->setVisible(false);
-        m_wallet_selector_action->setVisible(false);
     }
     rpcConsole->removeWallet(walletModel);
     return walletFrame->removeWallet(name);
@@ -570,7 +593,35 @@ bool BitcoinGUI::setCurrentWallet(const QString& name)
 {
     if(!walletFrame)
         return false;
-    return walletFrame->setCurrentWallet(name);
+    if (walletFrame->setCurrentWallet(name)) {
+        // The bar is a single widget shared by every wallet view, so it follows the
+        // wallet on screen instead of being duplicated per wallet.
+        if (m_wallet_bar) walletFrame->placeWalletBar(m_wallet_bar);
+
+        // Keep the selector in step with what is actually displayed. Wallets arrive
+        // in whatever order the node loads them, so selecting the default wallet
+        // switched the view while the combo still pointed at the first one loaded -
+        // the box named one wallet while the window showed another.
+        if (m_wallet_selector) {
+            const int index = m_wallet_selector->findData(name);
+            if (index >= 0 && index != m_wallet_selector->currentIndex()) {
+                const bool blocked = m_wallet_selector->blockSignals(true);
+                m_wallet_selector->setCurrentIndex(index);
+                m_wallet_selector->blockSignals(blocked);
+            }
+        }
+
+        // Remember that this wallet exists so it is loaded next time. Which wallet
+        // opens first is a separate, explicit choice - see Manage wallets.
+        QSettings settings;
+        QStringList remembered = settings.value("RememberedWallets").toStringList();
+        if (!remembered.contains(name)) {
+            remembered << name;
+            settings.setValue("RememberedWallets", remembered);
+        }
+        return true;
+    }
+    return false;
 }
 
 bool BitcoinGUI::setCurrentWalletBySelectorIndex(int index)
@@ -588,8 +639,70 @@ void BitcoinGUI::removeAllWallets()
 }
 #endif // ENABLE_WALLET
 
+void BitcoinGUI::createWalletFromMnemonic()
+{
+    MnemonicDialog dlg(MnemonicDialog::Mode::Create, m_node, this);
+    if (dlg.exec() == QDialog::Accepted && !dlg.createdWallet().isEmpty()) {
+        // The wallet appears through the node's load-wallet notification; just select it.
+        setCurrentWallet(dlg.createdWallet());
+    }
+}
+
+void BitcoinGUI::restoreWalletFromMnemonic()
+{
+    MnemonicDialog dlg(MnemonicDialog::Mode::Restore, m_node, this);
+    if (dlg.exec() == QDialog::Accepted && !dlg.createdWallet().isEmpty()) {
+        setCurrentWallet(dlg.createdWallet());
+    }
+}
+
+void BitcoinGUI::manageWallets()
+{
+    QString current;
+    if (walletFrame && m_wallet_selector && m_wallet_selector->currentIndex() >= 0) {
+        current = m_wallet_selector->itemData(m_wallet_selector->currentIndex()).toString();
+    }
+    WalletManagerDialog dlg(m_node, this, current);
+    dlg.exec();
+    if (!dlg.walletToActivate().isEmpty()) {
+        setCurrentWallet(dlg.walletToActivate());
+    }
+}
+
+void BitcoinGUI::showWalletMnemonic()
+{
+    MnemonicDialog dlg(MnemonicDialog::Mode::Show, m_node, this);
+    dlg.exec();
+}
+
 void BitcoinGUI::setWalletActionsEnabled(bool enabled)
 {
+    // Deliberately not gated on `enabled`: with no wallet open, creating or restoring
+    // one is the only thing left to do, so those two must stay reachable.
+    if (createWalletAction) createWalletAction->setEnabled(true);
+    if (manageWalletsAction) manageWalletsAction->setEnabled(true);
+    if (restoreWalletAction) restoreWalletAction->setEnabled(true);
+    if (showMnemonicAction) showMnemonicAction->setEnabled(enabled);
+
+    // Hide rather than grey out: a disabled toolbar invites clicking and teaches
+    // nothing. With no wallet, only the node-side pages stay visible.
+    // Only once it lives on a page: until then it has no parent, and showing it
+    // would put a stray floating window on screen.
+    if (m_wallet_bar && m_wallet_bar->parentWidget()) m_wallet_bar->setVisible(enabled);
+    overviewAction->setVisible(enabled);
+    sendCoinsAction->setVisible(enabled);
+    receiveCoinsAction->setVisible(enabled);
+    historyAction->setVisible(enabled);
+    encryptWalletAction->setVisible(enabled);
+    backupWalletAction->setVisible(enabled);
+    changePassphraseAction->setVisible(enabled);
+    signMessageAction->setVisible(enabled);
+    verifyMessageAction->setVisible(enabled);
+    usedSendingAddressesAction->setVisible(enabled);
+    usedReceivingAddressesAction->setVisible(enabled);
+    openAction->setVisible(enabled);
+    if (showMnemonicAction) showMnemonicAction->setVisible(enabled);
+
     overviewAction->setEnabled(enabled);
     sendCoinsAction->setEnabled(enabled);
     sendCoinsMenuAction->setEnabled(enabled);

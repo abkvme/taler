@@ -8,6 +8,8 @@
 
 #include <qt/optionsmodel.h>
 
+#include <qt/theme.h>
+
 #include <qt/bitcoinunits.h>
 #include <qt/guiutil.h>
 
@@ -289,6 +291,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return strThirdPartyTxUrls;
         case Language:
             return settings.value("language");
+        case Theme:
+            return settings.value("theme", static_cast<int>(theme::Theme::System));
         case CoinControlFeatures:
             return fCoinControlFeatures;
         case Prune:
@@ -413,6 +417,14 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 settings.setValue("language", value);
                 setRestartRequired(true);
             }
+            break;
+        case Theme:
+            // Applied immediately: an appearance change that needs a restart to be
+            // seen is indistinguishable from one that did not work.
+            if (settings.value("theme") != value) {
+                settings.setValue("theme", value);
+            }
+            theme::Apply(static_cast<theme::Theme>(value.toInt()));
             break;
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();

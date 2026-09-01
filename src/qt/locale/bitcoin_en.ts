@@ -9,7 +9,7 @@
         <translation type="unfinished">Taler</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+73"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -39,6 +39,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+3"/>
         <source>Community</source>
         <translation type="unfinished"></translation>
@@ -50,12 +55,16 @@
     </message>
     <message>
         <location line="+5"/>
-        <location line="+1"/>
         <source>Explorer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="+11"/>
+        <source>Maintained by abkvme, 2025-2026</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-13"/>
         <source>Network</source>
         <translation type="unfinished">Network</translation>
     </message>
@@ -65,7 +74,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Development</source>
         <translation type="unfinished"></translation>
     </message>
@@ -274,7 +283,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+11"/>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -309,47 +318,53 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-58"/>
+        <source>Start staking</source>
+        <translation type="unfinished">Start staking</translation>
+    </message>
+    <message>
+        <location line="+58"/>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
-        <location line="+57"/>
+        <location line="+73"/>
         <source>Wallet encrypted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-51"/>
+        <location line="-67"/>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+7"/>
-        <location line="+42"/>
+        <location line="+58"/>
         <location line="+6"/>
         <source>Wallet encryption failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-70"/>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+48"/>
+        <location line="+64"/>
         <source>The supplied passphrases do not match.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-37"/>
+        <location line="-53"/>
         <source>Wallet unlock failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location line="+16"/>
         <location line="+11"/>
         <location line="+19"/>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
@@ -366,23 +381,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+48"/>
         <location line="+33"/>
         <source>Warning: The Caps Lock key is on!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <location line="-227"/>
         <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
         <translation>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <location line="+115"/>
+        <location line="+6"/>
         <source>Start staking failed</source>
         <translation>Start staking failed</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="0"/>
+        <location line="-5"/>
         <source>Invalid staking duration.</source>
         <translation>Invalid staking duration.</translation>
     </message>
@@ -403,17 +419,17 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+333"/>
+        <location filename="../bitcoingui.cpp" line="+345"/>
         <source>Sign &amp;message...</source>
         <translation>Sign &amp;message...</translation>
     </message>
     <message>
-        <location line="+521"/>
+        <location line="+619"/>
         <source>Synchronizing with network...</source>
         <translation>Synchronizing with network...</translation>
     </message>
     <message>
-        <location line="-626"/>
+        <location line="-732"/>
         <source>&amp;Overview</source>
         <translation>&amp;Overview</translation>
     </message>
@@ -504,6 +520,46 @@
     </message>
     <message>
         <location line="+3"/>
+        <source>Create &amp;wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Create a new wallet backed up by a 24-word recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;Restore wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore a wallet from its 24-word recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show recovery &amp;phrase...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show the 24 words that back up this wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;Manage wallets...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>List, rename or remove wallets, and see where they are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>&amp;Backup Wallet...</source>
         <translation>&amp;Backup Wallet...</translation>
     </message>
@@ -528,17 +584,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+111"/>
-        <source>Wallet:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+83"/>
-        <source>default wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+256"/>
+        <location line="+548"/>
         <source>Click to disable network activity.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -568,12 +614,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-945"/>
+        <location line="-1051"/>
         <source>Send coins to a Taler address</source>
         <translation>Send coins to a Taler address</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+102"/>
         <source>Backup wallet to another location</source>
         <translation>Backup wallet to another location</translation>
     </message>
@@ -598,12 +644,12 @@
         <translation>&amp;Verify message...</translation>
     </message>
     <message>
-        <location line="+608"/>
+        <location line="+706"/>
         <source>Taler</source>
         <translation>Taler</translation>
     </message>
     <message>
-        <location line="-853"/>
+        <location line="-959"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -633,7 +679,7 @@
         <translation>Encrypt the private keys that belong to your wallet</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+15"/>
         <source>Sign messages with your Taler addresses to prove you own them</source>
         <translation>Sign messages with your Taler addresses to prove you own them</translation>
     </message>
@@ -643,12 +689,12 @@
         <translation>Verify messages to ensure they were signed with specified Taler addresses</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+68"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>&amp;Settings</source>
         <translation>&amp;Settings</translation>
     </message>
@@ -663,12 +709,12 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <location line="-189"/>
+        <location line="-210"/>
         <source>Request payments (generates QR codes and taler: URIs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+105"/>
         <source>Show the list of used sending addresses and labels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -688,7 +734,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+447"/>
+        <location line="+545"/>
         <source>%n active connection(s) to Taler network</source>
         <translation>
             <numerusform>%n active connection to Taler network</numerusform>
@@ -749,12 +795,17 @@
         <translation>Up to date</translation>
     </message>
     <message>
-        <location line="-532"/>
+        <location line="-630"/>
         <source>Show the %1 help message to get a list with possible Taler command-line options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+119"/>
+        <source>Wallet in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+241"/>
         <source>%1 client</source>
         <translation type="unfinished"></translation>
     </message>
@@ -835,12 +886,12 @@
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+493"/>
+        <location filename="../bitcoin.cpp" line="+530"/>
         <source>A fatal error occurred. Taler can no longer continue safely and will quit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bitcoingui.cpp" line="-878"/>
+        <location filename="../bitcoingui.cpp" line="-984"/>
         <source>&amp;Nodes</source>
         <translation>&amp;Nodes</translation>
     </message>
@@ -1344,19 +1395,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+123"/>
+        <location line="+15"/>
+        <source>Maintained by abkvme, 2025-2026</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+117"/>
         <source>Unavailable - remote seed list could not be fetched</source>
         <translation>Unavailable - remote seed list could not be fetched</translation>
     </message>
     <message>
-        <location line="-123"/>
-        <location line="+43"/>
+        <location line="-132"/>
+        <location line="+52"/>
         <source>Node</source>
         <translation>Node</translation>
     </message>
     <message>
-        <location line="-43"/>
-        <location line="+43"/>
+        <location line="-52"/>
+        <location line="+52"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
@@ -1471,6 +1527,239 @@ Visit the repository to learn how to contribute:</translation>
             <numerusform>(of %n GB needed)</numerusform>
             <numerusform>(of %n GB needed)</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>MnemonicDialog</name>
+    <message>
+        <location filename="../mnemonicdialog.cpp" line="+112"/>
+        <location line="+290"/>
+        <source>Create wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-289"/>
+        <location line="+289"/>
+        <source>Restore wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-289"/>
+        <location line="+407"/>
+        <source>Recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-391"/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>&lt;b&gt;Your wallet is backed up by 24 words.&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>In the next step you will see 24 words. Written down, they restore this wallet on any Taler wallet, on any computer, even if this one is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Anyone who sees those words owns your coins. Write them on paper. Do not store them in a file, a screenshot or a password manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Write these 24 words down, in this order, and keep them safe.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>&lt;i&gt;A screenshot or a photo of this screen is not a safe backup - anything that reads your screen or your files can read the words too.&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Confirm you wrote the words down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Enter the 24 words of the wallet you want to restore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>restored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Name for the restored wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+44"/>
+        <source>Latin letters, digits and hyphens only. No spaces, and it cannot start or end with a hyphen — the name becomes a folder on disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-40"/>
+        <source>I know roughly when this wallet was created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>&lt;i&gt;A date only makes the scan faster. If you are not sure, leave it unticked and the whole chain is scanned - slower, but it cannot miss anything.&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&lt;b&gt;Set a passphrase for this wallet.&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The passphrase protects this wallet file on this computer. It is not the same thing as your 24 words: the words recover your coins anywhere, even if you forget the passphrase or lose this computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Passphrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat passphrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Wallet name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Continue without a passphrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;i&gt;Without a passphrase the wallet stakes continuously with no unlocking. With one, you must unlock the wallet for it to stake.&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>These 24 words restore this wallet. Anyone who sees them owns it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Word %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Confirm you wrote the words down: type words %1, %2 and %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Show my 24 words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>I have written them down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+4"/>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>%1 of %2 words entered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;b&gt;These words are not a valid recovery phrase.&lt;/b&gt; Check the spelling and the order - one wrong word is enough to fail this check.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Recovery phrase is valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>This wallet will not be encrypted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>The two passphrases do not match.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Could not generate a recovery phrase: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <source>The wallet could not be created: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;b&gt;Wallet &quot;%1&quot; is ready.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Your 24 words are its backup. You can see them again from the wallet menu, as long as the wallet is unlocked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>The wallet could not be restored: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&lt;b&gt;Wallet &quot;%1&quot; was restored.&lt;/b&gt;&lt;br&gt;&lt;br&gt;%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Restoring the wallet and scanning the chain. This can take a while.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Working...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1638,7 +1927,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location line="+104"/>
         <location line="+13"/>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
         <translation type="unfinished"></translation>
@@ -1669,7 +1958,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation>&amp;Reset Options</translation>
     </message>
     <message>
-        <location line="-529"/>
+        <location line="-553"/>
         <source>&amp;Network</source>
         <translation>&amp;Network</translation>
     </message>
@@ -1823,6 +2112,16 @@ Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
         <location line="+8"/>
+        <source>&amp;Appearance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Choose how the wallet looks. &quot;Follow the system&quot; uses your desktop&apos;s own light or dark setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>User Interface &amp;language:</source>
         <translation>User Interface &amp;language:</translation>
     </message>
@@ -1842,12 +2141,12 @@ Visit the repository to learn how to contribute:</translation>
         <translation>Choose the default subdivision unit to show in the interface and when sending coins.</translation>
     </message>
     <message>
-        <location line="-450"/>
+        <location line="-474"/>
         <source>Whether to show coin control features or not.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+464"/>
+        <location line="+488"/>
         <source>&amp;Third party transaction URLs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1862,17 +2161,32 @@ Visit the repository to learn how to contribute:</translation>
         <translation>&amp;Cancel</translation>
     </message>
     <message>
-        <location filename="../optionsdialog.cpp" line="+112"/>
+        <location filename="../optionsdialog.cpp" line="+114"/>
         <source>default</source>
         <translation>default</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+23"/>
+        <source>Follow the system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+39"/>
         <source>none</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+78"/>
         <source>Confirm options reset</source>
         <translation>Confirm options reset</translation>
     </message>
@@ -1927,12 +2241,12 @@ Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
         <location line="+62"/>
-        <location line="+386"/>
+        <location line="+532"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source>
         <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</translation>
     </message>
     <message>
-        <location line="-139"/>
+        <location line="-285"/>
         <source>Watch-only:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1992,12 +2306,12 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+195"/>
         <source>Recent transactions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-317"/>
+        <location line="-463"/>
         <source>Unconfirmed transactions to watch-only addresses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2012,79 +2326,91 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
+        <location line="+132"/>
         <source>Staking</source>
         <translation>Staking</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+10"/>
         <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
         <translation>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+12"/>
         <source>Duration:</source>
         <translation>Duration:</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+8"/>
         <source>1 hour</source>
         <translation>1 hour</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+5"/>
         <source>6 hours</source>
         <translation>6 hours</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+5"/>
         <source>24 hours</source>
         <translation>24 hours</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+5"/>
         <source>7 days</source>
         <translation>7 days</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+5"/>
         <source>30 days</source>
         <translation>30 days</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+21"/>
         <source>Start staking</source>
         <translation>Start staking</translation>
     </message>
     <message>
-        <location filename="../forms/overviewpage.ui" line="0"/>
+        <location line="+13"/>
         <source>Stop staking</source>
         <translation>Stop staking</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
+        <location line="+12"/>
+        <location filename="../overviewpage.cpp" line="+440"/>
         <source>Not staking</source>
         <translation>Not staking</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
+        <location filename="../overviewpage.cpp" line="-9"/>
         <source>Staking — %1 remaining</source>
         <translation>Staking — %1 remaining</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
+        <location line="-29"/>
         <source>Stop staking?</source>
         <translation>Stop staking?</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
-        <source>Are you sure you want to stop staking?</source>
-        <translation>Are you sure you want to stop staking?</translation>
+        <location line="-231"/>
+        <source>Available balance</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="0"/>
-        <source>Encrypt your wallet first to enable staking.</source>
-        <translation>Encrypt your wallet first to enable staking.</translation>
+        <location line="+27"/>
+        <source>No transactions yet.
+Incoming and outgoing payments will appear here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+127"/>
+        <source>Wallet: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+78"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Are you sure you want to stop staking?</translation>
     </message>
 </context>
 <context>
@@ -2128,7 +2454,32 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished">Amount</translation>
     </message>
     <message>
-        <location filename="../guiutil.cpp" line="+112"/>
+        <location filename="../guiutil.cpp" line="+82"/>
+        <source>legacy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Enter a name for the wallet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The name is too long (64 characters at most).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Use Latin letters, digits and hyphens only - no spaces or other characters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The name cannot start or end with a hyphen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+81"/>
         <source>Enter a Taler address (e.g. %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2250,6 +2601,37 @@ Visit the repository to learn how to contribute:</translation>
     <message>
         <location filename="../modaloverlay.cpp" line="-33"/>
         <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../walletmanagerdialog.cpp" line="+39"/>
+        <source>The name cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The name cannot contain a path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../guiutil.cpp" line="-881"/>
+        <location filename="../walletmanagerdialog.cpp" line="+6"/>
+        <source>That name is reserved by the wallet directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../walletmanagerdialog.cpp" line="+273"/>
+        <source>Could not copy %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Could not copy the wallet file to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../asyncrpc.cpp" line="+37"/>
+        <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2951,7 +3333,7 @@ Visit the repository to learn how to contribute:</translation>
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
-        <location filename="../sendcoinsdialog.cpp" line="+580"/>
+        <location filename="../sendcoinsdialog.cpp" line="+582"/>
         <source>Send Coins</source>
         <translation>Send Coins</translation>
     </message>
@@ -4080,7 +4462,13 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+53"/>
+        <source>No transactions to show.
+Once this wallet sends or receives, its history appears here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Abandon transaction</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4130,7 +4518,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+193"/>
+        <location line="+208"/>
         <source>Export Transaction History</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4208,7 +4596,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+1023"/>
+        <location filename="../bitcoingui.cpp" line="+1129"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4216,20 +4604,257 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
 <context>
     <name>WalletFrame</name>
     <message>
-        <location filename="../walletframe.cpp" line="+30"/>
-        <source>No wallet has been loaded.</source>
+        <location filename="../walletframe.cpp" line="+39"/>
+        <source>&lt;b&gt;No wallet loaded&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>This node is running and staying in sync with the network.
+Create a new wallet, or restore one from its 24-word recovery phrase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Create new wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore from 24 words</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WalletManagerDialog</name>
+    <message>
+        <location filename="../walletmanagerdialog.cpp" line="-244"/>
+        <source>Manage wallets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Wallet</source>
+        <translation type="unfinished">Wallet</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>File on disk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Create wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rename...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Open this one at start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Removing a wallet moves its file to the &quot;removed&quot; folder inside the wallet directory. Nothing is deleted, so a mistake can be undone by moving the folder back.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <location line="+8"/>
+        <source>Working...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Could not list the wallet directory: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+54"/>
+        <source>%1  •  in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>File name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>This wallet opens when the application starts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Standard (file backup)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Not open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>A recovery-phrase wallet can be restored from its 24 words. A standard wallet can only be restored from a copy of its file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>This wallet is not open, so its type and balance are unknown. Open it from the wallet selector to see them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>The legacy wallet cannot be renamed: its name is what the node resolves by default, and changing it would leave talerd creating an empty wallet in its place.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>Closing the wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Could not create %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Could not move the wallet to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <location line="+7"/>
+        <location line="+5"/>
+        <location line="+32"/>
+        <location line="+9"/>
+        <source>Rename wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-52"/>
+        <source>New name for &quot;%1&quot;:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>A wallet named &quot;%1&quot; already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>The wallet was not renamed: %1
+
+The original wallet is untouched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Renamed to &quot;%1&quot;.
+
+The previous file was moved to the &quot;removed&quot; folder rather than deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>&lt;b&gt;Remove wallet &quot;%1&quot;?&lt;/b&gt;&lt;br&gt;&lt;br&gt;File: %2&lt;br&gt;&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>This is a legacy wallet: it has &lt;b&gt;no recovery phrase&lt;/b&gt;, so this file is the only copy of its keys.&lt;br&gt;&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&lt;b&gt;This wallet still holds %1 TLR.&lt;/b&gt;&lt;br&gt;&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The wallet will be moved to the &quot;removed&quot; folder in the wallet directory. Nothing is deleted, and you can bring it back by moving it out again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+9"/>
+        <location line="+5"/>
+        <location line="+9"/>
+        <location line="+6"/>
+        <source>Remove wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-19"/>
+        <source>Type the wallet name to confirm: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The name did not match. Nothing was removed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>The wallet was not removed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&quot;%1&quot; was moved to the &quot;removed&quot; folder in the wallet directory.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+198"/>
+        <location filename="../walletmodel.cpp" line="+207"/>
         <source>Send Coins</source>
         <translation type="unfinished">Send Coins</translation>
     </message>
     <message>
-        <location line="+280"/>
+        <location line="+314"/>
         <location line="+39"/>
         <location line="+6"/>
         <source>Fee bump error</source>
@@ -4343,6 +4968,21 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
     </message>
     <message>
         <location line="+3"/>
+        <source>-newwalletmnemonic: %s already exists. Refusing to overwrite it - it may hold a recovery phrase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>-newwalletmnemonic: %s is readable by your Windows user account; move it to safe storage and delete it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A new wallet was created from a recovery phrase. The phrase is stored IN CLEAR TEXT in %s - move it to safe offline storage and delete it from this machine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Can&apos;t generate a change-address key. Private keys are disabled for this wallet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4508,6 +5148,36 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
     </message>
     <message>
         <location line="+1"/>
+        <source>-newwalletmnemonic: cannot create %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: cannot restrict permissions on %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: cannot write %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: could not generate a recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: directory %s does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: failed writing %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Cannot downgrade wallet</source>
         <translation type="unfinished">Cannot downgrade wallet</translation>
     </message>
@@ -4549,6 +5219,21 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
     <message>
         <location line="+1"/>
         <source>Error creating %s: You can&apos;t create non-HD wallets with this version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Error creating %s: could not store the recovery phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Error creating %s: the recovery phrase could not be decoded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Error creating %s: the recovery phrase is not valid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

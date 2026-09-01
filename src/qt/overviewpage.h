@@ -9,6 +9,8 @@
 
 #include <cstdint>
 
+#include <QFrame>
+#include <QLabel>
 #include <QWidget>
 #include <memory>
 
@@ -40,6 +42,9 @@ public:
     void setWalletModel(WalletModel *walletModel);
     void showOutOfSyncWarning(bool fShow);
 
+    //! Host the application's wallet selector bar at the top of this page.
+    void setWalletBar(QWidget* bar);
+
 public Q_SLOTS:
     void setBalance(const interfaces::WalletBalances& balances);
 
@@ -48,6 +53,19 @@ Q_SIGNALS:
     void outOfSyncWarningClicked();
 
 private:
+    void updateTransactionsPlaceholder();
+
+protected:
+    void resizeEvent(QResizeEvent* event) override;
+
+private:
+    QLabel* m_empty_transactions = nullptr;
+    QLabel* m_wallet_name_label = nullptr;
+    bool m_wallet_bar_shown = false;
+    QFrame* m_balance_badge = nullptr;
+    QLabel* m_badge_caption = nullptr;
+    QLabel* m_badge_value = nullptr;
+
     Ui::OverviewPage *ui;
     ClientModel *clientModel;
     WalletModel *walletModel;

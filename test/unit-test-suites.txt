@@ -1,0 +1,74 @@
+# Unit test suites run by CI, one per line. Blank lines and # comments ignored.
+#
+# Taler is a Bitcoin Core fork, and the inherited test suite had never been built
+# here: -enable-tests was off by default, so the code drifted away from the tests
+# unnoticed. The suites below build and pass. Thirteen others are still carrying
+# Bitcoin data or Bitcoin economics and are not listed yet:
+#
+#   bloom_tests, key_tests, psbt_wallet_tests, descriptor_tests, rpc_tests,
+#   key_io_tests        - hard-coded Bitcoin WIFs and addresses, which this
+#                         chains version bytes reject
+#   main_tests, wallet_tests
+#                       - assume Bitcoins 50-coin subsidy and halving schedule
+#   miner_tests, validation_block_tests, tx_validationcache_tests,
+#   merkleblock_tests, denialofservice_tests
+#                       - build blocks and chains the way Bitcoin does, before
+#                         Talers proof-of-stake and difficulty rules
+#
+# Porting them is tracked in plans/cpp-node-seed-phrase-plan.md. Add each one here
+# as it goes green.
+arith_uint256_tests
+addrman_tests
+amount_tests
+allocator_tests
+base32_tests
+base58_tests
+base64_tests
+bech32_tests
+bip32_tests
+blockchain_tests
+blockencodings_tests
+bswap_tests
+checkqueue_tests
+coins_tests
+compilerbug_tests
+compress_tests
+crypto_tests
+cuckoocache_tests
+getarg_tests
+hash_tests
+limitedmap_tests
+dbwrapper_tests
+mempool_tests
+merkle_tests
+multisig_tests
+net_tests
+netbase_tests
+pmt_tests
+prevector_tests
+raii_event_tests
+random_tests
+reverselock_tests
+sanity_tests
+scheduler_tests
+script_p2sh_tests
+script_tests
+script_standard_tests
+scriptnum_tests
+serialize_tests
+sighash_tests
+sigopcount_tests
+skiplist_tests
+streams_tests
+timedata_tests
+torcontrol_tests
+transaction_tests
+txvalidation_tests
+uint256_tests
+util_tests
+accounting_tests
+bip39_tests
+bip44_tests
+db_tests
+wallet_crypto_tests
+coinselector_tests

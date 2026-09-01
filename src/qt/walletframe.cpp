@@ -13,6 +13,8 @@
 #include <cstdio>
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QLabel>
 
 WalletFrame::WalletFrame(const PlatformStyle *_platformStyle, BitcoinGUI *_gui) :
@@ -27,9 +29,39 @@ WalletFrame::WalletFrame(const PlatformStyle *_platformStyle, BitcoinGUI *_gui) 
     walletFrameLayout->setContentsMargins(0,0,0,0);
     walletFrameLayout->addWidget(walletStack);
 
-    QLabel *noWallet = new QLabel(tr("No wallet has been loaded."));
+    // Shown whenever no wallet is loaded. The node keeps running and syncing; the
+    // only thing missing is a wallet, so this page offers the two ways to get one
+    // rather than leaving the user at a dead end.
+    QWidget* noWalletPage = new QWidget(this);
+    QVBoxLayout* noWalletLayout = new QVBoxLayout(noWalletPage);
+    noWalletLayout->addStretch(1);
+
+    QLabel* noWallet = new QLabel(tr("<b>No wallet loaded</b>"), noWalletPage);
     noWallet->setAlignment(Qt::AlignCenter);
-    walletStack->addWidget(noWallet);
+    noWalletLayout->addWidget(noWallet);
+
+    QLabel* explain = new QLabel(tr(
+        "This node is running and staying in sync with the network.\n"
+        "Create a new wallet, or restore one from its 24-word recovery phrase."), noWalletPage);
+    explain->setAlignment(Qt::AlignCenter);
+    explain->setWordWrap(true);
+    noWalletLayout->addWidget(explain);
+    noWalletLayout->addSpacing(12);
+
+    QPushButton* createButton = new QPushButton(tr("Create new wallet"), noWalletPage);
+    QPushButton* restoreButton = new QPushButton(tr("Restore from 24 words"), noWalletPage);
+    connect(createButton, &QPushButton::clicked, this, &WalletFrame::createWalletRequested);
+    connect(restoreButton, &QPushButton::clicked, this, &WalletFrame::restoreWalletRequested);
+
+    QHBoxLayout* buttonRow = new QHBoxLayout();
+    buttonRow->addStretch(1);
+    buttonRow->addWidget(createButton);
+    buttonRow->addWidget(restoreButton);
+    buttonRow->addStretch(1);
+    noWalletLayout->addLayout(buttonRow);
+    noWalletLayout->addStretch(1);
+
+    walletStack->addWidget(noWalletPage);
 }
 
 WalletFrame::~WalletFrame()
@@ -74,6 +106,13 @@ bool WalletFrame::addWallet(WalletModel *walletModel)
     connect(walletView, SIGNAL(outOfSyncWarningClicked()), this, SLOT(outOfSyncWarningClicked()));
 
     return true;
+}
+
+void WalletFrame::placeWalletBar(QWidget* bar)
+{
+    if (WalletView* view = qobject_cast<WalletView*>(walletStack->currentWidget())) {
+        view->setWalletBar(bar);
+    }
 }
 
 bool WalletFrame::setCurrentWallet(const QString& name)

@@ -14,6 +14,12 @@
 #include <validation.h>
 #include <walletinitinterface.h>
 #include <wallet/rpcwallet.h>
+#ifndef WIN32
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
+#include <wallet/bip39.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 
@@ -64,6 +70,8 @@ void WalletInit::AddWalletOptions() const
     gArgs.AddArg("-fallbackfee=<amt>", strprintf("A fee rate (in %s/kB) that will be used when fee estimation has insufficient data (default: %s)",
                                                                CURRENCY_UNIT, FormatMoney(DEFAULT_FALLBACK_FEE)), false, OptionsCategory::WALLET);
     gArgs.AddArg("-keypool=<n>", strprintf("Set key pool size to <n> (default: %u)", DEFAULT_KEYPOOL_SIZE), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-createwalletonstart", "Create a wallet on first start when none exists (default: true). taler-qt turns this off so its wallet creation wizard can be cancelled without leaving a wallet behind.", true, OptionsCategory::WALLET);
+    gArgs.AddArg("-newwalletmnemonic=<file>", "On first start only, and only when no wallet exists yet: create the wallet from a newly generated 24-word BIP-39 recovery phrase, writing the phrase to <file> (mode 0600) before the wallet is created. The file must not already exist. Without this option a wallet is created exactly as in previous versions. Move the file to safe offline storage and delete it from this machine.", false, OptionsCategory::WALLET);
     gArgs.AddArg("-mintxfee=<amt>", strprintf("Fees (in %s/kB) smaller than this are considered zero fee for transaction creation (default: %s)",
                                                             CURRENCY_UNIT, FormatMoney(DEFAULT_TRANSACTION_MINFEE)), false, OptionsCategory::WALLET);
     gArgs.AddArg("-paytxfee=<amt>", strprintf("Fee (in %s/kB) to add to transactions you send (default: %s)",
@@ -293,6 +301,72 @@ bool AutoBackupWallet (std::string walletFile) {
     return true;
 }
 
+//! Generate a recovery phrase and write it to `path` before any wallet exists.
+//!
+//! Order matters: the phrase reaches disk, is flushed, and is closed before the
+//! wallet is created, so a phrase-based wallet can never exist without the operator
+//! holding a copy of its phrase. Refuses to overwrite an existing file.
+static bool CreateMnemonicFile(const std::string& path_str, SecureString& mnemonic_out)
+{
+    const fs::path path = fs::absolute(path_str, GetDataDir());
+
+    if (fs::exists(path)) {
+        return InitError(strprintf(_("-newwalletmnemonic: %s already exists. Refusing to overwrite it - it may hold a recovery phrase."), path.string()));
+    }
+    if (!fs::exists(path.parent_path())) {
+        return InitError(strprintf(_("-newwalletmnemonic: directory %s does not exist"), path.parent_path().string()));
+    }
+
+    SecureString mnemonic;
+    if (!bip39::GenerateMnemonic(bip39::ENTROPY_DEFAULT_BYTES, mnemonic)) {
+        return InitError(_("-newwalletmnemonic: could not generate a recovery phrase"));
+    }
+
+    const fs::path tmp = path.string() + ".tmp";
+    {
+        FILE* file = fsbridge::fopen(tmp, "w");
+        if (!file) {
+            return InitError(strprintf(_("-newwalletmnemonic: cannot write %s"), tmp.string()));
+        }
+        const std::string body = std::string(mnemonic.c_str()) + "\n" +
+            "# Taler wallet recovery phrase\n"
+            "# derivation: BIP-39 + BIP-44, English wordlist, 24 words, no passphrase\n"
+            "# WARNING: anyone with these words owns the coins. Move this file to safe\n"
+            "#          offline storage and delete it from this machine.\n";
+        const bool written = fwrite(body.data(), 1, body.size(), file) == body.size();
+        fflush(file);
+#ifndef WIN32
+        fsync(fileno(file));
+#endif
+        fclose(file);
+        if (!written) {
+            fs::remove(tmp);
+            return InitError(strprintf(_("-newwalletmnemonic: failed writing %s"), tmp.string()));
+        }
+    }
+
+#ifndef WIN32
+    if (chmod(tmp.string().c_str(), S_IRUSR | S_IWUSR) != 0) {
+        fs::remove(tmp);
+        return InitError(strprintf(_("-newwalletmnemonic: cannot restrict permissions on %s"), tmp.string()));
+    }
+#else
+    InitWarning(strprintf(_("-newwalletmnemonic: %s is readable by your Windows user account; move it to safe storage and delete it."), path.string()));
+#endif
+
+    try {
+        fs::rename(tmp, path);
+    } catch (const fs::filesystem_error& e) {
+        fs::remove(tmp);
+        return InitError(strprintf(_("-newwalletmnemonic: cannot create %s"), path.string()));
+    }
+
+    LogPrintf("Recovery phrase for the new wallet written to %s - move it offline and delete it from this machine\n", path.string());
+    InitWarning(strprintf(_("A new wallet was created from a recovery phrase. The phrase is stored IN CLEAR TEXT in %s - move it to safe offline storage and delete it from this machine."), path.string()));
+    mnemonic_out = mnemonic;
+    return true;
+}
+
 bool WalletInit::Open() const
 {
     if (gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET)) {
@@ -300,9 +374,30 @@ bool WalletInit::Open() const
         return true;
     }
 
+    const std::string mnemonic_out = gArgs.GetArg("-newwalletmnemonic", "");
+
     for (const std::string& walletFile : gArgs.GetArgs("-wallet")) {
         AutoBackupWallet (walletFile);
-        std::shared_ptr<CWallet> pwallet = CWallet::CreateWalletFromFile(WalletLocation(walletFile));
+
+        SecureString mnemonic;
+        const WalletLocation location(walletFile);
+        if (!mnemonic_out.empty()) {
+            if (location.HasWalletData()) {
+                // The flag will live in taler.conf, so later starts must not fail on it.
+                LogPrintf("-newwalletmnemonic ignored: wallet %s already exists\n", walletFile);
+            } else if (!CreateMnemonicFile(mnemonic_out, mnemonic)) {
+                return false; // CreateMnemonicFile has already reported why
+            }
+        }
+
+        // The GUI turns this off so the main window can open with no wallet and its
+        // creation wizard can genuinely be cancelled. talerd keeps today's behaviour.
+        if (!location.HasWalletData() && mnemonic.empty() && !gArgs.GetBoolArg("-createwalletonstart", true)) {
+            LogPrintf("No wallet found and -createwalletonstart is off; starting without one\n");
+            continue;
+        }
+
+        std::shared_ptr<CWallet> pwallet = CWallet::CreateWalletFromFile(location, 0, mnemonic.empty() ? nullptr : &mnemonic);
         if (!pwallet) {
             return false;
         }

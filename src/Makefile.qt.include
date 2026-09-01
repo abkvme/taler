@@ -79,6 +79,8 @@ QT_MOC_CPP = \
   qt/moc_intro.cpp \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
+  qt/moc_mnemonicdialog.cpp \
+  qt/moc_walletmanagerdialog.cpp \
   qt/moc_modaloverlay.cpp \
   qt/moc_notificator.cpp \
   qt/moc_openuridialog.cpp \
@@ -147,6 +149,10 @@ BITCOIN_QT_H = \
   qt/intro.h \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
+  qt/mnemonicdialog.h \
+  qt/asyncrpc.h \
+  qt/theme.h \
+  qt/walletmanagerdialog.h \
   qt/modaloverlay.h \
   qt/networkstyle.h \
   qt/notificator.h \
@@ -261,6 +267,8 @@ BITCOIN_QT_BASE_CPP = \
   qt/qvalidatedlineedit.cpp \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
+  qt/asyncrpc.cpp \
+  qt/theme.cpp \
   qt/splashscreen.cpp \
   qt/trafficgraphwidget.cpp \
   qt/utilitydialog.cpp
@@ -274,6 +282,8 @@ BITCOIN_QT_WALLET_CPP = \
   qt/coincontroldialog.cpp \
   qt/coincontroltreewidget.cpp \
   qt/editaddressdialog.cpp \
+  qt/mnemonicdialog.cpp \
+  qt/walletmanagerdialog.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/receivecoinsdialog.cpp \

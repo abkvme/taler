@@ -28,6 +28,8 @@
 #include <utilmoneystr.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
+#include <wallet/bip39.h>
+#include <wallet/bip44.h>
 #include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletdb.h>
@@ -2983,6 +2985,7 @@ static UniValue getwalletinfo(const JSONRPCRequest& request)
             "\nResult:\n"
             "{\n"
             "  \"walletname\": xxxxx,               (string) the wallet name\n"
+            "  \"walletpath\": \"...\",               (string) the absolute path of this wallet on disk\n"
             "  \"walletversion\": xxxxx,            (numeric) the wallet version\n"
             "  \"balance\": xxxxxxx,                (numeric) the total confirmed balance of the wallet in " + CURRENCY_UNIT + "\n"
             "  \"unconfirmed_balance\": xxx,        (numeric) the total unconfirmed balance of the wallet in " + CURRENCY_UNIT + "\n"
@@ -2995,6 +2998,10 @@ static UniValue getwalletinfo(const JSONRPCRequest& request)
             "  \"paytxfee\": x.xxxx,                (numeric) the transaction fee configuration, set in " + CURRENCY_UNIT + "/kB\n"
             "  \"hdseedid\": \"<hash160>\"            (string, optional) the Hash160 of the HD seed (only present when HD is enabled)\n"
             "  \"hdmasterkeyid\": \"<hash160>\"       (string, optional) alias for hdseedid retained for backwards-compatibility. Will be removed in V0.18.\n"
+            "  \"hdscheme\": \"legacy|bip44\"          (string, optional) key derivation scheme; bip44 wallets are created from a recovery phrase (only present when HD is enabled)\n"
+            "  \"coin_type\": n,                     (numeric, optional) BIP44 coin type (bip44 wallets only)\n"
+            "  \"account\": n,                       (numeric, optional) BIP44 account index (bip44 wallets only)\n"
+            "  \"has_imported_keys\": true|false,     (boolean, optional) whether this wallet holds keys that were imported rather than derived. When true, the recovery phrase alone does not restore everything in this wallet\n"
             "  \"private_keys_enabled\": true|false (boolean) false if privatekeys are disabled for this wallet (enforced watch-only wallet)\n"
             "}\n"
             "\nExamples:\n"
@@ -3012,6 +3019,7 @@ static UniValue getwalletinfo(const JSONRPCRequest& request)
 
     size_t kpExternalSize = pwallet->KeypoolCountExternalKeys();
     obj.pushKV("walletname", pwallet->GetName());
+    obj.pushKV("walletpath", pwallet->GetLocation().GetPath().string());
     obj.pushKV("walletversion", pwallet->GetVersion());
     BalanceInfo bal = pwallet->GetBalance();
     obj.pushKV("balance",       ValueFromAmount(bal.Total));
@@ -3031,6 +3039,12 @@ static UniValue getwalletinfo(const JSONRPCRequest& request)
     if (!seed_id.IsNull()) {
         obj.pushKV("hdseedid", seed_id.GetHex());
         obj.pushKV("hdmasterkeyid", seed_id.GetHex());
+        obj.pushKV("hdscheme", pwallet->IsBIP44HD() ? "bip44" : "legacy");
+        obj.pushKV("has_imported_keys", pwallet->HasImportedKeys());
+        if (pwallet->IsBIP44HD()) {
+            obj.pushKV("coin_type", (uint64_t)pwallet->GetHDChain().nCoinType);
+            obj.pushKV("account", (uint64_t)pwallet->GetHDChain().nAccount);
+        }
     }
     obj.pushKV("private_keys_enabled", !pwallet->IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS));
     return obj;
@@ -3121,15 +3135,300 @@ static UniValue loadwallet(const JSONRPCRequest& request)
     return obj;
 }
 
+static UniValue getnewmnemonic(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() > 0) {
+        throw std::runtime_error(
+            "getnewmnemonic\n"
+            "\nGenerates a new 24-word BIP-39 recovery phrase, without creating anything.\n"
+            "Pass it to createwallet to create a wallet from it.\n"
+            "\nWARNING: anyone who sees these words owns the coins of any wallet created\n"
+            "from them. Write them down offline; do not store them in a file.\n"
+            "\nResult:\n"
+            "\"mnemonic\"    (string) The 24-word recovery phrase\n"
+            "\nExamples:\n"
+            + HelpExampleCli("getnewmnemonic", "")
+            + HelpExampleRpc("getnewmnemonic", "")
+        );
+    }
+
+    SecureString mnemonic;
+    if (!bip39::GenerateMnemonic(bip39::ENTROPY_DEFAULT_BYTES, mnemonic)) {
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Failed to generate a recovery phrase");
+    }
+    return std::string(mnemonic.c_str());
+}
+
+static UniValue getwalletmnemonic(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() > 0) {
+        throw std::runtime_error(
+            "getwalletmnemonic\n"
+            "\nReveals the 24-word recovery phrase of this wallet.\n"
+            "Only works for wallets created from a recovery phrase, and requires the\n"
+            "wallet to be unlocked when it is encrypted.\n"
+            "\nWARNING: anyone who sees these words owns this wallet.\n"
+            "\nResult:\n"
+            "\"mnemonic\"    (string) The 24-word recovery phrase\n"
+            "\nExamples:\n"
+            + HelpExampleCli("getwalletmnemonic", "")
+            + HelpExampleRpc("getwalletmnemonic", "")
+        );
+    }
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    if (!pwallet->HasMnemonic()) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "This wallet was not created from a recovery phrase, so it has none. Back it up by copying wallet.dat.");
+    }
+    EnsureWalletIsUnlocked(pwallet);
+
+    SecureString mnemonic;
+    if (!pwallet->GetMnemonic(mnemonic)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Could not read the recovery phrase");
+    }
+    return std::string(mnemonic.c_str());
+}
+
+namespace {
+
+//! Highest derived index on a chain that has actually been used by a transaction.
+//! Returns -1 when the chain is untouched. Used to decide whether the look-ahead
+//! window still needs extending after a rescan.
+int64_t HighestUsedIndex(CWallet* pwallet, uint32_t chain)
+{
+    AssertLockHeld(pwallet->cs_wallet);
+    int64_t highest = -1;
+    const std::string prefix = strprintf("%s/%u/", bip44::FormatAccountPath(pwallet->GetHDChain().nCoinType,
+                                                                           pwallet->GetHDChain().nAccount), chain);
+    for (const std::pair<const uint256, CWalletTx>& entry : pwallet->mapWallet) {
+        for (const CTxOut& txout : entry.second.tx->vout) {
+            CTxDestination dest;
+            if (!ExtractDestination(txout.scriptPubKey, dest)) continue;
+            const CKeyID* keyid = boost::get<CKeyID>(&dest);
+            if (!keyid) continue;
+            const auto it = pwallet->mapKeyMetadata.find(*keyid);
+            if (it == pwallet->mapKeyMetadata.end()) continue;
+            const std::string& path = it->second.hdKeypath;
+            if (path.compare(0, prefix.size(), prefix) != 0) continue;
+            try {
+                highest = std::max<int64_t>(highest, std::stoll(path.substr(prefix.size())));
+            } catch (const std::exception&) {
+                // not a plain index; ignore
+            }
+        }
+    }
+    return highest;
+}
+
+} // namespace
+
+static UniValue restorewallet(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 5) {
+        throw std::runtime_error(
+            "restorewallet \"wallet_name\" \"mnemonic\" ( birthday_time gap_limit \"passphrase\" )\n"
+            "\nCreates a wallet from an existing 24-word recovery phrase and scans the chain for its history.\n"
+            "\nArguments:\n"
+            "1. \"wallet_name\"     (string, required) Name for the restored wallet. Must not already exist.\n"
+            "2. \"mnemonic\"        (string, required) The 24-word BIP-39 recovery phrase.\n"
+            "3. birthday_time     (numeric, optional) Approximate UNIX time the wallet was first created. Scanning starts there instead of at the genesis block. If you are not sure, leave it out and the whole chain is scanned.\n"
+            "4. gap_limit         (numeric, optional, default: 1000) How many unused addresses to look ahead on each chain. Extended automatically if used addresses are found near the edge.\n"
+            "5. \"passphrase\"      (string, optional) Encrypt the restored wallet with this passphrase as it is created.\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"name\": \"wallet\",            (string) The restored wallet name\n"
+            "  \"scanned_from_height\": n,    (numeric) Height the scan started at\n"
+            "  \"gap_limit\": n,              (numeric) Look-ahead actually used after any extension\n"
+            "  \"used_addresses\": n,         (numeric) Derived addresses found to have been used\n"
+            "  \"balance\": x.xxx,            (numeric) Balance found\n"
+            "  \"warning\": \"...\"            (string) Warning message, if any\n"
+            "}\n"
+            "\nExamples:\n"
+            + HelpExampleCli("restorewallet", "\"restored\" \"word word ... word\"")
+            + HelpExampleRpc("restorewallet", "\"restored\", \"word word ... word\"")
+        );
+    }
+
+    // A rescan needs the blocks. On a pruned node the history simply is not there,
+    // and a partial scan would report a plausible but wrong balance - the worst
+    // possible outcome at the most anxious moment.
+    if (fPruneMode) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Restoring a wallet requires a full, unpruned chain. Run this node without -prune (a -reindex is needed to rebuild the pruned blocks).");
+    }
+    if (IsInitialBlockDownload()) {
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Cannot restore a wallet while the node is still syncing: the scan would find only part of the history and report a wrong balance. Wait for the sync to finish.");
+    }
+
+    SecureString mnemonic(request.params[1].get_str().c_str());
+    if (!bip39::MnemonicIsValidForWallet(mnemonic)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid recovery phrase: expected 24 words from the BIP-39 English wordlist with a valid checksum");
+    }
+
+    int64_t birthday_time = 0;
+    if (!request.params[2].isNull()) birthday_time = request.params[2].get_int64();
+
+    int64_t gap_limit = DEFAULT_RESTORE_GAP_LIMIT;
+    if (!request.params[3].isNull()) {
+        gap_limit = request.params[3].get_int64();
+        if (gap_limit < 20 || gap_limit > 100000) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "gap_limit must be between 20 and 100000");
+        }
+    }
+
+    SecureString wallet_passphrase;
+    if (!request.params[4].isNull()) wallet_passphrase = request.params[4].get_str().c_str();
+
+    std::string error, warning;
+    WalletLocation location(request.params[0].get_str());
+    if (location.Exists()) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet " + location.GetName() + " already exists.");
+    }
+    if (!CWallet::Verify(location, false, error, warning)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet file verification failed: " + error);
+    }
+
+    std::shared_ptr<CWallet> const wallet = CWallet::CreateWalletFromFile(location, 0, &mnemonic);
+    if (!wallet) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet creation failed.");
+    }
+    if (!wallet_passphrase.empty() && !wallet->EncryptWallet(wallet_passphrase)) {
+        throw JSONRPCError(RPC_WALLET_ENCRYPTION_FAILED, "Error: Failed to encrypt the wallet.");
+    }
+    CWallet* const pwallet = wallet.get();
+
+    CBlockIndex* pindexStart = nullptr;
+    {
+        LOCK(cs_main);
+        pindexStart = birthday_time > 0 ? chainActive.FindEarliestAtLeast(birthday_time - TIMESTAMP_WINDOW)
+                                        : chainActive.Genesis();
+        if (!pindexStart) pindexStart = chainActive.Genesis();
+    }
+
+    int64_t used_addresses = 0;
+    int64_t derived = gap_limit;
+    {
+        // Derive the look-ahead window, scan, and extend if any used address landed
+        // inside the trailing window - a fixed window is how a restore silently
+        // under-reports a balance.
+        for (int round = 0; round < MAX_RESTORE_EXTENSIONS; ++round) {
+            if (!pwallet->TopUpKeyPool(derived)) {
+                throw JSONRPCError(RPC_WALLET_ERROR, "Unable to derive the look-ahead addresses");
+            }
+
+            WalletRescanReserver reserver(pwallet);
+            if (!reserver.reserve()) {
+                throw JSONRPCError(RPC_WALLET_ERROR, "Wallet is currently rescanning. Abort existing rescan or wait.");
+            }
+            pwallet->ScanForWalletTransactions(pindexStart, nullptr, reserver, true);
+
+            LOCK2(cs_main, pwallet->cs_wallet);
+            const int64_t highest_external = HighestUsedIndex(pwallet, bip44::CHAIN_EXTERNAL);
+            const int64_t highest_internal = HighestUsedIndex(pwallet, bip44::CHAIN_INTERNAL);
+            const int64_t highest = std::max(highest_external, highest_internal);
+            used_addresses = (highest_external >= 0 ? highest_external + 1 : 0) +
+                             (highest_internal >= 0 ? highest_internal + 1 : 0);
+
+            if (highest < 0 || highest + gap_limit < derived) break; // a clean window of unused addresses
+            derived = highest + 1 + gap_limit;
+        }
+    }
+
+    AddWallet(wallet);
+    wallet->postInitProcess();
+
+    UniValue obj(UniValue::VOBJ);
+    obj.pushKV("name", wallet->GetName());
+    obj.pushKV("scanned_from_height", pindexStart ? pindexStart->nHeight : 0);
+    obj.pushKV("gap_limit", derived);
+    obj.pushKV("used_addresses", used_addresses);
+    const BalanceInfo balance = pwallet->GetBalance();
+    obj.pushKV("balance", ValueFromAmount(balance.Total));
+    obj.pushKV("immature_balance", ValueFromAmount(balance.Immature));
+    obj.pushKV("warning", warning);
+    return obj;
+}
+
+static UniValue listwalletdir(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() > 0) {
+        throw std::runtime_error(
+            "listwalletdir\n"
+            "\nLists the wallets in the wallet directory, loaded or not, with their absolute paths.\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"walletdir\": \"...\",           (string) the wallet directory itself\n"
+            "  \"wallets\": [\n"
+            "    { \"name\": \"...\", \"filename\": \"...\", \"path\": \"...\", \"file\": \"...\", \"loaded\": true|false }\n"
+            "  ]\n"
+            "}\n"
+            "\nExamples:\n"
+            + HelpExampleCli("listwalletdir", "")
+            + HelpExampleRpc("listwalletdir", "")
+        );
+    }
+
+    const fs::path wallet_dir = GetWalletDir();
+
+    // Match loaded wallets by PATH, not by name: the default wallet is loaded under
+    // the empty name while its file is called wallet.dat, so a name comparison would
+    // report it as not loaded and hide its type and balance.
+    // Normalise to the wallet.dat file on both sides. A wallet may be a directory
+    // holding wallet.dat, and the default wallet - loaded under the empty name -
+    // resolves its location to the wallet directory itself, so comparing raw paths
+    // never matched it and it was reported as not loaded.
+    auto walletFile = [](const fs::path& p) {
+        return fs::absolute(fs::is_directory(p) ? (p / "wallet.dat") : p).string();
+    };
+
+    std::map<std::string, std::string> loaded_by_path;
+    for (const std::shared_ptr<CWallet>& wallet : GetWallets()) {
+        loaded_by_path[walletFile(wallet->GetLocation().GetPath())] = wallet->GetName();
+    }
+
+    UniValue wallets(UniValue::VARR);
+    for (const fs::path& path : ListWalletDir()) {
+        const std::string absolute = fs::absolute(path).string();
+        const auto loaded = loaded_by_path.find(walletFile(path));
+
+        UniValue entry(UniValue::VOBJ);
+        // The file name is what loadwallet and -wallet expect for a wallet that is
+        // not loaded; for a loaded one, report the name it is actually loaded under.
+        entry.pushKV("name", loaded != loaded_by_path.end() ? loaded->second : path.filename().string());
+        entry.pushKV("filename", path.filename().string());
+        entry.pushKV("path", absolute);
+        // A phrase-based wallet is a directory holding wallet.dat. Report the file
+        // itself as well, since "where is my wallet on disk" means the file.
+        const fs::path file = fs::is_directory(path) ? (path / "wallet.dat") : path;
+        entry.pushKV("file", fs::absolute(file).string());
+        entry.pushKV("loaded", loaded != loaded_by_path.end());
+        wallets.push_back(entry);
+    }
+
+    UniValue obj(UniValue::VOBJ);
+    obj.pushKV("walletdir", fs::absolute(wallet_dir).string());
+    obj.pushKV("wallets", wallets);
+    return obj;
+}
+
 static UniValue createwallet(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 4) {
         throw std::runtime_error(
-            "createwallet \"wallet_name\" ( disable_private_keys )\n"
+            "createwallet \"wallet_name\" ( disable_private_keys \"mnemonic\" \"passphrase\" )\n"
             "\nCreates and loads a new wallet.\n"
             "\nArguments:\n"
             "1. \"wallet_name\"          (string, required) The name for the new wallet. If this is a path, the wallet will be created at the path location.\n"
             "2. disable_private_keys   (boolean, optional, default: false) Disable the possibility of private keys (only watchonlys are possible in this mode).\n"
+            "3. \"mnemonic\"            (string, optional) A 24-word BIP-39 recovery phrase. The wallet derives its keys from this phrase (BIP-44), and the phrase can be shown again with getwalletmnemonic. Generate one with getnewmnemonic.\n"
+            "4. \"passphrase\"          (string, optional) Encrypt the new wallet with this passphrase as it is created, so an unencrypted copy of a recovery-phrase wallet never reaches disk.\n"
             "\nResult:\n"
             "{\n"
             "  \"name\" :    <wallet_name>,        (string) The wallet name if created successfully. If the wallet was created using a full path, the wallet_name will be the full path.\n"
@@ -3148,6 +3447,25 @@ static UniValue createwallet(const JSONRPCRequest& request)
         disable_privatekeys = request.params[1].get_bool();
     }
 
+    SecureString mnemonic;
+    if (!request.params[2].isNull()) {
+        mnemonic = request.params[2].get_str().c_str();
+        if (disable_privatekeys) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Cannot create a recovery-phrase wallet with private keys disabled");
+        }
+        if (!bip39::MnemonicIsValidForWallet(mnemonic)) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid recovery phrase: expected 24 words from the BIP-39 English wordlist with a valid checksum");
+        }
+    }
+
+    SecureString wallet_passphrase;
+    if (!request.params[3].isNull()) {
+        wallet_passphrase = request.params[3].get_str().c_str();
+        if (wallet_passphrase.empty()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Passphrase must not be empty; omit it to create an unencrypted wallet");
+        }
+    }
+
     WalletLocation location(request.params[0].get_str());
     if (location.Exists()) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet " + location.GetName() + " already exists.");
@@ -3158,10 +3476,20 @@ static UniValue createwallet(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet file verification failed: " + error);
     }
 
-    std::shared_ptr<CWallet> const wallet = CWallet::CreateWalletFromFile(location, (disable_privatekeys ? (uint64_t)WALLET_FLAG_DISABLE_PRIVATE_KEYS : 0));
+    std::shared_ptr<CWallet> const wallet = CWallet::CreateWalletFromFile(
+        location,
+        (disable_privatekeys ? (uint64_t)WALLET_FLAG_DISABLE_PRIVATE_KEYS : 0),
+        mnemonic.empty() ? nullptr : &mnemonic);
     if (!wallet) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet creation failed.");
     }
+
+    // Encrypt before the wallet is handed out, so a recovery-phrase wallet is never
+    // usable - or backed up by the startup auto-backup - in an unencrypted state.
+    if (!wallet_passphrase.empty() && !wallet->EncryptWallet(wallet_passphrase)) {
+        throw JSONRPCError(RPC_WALLET_ENCRYPTION_FAILED, "Error: Failed to encrypt the wallet.");
+    }
+
     AddWallet(wallet);
 
     wallet->postInitProcess();
@@ -4347,6 +4675,14 @@ UniValue sethdseed(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_WALLET_ERROR, "Cannot set a HD seed on a non-HD wallet. Start with -upgradewallet in order to upgrade a non-HD wallet to HD");
     }
 
+    if (pwallet->IsBIP44HD()) {
+        // Replacing the seed would silently invalidate the recovery phrase this
+        // wallet was created from: the words would no longer restore it, and
+        // everything received afterwards would be unrecoverable from the backup
+        // the owner is relying on.
+        throw JSONRPCError(RPC_WALLET_ERROR, "Cannot set a HD seed on a wallet created from a recovery phrase. Its keys come from that phrase; create a new wallet instead.");
+    }
+
     EnsureWalletIsUnlocked(pwallet);
 
     bool flush_key_pool = true;
@@ -4946,7 +5282,11 @@ static const CRPCCommand commands[] =
     { "hidden",             "addwitnessaddress",                &addwitnessaddress,             {"address","p2sh"} },
     { "wallet",             "backupwallet",                     &backupwallet,                  {"destination"} },
     { "wallet",             "bumpfee",                          &bumpfee,                       {"txid", "options"} },
-    { "wallet",             "createwallet",                     &createwallet,                  {"wallet_name", "disable_private_keys"} },
+    { "wallet",             "createwallet",                     &createwallet,                  {"wallet_name", "disable_private_keys", "mnemonic", "passphrase"} },
+    { "wallet",             "getnewmnemonic",                   &getnewmnemonic,                {} },
+    { "wallet",             "listwalletdir",                    &listwalletdir,                 {} },
+    { "wallet",             "restorewallet",                    &restorewallet,                 {"wallet_name","mnemonic","birthday_time","gap_limit","passphrase"} },
+    { "wallet",             "getwalletmnemonic",                &getwalletmnemonic,             {} },
     { "wallet",             "dumpprivkey",                      &dumpprivkey,                   {"address"}  },
     { "wallet",             "dumpwallet",                       &dumpwallet,                    {"filename"} },
     { "wallet",             "encryptwallet",                    &encryptwallet,                 {"passphrase"} },

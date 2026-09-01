@@ -101,64 +101,68 @@ BOOST_AUTO_TEST_CASE(getlocator_test)
 
 BOOST_AUTO_TEST_CASE(findearliestatleast_test)
 {
+    // Taler's CBlockIndex carries no nTimeMax, so FindEarliestAtLeast is a lower
+    // bound over the block times themselves. Times here rise by the target spacing,
+    // as they do on a healthy chain, which is the assumption the search makes.
     std::vector<uint256> vHashMain(100000);
     std::vector<CBlockIndex> vBlocksMain(100000);
-    for (unsigned int i=0; i<vBlocksMain.size(); i++) {
+    for (unsigned int i = 0; i < vBlocksMain.size(); i++) {
         vHashMain[i] = ArithToUint256(i); // Set the hash equal to the height
         vBlocksMain[i].nHeight = i;
         vBlocksMain[i].pprev = i ? &vBlocksMain[i - 1] : nullptr;
         vBlocksMain[i].phashBlock = &vHashMain[i];
         vBlocksMain[i].BuildSkip();
-        if (i < 10) {
-            vBlocksMain[i].nTime = i;
-            vBlocksMain[i].nTimeMax = i;
-        } else {
-            // randomly choose something in the range [MTP, MTP*2]
-            int64_t medianTimePast = vBlocksMain[i].GetMedianTimePast();
-            int r = InsecureRandRange(medianTimePast);
-            vBlocksMain[i].nTime = r + medianTimePast;
-            vBlocksMain[i].nTimeMax = std::max(vBlocksMain[i].nTime, vBlocksMain[i-1].nTimeMax);
-        }
-    }
-    // Check that we set nTimeMax up correctly.
-    unsigned int curTimeMax = 0;
-    for (unsigned int i=0; i<vBlocksMain.size(); ++i) {
-        curTimeMax = std::max(curTimeMax, vBlocksMain[i].nTime);
-        BOOST_CHECK(curTimeMax == vBlocksMain[i].nTimeMax);
+        vBlocksMain[i].nTime = 1500000000 + i * 140; // nPosTargetSpacing
     }
 
-    // Build a CChain for the main branch.
     CChain chain;
     chain.SetTip(&vBlocksMain.back());
 
-    // Verify that FindEarliestAtLeast is correct.
-    for (unsigned int i=0; i<10000; ++i) {
-        // Pick a random element in vBlocksMain.
-        int r = InsecureRandRange(vBlocksMain.size());
-        int64_t test_time = vBlocksMain[r].nTime;
-        CBlockIndex *ret = chain.FindEarliestAtLeast(test_time);
-        BOOST_CHECK(ret->nTimeMax >= test_time);
-        BOOST_CHECK((ret->pprev==nullptr) || ret->pprev->nTimeMax < test_time);
+    for (unsigned int i = 0; i < 10000; ++i) {
+        const int r = InsecureRandRange(vBlocksMain.size());
+        const int64_t test_time = vBlocksMain[r].nTime;
+
+        // Asking for a block's own time returns that block, not the one after it.
+        CBlockIndex* ret = chain.FindEarliestAtLeast(test_time);
+        BOOST_CHECK(ret != nullptr);
+        BOOST_CHECK_EQUAL(ret->nHeight, r);
+        BOOST_CHECK(ret->GetBlockTime() >= test_time);
+        BOOST_CHECK((ret->pprev == nullptr) || ret->pprev->GetBlockTime() < test_time);
         BOOST_CHECK(vBlocksMain[r].GetAncestor(ret->nHeight) == ret);
+
+        // A time between two blocks returns the later one - the first block that
+        // could hold a transaction made at that moment.
+        CBlockIndex* between = chain.FindEarliestAtLeast(test_time - 1);
+        BOOST_CHECK(between != nullptr);
+        BOOST_CHECK_EQUAL(between->nHeight, r);
     }
+
+    // Before the first block and after the last.
+    BOOST_CHECK(!chain.FindEarliestAtLeast(vBlocksMain.front().nTime - 1));
+    BOOST_CHECK(!chain.FindEarliestAtLeast(vBlocksMain.back().nTime + 1));
+    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(vBlocksMain.front().nTime)->nHeight, 0);
+    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(vBlocksMain.back().nTime)->nHeight,
+                      (int)vBlocksMain.size() - 1);
 }
 
 BOOST_AUTO_TEST_CASE(findearliestatleast_edge_test)
 {
+    // Repeated timestamps: the answer must be the *first* block of each group.
+    // This is also the regression test for a lower bound that failed to advance
+    // its low end, which spun forever once the window narrowed to two blocks.
     std::list<CBlockIndex> blocks;
-    for (unsigned int timeMax : {100, 100, 100, 200, 200, 200, 300, 300, 300}) {
+    for (unsigned int time : {100, 100, 100, 200, 200, 200, 300, 300, 300}) {
         CBlockIndex* prev = blocks.empty() ? nullptr : &blocks.back();
         blocks.emplace_back();
         blocks.back().nHeight = prev ? prev->nHeight + 1 : 0;
         blocks.back().pprev = prev;
         blocks.back().BuildSkip();
-        blocks.back().nTimeMax = timeMax;
+        blocks.back().nTime = time;
     }
 
     CChain chain;
     chain.SetTip(&blocks.back());
 
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(50)->nHeight, 0);
     BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(100)->nHeight, 0);
     BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(150)->nHeight, 3);
     BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(200)->nHeight, 3);
@@ -166,15 +170,15 @@ BOOST_AUTO_TEST_CASE(findearliestatleast_edge_test)
     BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(300)->nHeight, 6);
     BOOST_CHECK(!chain.FindEarliestAtLeast(350));
 
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(0)->nHeight, 0);
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(-1)->nHeight, 0);
-
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(std::numeric_limits<int64_t>::min())->nHeight, 0);
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(std::numeric_limits<unsigned int>::min())->nHeight, 0);
-    BOOST_CHECK_EQUAL(chain.FindEarliestAtLeast(-int64_t(std::numeric_limits<unsigned int>::max()) - 1)->nHeight, 0);
+    // Unlike upstream, a time older than the first block finds nothing rather than
+    // the genesis block: callers that want the whole chain pass the genesis block
+    // themselves. restorewallet relies on this and falls back to genesis.
+    BOOST_CHECK(!chain.FindEarliestAtLeast(50));
+    BOOST_CHECK(!chain.FindEarliestAtLeast(0));
+    BOOST_CHECK(!chain.FindEarliestAtLeast(-1));
+    BOOST_CHECK(!chain.FindEarliestAtLeast(std::numeric_limits<int64_t>::min()));
     BOOST_CHECK(!chain.FindEarliestAtLeast(std::numeric_limits<int64_t>::max()));
     BOOST_CHECK(!chain.FindEarliestAtLeast(std::numeric_limits<unsigned int>::max()));
-    BOOST_CHECK(!chain.FindEarliestAtLeast(int64_t(std::numeric_limits<unsigned int>::max()) + 1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

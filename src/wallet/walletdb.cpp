@@ -504,6 +504,18 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             ssValue >> strValue;
             pwallet->LoadDestData(DecodeDestination(strAddress), strKey, strValue);
         }
+        else if (strType == "mnemonic")
+        {
+            std::vector<unsigned char> entropy;
+            ssValue >> entropy;
+            pwallet->LoadMnemonicEntropy(entropy, false);
+        }
+        else if (strType == "cmnemonic")
+        {
+            std::vector<unsigned char> crypted_entropy;
+            ssValue >> crypted_entropy;
+            pwallet->LoadMnemonicEntropy(crypted_entropy, true);
+        }
         else if (strType == "hdchain")
         {
             CHDChain chain;
@@ -816,7 +828,7 @@ bool WalletBatch::RecoverKeysOnlyFilter(void *callbackData, CDataStream ssKey, C
         fReadOK = ReadKeyValue(dummyWallet, ssKey, ssValue,
                                dummyWss, strType, strErr);
     }
-    if (!IsKeyType(strType) && strType != "hdchain")
+    if (!IsKeyType(strType) && strType != "hdchain" && strType != "mnemonic" && strType != "cmnemonic")
         return false;
     if (!fReadOK)
     {
@@ -847,6 +859,21 @@ bool WalletBatch::EraseDestData(const std::string &address, const std::string &k
     return EraseIC(std::make_pair(std::string("destdata"), std::make_pair(address, key)));
 }
 
+
+bool WalletBatch::WriteMnemonicEntropy(const std::vector<unsigned char>& entropy)
+{
+    return WriteIC(std::string("mnemonic"), entropy);
+}
+
+bool WalletBatch::WriteCryptedMnemonicEntropy(const std::vector<unsigned char>& crypted_entropy)
+{
+    return WriteIC(std::string("cmnemonic"), crypted_entropy);
+}
+
+bool WalletBatch::EraseMnemonicEntropy()
+{
+    return EraseIC(std::string("mnemonic"));
+}
 
 bool WalletBatch::WriteHDChain(const CHDChain& chain)
 {

@@ -116,10 +116,7 @@ public:
         vSeeds.clear();
         vSeeds.emplace_back("talerseed01.taler.tech");
         vSeeds.emplace_back("talerseed02.taler.tech");
-        vSeeds.emplace_back("dnsseed.talercrypto.com");
         vSeeds.emplace_back("talerseed1.vovanchik.net");
-        vSeeds.emplace_back("talerseed2.vovanchik.net");
-        vSeeds.emplace_back("talerseed3.vovanchik.net");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 65);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 50);
@@ -128,6 +125,7 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
         bech32_hrp = "tlr";
+        nBIP44CoinType = 1524;
 
         vFixedSeeds.clear();
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
@@ -213,8 +211,6 @@ public:
 
         vSeeds.clear();
         vSeeds.emplace_back("talerseed1.vovanchik.net");
-        vSeeds.emplace_back("talerseed2.vovanchik.net");
-        vSeeds.emplace_back("talerseed3.vovanchik.net");
         vFixedSeeds.clear();
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 111);
@@ -224,6 +220,7 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94}; 
         
         bech32_hrp = "test";
+        nBIP44CoinType = 1;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -254,9 +251,34 @@ public:
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
         consensus.CSVHeight = 1400;
         consensus.WitnessHeight = 1400;
-        consensus.powLimit = (~arith_uint256 (0)) >> 4;
-        consensus.powLimitLegacy = (~arith_uint256 (0)) >> 16;
-        consensus.posLimit = (~arith_uint256 (0)) >> 8;
+        // Regtest inherited none of Taler's staking or difficulty parameters, so
+        // every one of them was zero. The first generate() call divided by a
+        // zero-length averaging window and the RPC failed with "Division by zero",
+        // which is as far as any functional test could ever get. Values are scaled
+        // for a local chain: short ages so staking is reachable within a test, a
+        // small averaging window so difficulty settles in a few blocks.
+        consensus.nPosTargetTimespan = 14 * 24 * 60 * 60;
+        consensus.nPosTargetSpacing = 60;
+        consensus.nCoinAgeTick = 60;
+        consensus.nStakeMinAge = 60;
+        consensus.nStakeMaxAge = 60 * 60;
+        consensus.nStakeModifierInterval = 60;
+        consensus.nPowAveragingWindowv1 = 5;
+        consensus.nPowAveragingWindowv2 = 5;
+        // Zero keeps the behaviour the chain already had with these unset: the
+        // newest rules apply from genesis, which is what the genesis block above
+        // was mined under.
+        consensus.nLyra2ZHeight = 0;
+        consensus.TLRHeight = 0;
+        consensus.nNewDiffAdjustmentAlgorithmHeight = 0;
+
+        // Every limit must sit above the 0x207fffff target the blocks below are
+        // built with, or CheckProofOfWork rejects them for being easier than the
+        // network minimum - which made every block on regtest unacceptable,
+        // genesis included. Regtest is local-only, so this affects no network.
+        consensus.powLimit = (~arith_uint256 (0)) >> 1;
+        consensus.powLimitLegacy = (~arith_uint256 (0)) >> 1;
+        consensus.posLimit = (~arith_uint256 (0)) >> 1;
         consensus.nPowTargetTimespan = 24 * 60 * 60;
         consensus.nPowTargetSpacing = 1 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
@@ -275,10 +297,16 @@ public:
         nDefaultPort = 18444;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1296688602, 2, 0x207fffff, 1, 50 * COIN);
+        // Nonce chosen so the block satisfies its own proof of work: the genesis
+        // block is proof-checked every time it is read back from disk, and the
+        // inherited nonce of 2 did not pass under this chain's hash.
+        genesis = CreateGenesisBlock(1296688602, 0, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"));
-        assert(genesis.hashMerkleRoot == uint256S("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
+        // Taler's own regtest genesis. The values here were Bitcoin's, so the
+        // assertion fired the moment anything selected regtest - which nothing did,
+        // because the test suite had never been built.
+        assert(consensus.hashGenesisBlock == uint256S("0xd2315de6024d7bee64fa9544461025e027ef75ffa58f4b5e72e320c08ff4bedd"));
+        assert(genesis.hashMerkleRoot == uint256S("0x985fae483ebbef9cde04a259282cb7465d52bf56824caf1a8132395e90488b12"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
@@ -289,7 +317,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206")},
+                {0, uint256S("d2315de6024d7bee64fa9544461025e027ef75ffa58f4b5e72e320c08ff4bedd")},
             }
         };
 
@@ -300,6 +328,7 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
         bech32_hrp = "bcrt";
+        nBIP44CoinType = 1;
 
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;

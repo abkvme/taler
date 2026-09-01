@@ -1,0 +1,123 @@
+name: Tests
+
+# The build workflows prove the tree compiles. This one proves it behaves: the
+# unit suites listed in test/unit-test-suites.txt, then the functional tests that
+# cover recovery-phrase wallets end to end on regtest.
+#
+# Tests are off by default in configure (see configure.ac), so --enable-tests is
+# required here or nothing below actually runs.
+
+on:
+  push:
+    branches: [ master, main, 'feature/**' ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Unit and functional tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libtool autotools-dev automake \
+            pkg-config bsdmainutils python3 curl
+
+      - name: Cache depends
+        uses: actions/cache@v6
+        with:
+          path: depends/built
+          key: depends-${{ runner.os }}-${{ hashFiles('depends/packages/*.mk') }}
+
+      - name: Build dependencies
+        run: make -C depends -j$(nproc) NO_QT=1
+
+      - name: Build with tests enabled
+        run: |
+          ./autogen.sh
+          HOST_TRIPLET=$(cd depends && ./config.guess)
+          CONFIG_SITE=$PWD/depends/${HOST_TRIPLET}/share/config.site \
+            ./configure --prefix=/ --with-incompatible-bdb --enable-tests --without-gui
+          make -j$(nproc)
+
+      - name: Unit tests
+        run: |
+          SUITES=$(grep -v '^#' test/unit-test-suites.txt | grep -v '^$' | paste -sd, -)
+          echo "Running $(echo "$SUITES" | tr ',' '\n' | wc -l) suites"
+          ./src/test/test_bitcoin --run_test="$SUITES" --log_level=test_suite
+
+      - name: Functional tests - recovery phrase wallets
+        run: |
+          python3 test/functional/wallet_mnemonic.py
+          python3 test/functional/wallet_mnemonic_startup.py
+
+      - name: Derivation vectors match the published spec
+        # The node and the mobile wallet derive from the same phrase, so the vectors
+        # they share must be byte-identical to the ones the spec publishes.
+        run: |
+          curl -sSfL -o /tmp/spec-vectors.json \
+            https://raw.githubusercontent.com/abkvme/taler.spec/main/vectors/seed-derivation-v1.json
+          diff -u /tmp/spec-vectors.json test/functional/data/seed-derivation-v1.json \
+            || { echo "::error::test/functional/data/seed-derivation-v1.json is out of date with taler.spec"; exit 1; }
+
+  upgrade-gate:
+    name: 0.19 to 0.20 upgrade gate
+    # The one test that needs two versions of the daemon, so it builds the previous
+    # release as well. Run before tagging a release, or on demand - not on every push.
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # the previous release's tag has to be reachable
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libtool autotools-dev automake \
+            pkg-config bsdmainutils python3
+
+      - name: Build dependencies
+        run: make -C depends -j$(nproc) NO_QT=1
+
+      - name: Build this version
+        run: |
+          ./autogen.sh
+          HOST_TRIPLET=$(cd depends && ./config.guess)
+          CONFIG_SITE=$PWD/depends/${HOST_TRIPLET}/share/config.site \
+            ./configure --prefix=/ --with-incompatible-bdb --without-gui
+          make -j$(nproc)
+
+      - name: Build the previous release
+        run: |
+          PREVIOUS=$(git tag --list 'v0.19.*' --sort=-v:refname | head -1)
+          echo "Previous release: $PREVIOUS"
+          git worktree add --detach /tmp/taler-previous "$PREVIOUS"
+          HOST_TRIPLET=$(cd depends && ./config.guess)
+          cd /tmp/taler-previous
+          ./autogen.sh
+          CONFIG_SITE=$GITHUB_WORKSPACE/depends/${HOST_TRIPLET}/share/config.site \
+            ./configure --prefix=/ --with-incompatible-bdb --without-gui
+          make -j$(nproc) src/talerd src/taler-cli
+
+      - name: A 0.19 wallet must survive 0.20, and 0.19 must survive after
+        run: python3 test/compat/wallet_compat.py --old /tmp/taler-previous/src

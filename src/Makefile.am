@@ -184,6 +184,9 @@ BITCOIN_CORE_H = \
   validationinterface.h \
   versionbits.h \
   walletinitinterface.h \
+  wallet/bip39.h \
+  wallet/bip39_english.h \
+  wallet/bip44.h \
   wallet/coincontrol.h \
   wallet/crypter.h \
   wallet/db.h \
@@ -269,6 +272,8 @@ libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
+  wallet/bip39.cpp \
+  wallet/bip44.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \

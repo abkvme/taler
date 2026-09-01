@@ -66,6 +66,8 @@ BASE_SCRIPTS = [
     'p2p_compactblocks.py',
     'feature_segwit.py',
     # vv Tests less than 2m vv
+    'wallet_mnemonic.py',
+    'wallet_mnemonic_startup.py',
     'wallet_basic.py',
     'wallet_labels.py',
     'p2p_segwit.py',

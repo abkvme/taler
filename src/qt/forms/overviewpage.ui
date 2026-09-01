@@ -415,14 +415,13 @@
           <enum>QFrame::Raised</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true">QFrame#stakingFrame { border: 1px solid palette(mid); border-radius: 8px; background-color: palette(base); }
-QPushButton#startStakingButton { background-color: #2ecc71; color: white; border: none; border-radius: 6px; padding: 6px 16px; font-weight: bold; }
-QPushButton#startStakingButton:hover { background-color: #27ae60; }
+          <string notr="true">QPushButton#startStakingButton { background-color: #0088cc; color: white; border: none; border-radius: 8px; padding: 7px 16px; font-weight: bold; }
+QPushButton#startStakingButton:hover { background-color: #17a0e6; }
 QPushButton#startStakingButton:disabled { background-color: #95a5a6; color: #ecf0f1; }
-QPushButton#stopStakingButton { background-color: #e74c3c; color: white; border: none; border-radius: 6px; padding: 6px 16px; font-weight: bold; }
+QPushButton#stopStakingButton { background-color: #e74c3c; color: white; border: none; border-radius: 8px; padding: 7px 16px; font-weight: bold; }
 QPushButton#stopStakingButton:hover { background-color: #c0392b; }
-QProgressBar#stakingProgressBar { border: 1px solid palette(mid); border-radius: 4px; background-color: palette(base); height: 6px; text-align: center; }
-QProgressBar#stakingProgressBar::chunk { background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #2ecc71, stop: 1 #27ae60); border-radius: 3px; }</string>
+QProgressBar#stakingProgressBar { border: none; border-radius: 6px; background-color: palette(alternate-base); height: 8px; text-align: center; }
+QProgressBar#stakingProgressBar::chunk { background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #0088cc, stop: 1 #17a0e6); border-radius: 6px; }</string>
          </property>
          <layout class="QVBoxLayout" name="stakingLayout">
           <property name="spacing">

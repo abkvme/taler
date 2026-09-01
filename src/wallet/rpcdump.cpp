@@ -180,6 +180,7 @@ UniValue importprivkey(const JSONRPCRequest& request)
             if (!pwallet->AddKeyPubKey(key, pubkey)) {
                 throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
             }
+            pwallet->MarkImportedKeys();
             pwallet->LearnAllRelatedScripts(pubkey);
         }
     }
@@ -225,6 +226,7 @@ static void ImportScript(CWallet* const pwallet, const CScript& script, const st
 
     pwallet->MarkDirty();
 
+    pwallet->MarkImportedKeys(); // watch-only scripts are not covered by a recovery phrase either
     if (!pwallet->HaveWatchOnly(script) && !pwallet->AddWatchOnly(script, 0 /* nCreateTime */)) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Error adding address to wallet");
     }
@@ -595,6 +597,7 @@ UniValue importwallet(const JSONRPCRequest& request)
                     fGood = false;
                     continue;
                 }
+                pwallet->MarkImportedKeys();
                 pwallet->mapKeyMetadata[keyid].nCreateTime = nTime;
                 if (fLabel)
                     pwallet->SetAddressBook(keyid, strLabel, "receive");
@@ -945,6 +948,7 @@ static UniValue ProcessImport(CWallet * const pwallet, const UniValue& data, con
                     if (!pwallet->AddKeyPubKey(key, pubkey)) {
                         throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
                     }
+                    pwallet->MarkImportedKeys();
 
                     pwallet->UpdateTimeFirstKey(timestamp);
                 }
@@ -1064,6 +1068,7 @@ static UniValue ProcessImport(CWallet * const pwallet, const UniValue& data, con
                 if (!pwallet->AddKeyPubKey(key, pubKey)) {
                     throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
                 }
+                pwallet->MarkImportedKeys();
 
                 pwallet->UpdateTimeFirstKey(timestamp);
 

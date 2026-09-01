@@ -35,7 +35,7 @@ static void RejectDifficultyMismatch(double difficulty, double expected_difficul
 static void TestDifficulty(uint32_t nbits, double expected_difficulty)
 {
     CBlockIndex* block_index = CreateBlockIndexWithNbits(nbits);
-    double difficulty = GetDifficulty(block_index);
+    double difficulty = GetDifficulty(false, block_index);
     delete block_index;
 
     RejectDifficultyMismatch(difficulty, expected_difficulty);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(get_difficulty_for_very_high_target)
 // Verify that difficulty is 1.0 for an empty chain.
 BOOST_AUTO_TEST_CASE(get_difficulty_for_null_tip)
 {
-    double difficulty = GetDifficulty(nullptr);
+    double difficulty = GetDifficulty(false, nullptr);
     RejectDifficultyMismatch(difficulty, 1.0);
 }
 

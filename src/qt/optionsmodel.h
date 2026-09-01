@@ -55,6 +55,7 @@ public:
         DatabaseCache,          // int
         SpendZeroConfChange,    // bool
         Listen,                 // bool
+        Theme,                  // int: 0 system, 1 light, 2 dark
         OptionIDRowCount,
     };
 

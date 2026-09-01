@@ -20,13 +20,37 @@
 
 #include <QAbstractItemDelegate>
 #include <QMessageBox>
+#include <QBoxLayout>
+#include <QFrame>
 #include <QPainter>
 #include <QTimer>
 
-#define DECORATION_SIZE 54
+#define DECORATION_SIZE 24
+//! Row height is independent of the icon: the row holds two lines of text, and tying
+//! its height to the icon is what clipped them when the icon shrank.
+#define ROW_HEIGHT 46
+//! Breathing room so the icon does not sit against the panel border.
+#define ROW_PADDING 10
 #define NUM_ITEMS 5
 
 Q_DECLARE_METATYPE(interfaces::WalletBalances)
+
+//! The Taler blue from the project mark. Transaction icons are drawn in it rather
+//! than in the text colour: white icons vanish on a light background, and at this
+//! size the accent reads as part of the brand instead of as decoration.
+static const QColor TALER_ACCENT(0x00, 0x88, 0xcc);
+
+//! Recolour an icon, keeping its alpha. QIcon has no tint of its own.
+static QIcon ColorizeIcon(const QIcon& icon, const QColor& colour)
+{
+    QPixmap pixmap = icon.pixmap(QSize(DECORATION_SIZE, DECORATION_SIZE) * 2);
+    if (pixmap.isNull()) return icon;
+    QPainter painter(&pixmap);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(pixmap.rect(), colour);
+    painter.end();
+    return QIcon(pixmap);
+}
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -46,13 +70,17 @@ public:
 
         QIcon icon = qvariant_cast<QIcon>(index.data(TransactionTableModel::RawDecorationRole));
         QRect mainRect = option.rect;
-        QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
-        int xspace = DECORATION_SIZE + 8;
+        // Icon padded from the left edge and centred against the two text lines.
+        QRect decorationRect(mainRect.left() + ROW_PADDING,
+                             mainRect.top() + (mainRect.height() - DECORATION_SIZE) / 2,
+                             DECORATION_SIZE, DECORATION_SIZE);
+        int xspace = ROW_PADDING + DECORATION_SIZE + 12;
         int ypad = 6;
         int halfheight = (mainRect.height() - 2*ypad)/2;
-        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
-        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
-        icon = platformStyle->SingleColorIcon(icon);
+        const int textWidth = mainRect.width() - xspace - ROW_PADDING; // keep off the right edge too
+        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, textWidth, halfheight);
+        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, textWidth, halfheight);
+        icon = ColorizeIcon(icon, TALER_ACCENT);
         icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
@@ -106,7 +134,7 @@ public:
 
     inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return QSize(DECORATION_SIZE, DECORATION_SIZE);
+        return QSize(DECORATION_SIZE, ROW_HEIGHT);
     }
 
     int unit;
@@ -128,6 +156,55 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
 
     m_balances.balance = -1;
 
+    // ---- visual hierarchy -------------------------------------------------
+    // Card titles get one treatment everywhere instead of ad-hoc bold labels, and
+    // the balance is promoted to the hero it should be: it is the number the whole
+    // screen exists to show, and it was rendered the same size as its own caption.
+    // Headline balance in a badge of its own, above the Balances card. The card
+    // keeps its plain rows: enlarging the number in place overlapped its caption,
+    // because the form's grid was laid out for text of one size.
+    m_balance_badge = new QFrame(this);
+    m_balance_badge->setObjectName("balanceBadge");
+    QVBoxLayout* badgeLayout = new QVBoxLayout(m_balance_badge);
+    badgeLayout->setContentsMargins(18, 12, 18, 14);
+    badgeLayout->setSpacing(2);
+    m_badge_caption = new QLabel(tr("Available balance"), m_balance_badge);
+    m_badge_caption->setObjectName("balanceBadgeCaption");
+    m_badge_value = new QLabel(QString(), m_balance_badge);
+    m_badge_value->setObjectName("balanceBadgeValue");
+    m_badge_value->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    badgeLayout->addWidget(m_badge_caption);
+    badgeLayout->addWidget(m_badge_value);
+
+    // Which wallet is on screen, stated plainly on the main screen rather than only
+    // in the toolbar selector.
+    // Reserves the row the wallet bar is placed into; it names the wallet only
+    // until the bar arrives, which is the case before any wallet is loaded.
+    m_wallet_name_label = new QLabel(this);
+    m_wallet_name_label->setProperty("class", "walletName");
+    m_wallet_name_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
+        page->insertWidget(0, m_wallet_name_label);
+    }
+    // Inside the left column, directly above the Balances card. At page level it
+    // spanned both columns and pushed the transaction list down with it.
+    ui->verticalLayout_2->insertWidget(0, m_balance_badge);
+
+    ui->label_5->setProperty("class", "cardTitle");          // Balances
+    ui->label_4->setProperty("class", "cardTitle");          // Recent transactions
+    ui->labelStakingTitle->setProperty("class", "cardTitle");
+    ui->labelStakingSubtitle->setProperty("class", "cardHint");
+
+
+    // Empty state: a blank panel reads as broken on a fresh wallet.
+    // Parented to the list itself: as a child of the page, its geometry was in the
+    // page's coordinates and the message landed on top of the Balances card.
+    m_empty_transactions = new QLabel(tr("No transactions yet.\nIncoming and outgoing payments will appear here."), ui->listTransactions);
+    m_empty_transactions->setAlignment(Qt::AlignCenter);
+    m_empty_transactions->setProperty("class", "emptyState");
+    m_empty_transactions->setWordWrap(true);
+    m_empty_transactions->hide();
+
     // use a SingleColorIcon for the "out of sync warning" icon
     QIcon icon = platformStyle->SingleColorIcon(":/icons/warning");
     icon.addPixmap(icon.pixmap(QSize(64,64), QIcon::Normal), QIcon::Disabled); // also set the disabled icon because we are using a disabled QPushButton to work around missing HiDPI support of QLabel (https://bugreports.qt.io/browse/QTBUG-42503)
@@ -137,7 +214,7 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
-    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
+    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (ROW_HEIGHT + 2));
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
@@ -179,11 +256,36 @@ OverviewPage::~OverviewPage()
     delete ui;
 }
 
+//! Headline amount, cut to two decimals. The badge is for reading at a glance; the
+//! exact figure to the last unit stays on the Balances rows underneath.
+static QString FormatBadgeAmount(int unit, const CAmount& amount)
+{
+    QString text = BitcoinUnits::format(unit, amount, false, BitcoinUnits::separatorAlways);
+    const int point = text.indexOf(QChar('.'));
+    if (point >= 0) text.truncate(point + 3);
+    return text + QString(" ") + BitcoinUnits::shortName(unit);
+}
+
+void OverviewPage::setWalletBar(QWidget* bar)
+{
+    if (!bar) return;
+    // The bar is shared between wallet views, so it arrives here already parented to
+    // another page. Inserting it into this layout reparents it and Qt drops it from
+    // the previous one; the label it stands in for is hidden while it is present.
+    if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
+        page->insertWidget(0, bar);
+        bar->show();
+    }
+    m_wallet_bar_shown = true;
+    m_wallet_name_label->hide();
+}
+
 void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 {
     int unit = walletModel->getOptionsModel()->getDisplayUnit();
     m_balances = balances;
     ui->labelBalance->setText(BitcoinUnits::formatWithUnit(unit, balances.balance, false, BitcoinUnits::separatorAlways));
+    if (m_badge_value) m_badge_value->setText(FormatBadgeAmount(unit, balances.balance));
     ui->labelUnconfirmed->setText(BitcoinUnits::formatWithUnit(unit, balances.unconfirmed_balance, false, BitcoinUnits::separatorAlways));
     ui->labelImmature->setText(BitcoinUnits::formatWithUnit(unit, balances.immature_balance, false, BitcoinUnits::separatorAlways));
     ui->labelTotal->setText(BitcoinUnits::formatWithUnit(unit, balances.balance + balances.unconfirmed_balance + balances.immature_balance, false, BitcoinUnits::separatorAlways));
@@ -228,8 +330,30 @@ void OverviewPage::setClientModel(ClientModel *model)
     }
 }
 
+void OverviewPage::updateTransactionsPlaceholder()
+{
+    if (!m_empty_transactions) return;
+    const bool empty = !ui->listTransactions->model() || ui->listTransactions->model()->rowCount() == 0;
+    m_empty_transactions->setVisible(empty);
+    if (empty) {
+        m_empty_transactions->setGeometry(ui->listTransactions->rect());
+        m_empty_transactions->raise();
+    }
+}
+
+void OverviewPage::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    updateTransactionsPlaceholder();
+}
+
 void OverviewPage::setWalletModel(WalletModel *model)
 {
+    if (m_wallet_name_label) {
+        m_wallet_name_label->setText(model ? tr("Wallet: %1").arg(GUIUtil::walletDisplayName(model->getWalletName()))
+                                           : QString());
+        m_wallet_name_label->setVisible(model != nullptr && !m_wallet_bar_shown);
+    }
     this->walletModel = model;
     if(model && model->getOptionsModel())
     {
@@ -243,6 +367,10 @@ void OverviewPage::setWalletModel(WalletModel *model)
         filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
 
         ui->listTransactions->setModel(filter.get());
+        connect(filter.get(), &QAbstractItemModel::rowsInserted, this, &OverviewPage::updateTransactionsPlaceholder);
+        connect(filter.get(), &QAbstractItemModel::rowsRemoved, this, &OverviewPage::updateTransactionsPlaceholder);
+        connect(filter.get(), &QAbstractItemModel::modelReset, this, &OverviewPage::updateTransactionsPlaceholder);
+        updateTransactionsPlaceholder();
         ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
 
         // Keep up to date with wallet

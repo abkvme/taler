@@ -124,6 +124,10 @@ private:
     QAction* receiveCoinsMenuAction = nullptr;
     QAction* optionsAction = nullptr;
     QAction* toggleHideAction = nullptr;
+    QAction* createWalletAction = nullptr;
+    QAction* restoreWalletAction = nullptr;
+    QAction* showMnemonicAction = nullptr;
+    QAction* manageWalletsAction = nullptr;
     QAction* encryptWalletAction = nullptr;
     QAction* backupWalletAction = nullptr;
     QAction* changePassphraseAction = nullptr;
@@ -131,10 +135,9 @@ private:
     QAction* openRPCConsoleAction = nullptr;
     QAction* openAction = nullptr;
     QAction* showHelpMessageAction = nullptr;
-    QAction* m_wallet_selector_label_action = nullptr;
-    QAction* m_wallet_selector_action = nullptr;
+    //! Selector + manage button, shown on the current wallet's overview page.
+    QWidget* m_wallet_bar = nullptr;
 
-    QLabel *m_wallet_selector_label = nullptr;
     QComboBox* m_wallet_selector = nullptr;
 
     QSystemTrayIcon* trayIcon = nullptr;
@@ -226,6 +229,16 @@ public Q_SLOTS:
 private:
     /** Set the proxy-enabled icon as shown in the UI. */
     void updateProxyIcon();
+
+public Q_SLOTS:
+    /** Create a new wallet from a freshly generated recovery phrase */
+    void createWalletFromMnemonic();
+    /** Restore a wallet from an existing recovery phrase */
+    void restoreWalletFromMnemonic();
+    /** Show the recovery phrase of the current wallet */
+    void showWalletMnemonic();
+    /** Open the wallet manager: list, rename, remove */
+    void manageWallets();
 
 private Q_SLOTS:
 #ifdef ENABLE_WALLET

@@ -68,9 +68,18 @@ bool ConnectivityChecker::tcpConnect(const std::string& host, int port, int time
                 FD_ZERO(&wfds);
                 FD_SET(sock, &wfds);
                 struct timeval tv;
-                tv.tv_sec = timeoutSec;
+                tv.tv_sec = 0;
                 tv.tv_usec = 0;
-                if (select(sock + 1, nullptr, &wfds, nullptr, &tv) > 0) {
+                bool done = false;
+                for (int waited = 0; waited < timeoutSec * 1000 && !done; waited += 100) {
+                    if (isInterruptionRequested()) break;
+                    FD_ZERO(&wfds);
+                    FD_SET(sock, &wfds);
+                    tv.tv_sec = 0;
+                    tv.tv_usec = 100000;
+                    if (select(sock + 1, nullptr, &wfds, nullptr, &tv) > 0) done = true;
+                }
+                if (done) {
                     int err = 0;
                     int len = sizeof(err);
                     getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&err, &len);
@@ -82,11 +91,20 @@ bool ConnectivityChecker::tcpConnect(const std::string& host, int port, int time
                 struct pollfd pfd;
                 pfd.fd = sock;
                 pfd.events = POLLOUT;
-                if (poll(&pfd, 1, timeoutSec * 1000) > 0) {
-                    int err = 0;
-                    socklen_t len = sizeof(err);
-                    getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len);
-                    connected = (err == 0);
+                // Waited in slices so that an interruption is noticed promptly:
+                // a single blocking poll of several seconds per host made stopping
+                // a sweep take far longer than a user switching tabs will wait.
+                for (int waited = 0; waited < timeoutSec * 1000; waited += 100) {
+                    if (isInterruptionRequested()) break;
+                    int ready = poll(&pfd, 1, 100);
+                    if (ready < 0) break;
+                    if (ready > 0) {
+                        int err = 0;
+                        socklen_t len = sizeof(err);
+                        getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len);
+                        connected = (err == 0);
+                        break;
+                    }
                 }
             }
 #endif
@@ -109,7 +127,8 @@ void ConnectivityChecker::run()
     for (const auto& item : m_items) {
         if (isInterruptionRequested()) return;
         bool ok = tcpConnect(item.host.toStdString(), item.port, 3);
-        Q_EMIT checkResult(item.tableIndex, item.row, ok);
+        if (isInterruptionRequested()) return;
+        Q_EMIT checkResult(m_generation, item.tableIndex, item.row, ok);
     }
 }
 
@@ -118,7 +137,8 @@ InfoPage::InfoPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     QWidget(parent),
     clientModel(nullptr),
     platformStyle(_platformStyle),
-    checker(nullptr)
+    checker(nullptr),
+    m_generation(0)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -214,9 +234,13 @@ InfoPage::InfoPage(const PlatformStyle *_platformStyle, QWidget *parent) :
 InfoPage::~InfoPage()
 {
     if (checker) {
+        // Ask it to stop and let go of it. It is parentless and deletes itself when
+        // it returns, so it is never deleted here even if it is still inside a
+        // blocking name lookup - deleting a running QThread aborts the process.
+        disconnect(checker, nullptr, this, nullptr);
         checker->requestInterruption();
-        checker->wait(5000);
-        delete checker;
+        checker->wait(2000);
+        checker = nullptr;
     }
 }
 
@@ -353,12 +377,19 @@ void InfoPage::populateTables()
 
 void InfoPage::refreshData()
 {
-    // Stop any running checker
+    // Retire any running sweep without waiting for it and without deleting it.
+    //
+    // This used to be requestInterruption() + wait(5000) + delete. A sweep over
+    // unreachable seeds regularly takes longer than five seconds, so wait() timed
+    // out and the thread was deleted while it was still running, which aborts the
+    // process - the crash seen when returning to this page before the checks had
+    // finished. Leaving the page for long enough that the sweep ended first hit
+    // none of this, which is why waiting made the crash disappear.
+    ++m_generation;
     if (checker) {
+        disconnect(checker, nullptr, this, nullptr);
         checker->requestInterruption();
-        checker->wait(5000);
-        delete checker;
-        checker = nullptr;
+        checker = nullptr; // owns itself; freed by the finished/deleteLater pair
     }
 
     populateTables();
@@ -397,13 +428,20 @@ void InfoPage::refreshData()
         items.push_back(item);
     }
 
+    refreshButton->setEnabled(!items.empty());
+
     if (!items.empty()) {
-        checker = new ConnectivityChecker(this);
+        const int generation = m_generation;
+        // Deliberately parentless: as a child, the page's destructor would delete it
+        // mid-run. It is freed by finished -> deleteLater instead.
+        checker = new ConnectivityChecker();
         checker->setItems(items);
+        checker->setGeneration(generation);
         connect(checker, &ConnectivityChecker::checkResult, this, &InfoPage::onCheckResult);
         connect(checker, &QThread::finished, checker, &QObject::deleteLater);
         refreshButton->setEnabled(false);
-        connect(checker, &QThread::finished, this, [this]() {
+        connect(checker, &QThread::finished, this, [this, generation]() {
+            if (generation != m_generation) return; // superseded by a newer sweep
             refreshButton->setEnabled(true);
             checker = nullptr;
         });
@@ -411,8 +449,12 @@ void InfoPage::refreshData()
     }
 }
 
-void InfoPage::onCheckResult(int tableIndex, int row, bool reachable)
+void InfoPage::onCheckResult(int generation, int tableIndex, int row, bool reachable)
 {
+    // Results already queued when a sweep was retired refer to rows that
+    // populateTables() has since rebuilt, so they must not be painted.
+    if (generation != m_generation) return;
+
     QTableWidget *table = nullptr;
     if (tableIndex == 0) table = hardcodedTable;
     else if (tableIndex == 1) table = githubTable;

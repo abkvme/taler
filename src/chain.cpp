@@ -124,11 +124,19 @@ CBlockIndex* CChain::FindEarliestAtLeast(int64_t nTime) const
 {
     if ((Genesis() == nullptr) || (Genesis()->GetBlockTime() > nTime)) return nullptr;
     if (Tip()->GetBlockTime() < nTime) return nullptr;
+    // Lower bound over block times. The low end must move past the midpoint: with
+    // loHeight = mHeight the search stops making progress as soon as the window
+    // narrows to two blocks and the lower one is older than nTime, and spins there
+    // forever - which is every call that does not land exactly on the first block.
+    //
+    // Block times are only required to exceed the median of the last eleven, so a
+    // single block may sit slightly earlier than its parent. Every caller applies a
+    // TIMESTAMP_WINDOW of slack before calling, which covers that.
     int loHeight = 0;
     int hiHeight = Height();
     while (loHeight < hiHeight) {
-        int mHeight = (loHeight + hiHeight) / 2;
-        if ((*this)[mHeight]->GetBlockTime() < nTime) { loHeight = mHeight; } else { hiHeight = mHeight; }
+        int mHeight = loHeight + (hiHeight - loHeight) / 2;
+        if ((*this)[mHeight]->GetBlockTime() < nTime) { loHeight = mHeight + 1; } else { hiHeight = mHeight; }
     }
     return (*this)[hiHeight];
 }

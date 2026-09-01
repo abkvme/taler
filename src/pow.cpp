@@ -184,6 +184,13 @@ GetNextWorkRequiredForPow(const CBlockIndex *pindexLast, const CBlockHeader *pbl
 
 uint32_t GetNextWorkRequired(const CBlockIndex *pindexLast, const CBlockHeader *pblock, const Consensus::Params &params) {
     assert(pindexLast != nullptr);
+
+    // Test chains hold a fixed target. Blocks there are minted as fast as they are
+    // asked for, so every averaging window sees a timespan of almost zero and
+    // clamps the target to a third of the previous one - difficulty triples per
+    // block and the chain is unmineable within a dozen. Only regtest sets this.
+    if (params.fPowNoRetargeting) return pindexLast->nBits;
+
     bool fProofOfStake = pblock->IsProofOfStake();
     if (params.forkNumber(pindexLast->nHeight + 1) < 3)
         return fProofOfStake ? GetNextWorkRequiredForPos(pindexLast, pblock, params) :

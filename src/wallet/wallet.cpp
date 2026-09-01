@@ -6,6 +6,9 @@
 
 #include <wallet/wallet.h>
 
+#include <wallet/bip39.h>
+#include <wallet/bip44.h>
+
 #include <checkpoints.h>
 #include <chain.h>
 #include <wallet/coincontrol.h>
@@ -250,6 +253,11 @@ CPubKey CWallet::GenerateNewKey(WalletBatch &batch, bool internal)
 
 void CWallet::DeriveNewChildKey(WalletBatch &batch, CKeyMetadata& metadata, CKey& secret, bool internal)
 {
+    if (hdChain.IsBIP44()) {
+        DeriveNewChildKeyBIP44(batch, metadata, secret, internal);
+        return;
+    }
+
     // for now we use a fixed keypath scheme of m/0'/0'/k
     CKey seed;                     //seed (256bit)
     CExtKey masterKey;             //hd master key
@@ -675,6 +683,37 @@ void CWallet::AddToSpends(const uint256& wtxid)
         AddToSpends(txin.prevout, wtxid);
 }
 
+namespace {
+//! Same construction the keystore uses for private keys: the wallet master key plus
+//! a deterministic IV. Kept local because crypter.cpp's helpers are file-static.
+bool EncryptEntropyBlob(const CKeyingMaterial& vMasterKey, const CKeyingMaterial& plaintext,
+                        const uint256& iv, std::vector<unsigned char>& ciphertext)
+{
+    CCrypter crypter;
+    std::vector<unsigned char> chIV(WALLET_CRYPTO_IV_SIZE);
+    memcpy(chIV.data(), iv.begin(), WALLET_CRYPTO_IV_SIZE);
+    if (!crypter.SetKey(vMasterKey, chIV)) return false;
+    return crypter.Encrypt(plaintext, ciphertext);
+}
+
+bool DecryptEntropyBlob(const CKeyingMaterial& vMasterKey, const std::vector<unsigned char>& ciphertext,
+                        const uint256& iv, CKeyingMaterial& plaintext)
+{
+    CCrypter crypter;
+    std::vector<unsigned char> chIV(WALLET_CRYPTO_IV_SIZE);
+    memcpy(chIV.data(), iv.begin(), WALLET_CRYPTO_IV_SIZE);
+    if (!crypter.SetKey(vMasterKey, chIV)) return false;
+    return crypter.Decrypt(ciphertext, plaintext);
+}
+} // namespace
+
+//! IV for the entropy blob: derived from the seed id, so it is stable for the life of
+//! the wallet and distinct per wallet.
+static uint256 MnemonicEntropyIV(const CKeyID& seed_id)
+{
+    return Hash(seed_id.begin(), seed_id.end());
+}
+
 bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
 {
     if (IsCrypted())
@@ -721,6 +760,23 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
         }
         encrypted_batch->WriteMasterKey(nMasterKeyMaxID, kMasterKey);
 
+        // Re-encrypt the recovery-phrase entropy under the new master key, so
+        // "show my recovery phrase" keeps working after the wallet is encrypted.
+        if (!vchMnemonicEntropy.empty()) {
+            const CKeyingMaterial plaintext(vchMnemonicEntropy.begin(), vchMnemonicEntropy.end());
+            std::vector<unsigned char> ciphertext;
+            if (!EncryptEntropyBlob(_vMasterKey, plaintext, MnemonicEntropyIV(hdChain.seed_id), ciphertext)) {
+                encrypted_batch->TxnAbort();
+                delete encrypted_batch;
+                encrypted_batch = nullptr;
+                return false;
+            }
+            encrypted_batch->WriteCryptedMnemonicEntropy(ciphertext);
+            encrypted_batch->EraseMnemonicEntropy();
+            vchCryptedMnemonicEntropy = ciphertext;
+            vchMnemonicEntropy.clear();
+        }
+
         if (!EncryptKeys(_vMasterKey))
         {
             encrypted_batch->TxnAbort();
@@ -747,7 +803,12 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
         Unlock(strWalletPassphrase);
 
         // if we are using HD, replace the HD seed with a new one
-        if (IsHDEnabled()) {
+        // A phrase-based wallet must keep its seed: rotating it here would silently
+        // invalidate the 24 words the user wrote down, and everything received
+        // afterwards would be unrecoverable from the backup they are relying on.
+        // Legacy wallets keep Core's behaviour, where rotation protects against an
+        // older unencrypted backup still holding the live seed.
+        if (IsHDEnabled() && !hdChain.IsBIP44()) {
             SetHDSeed(GenerateNewSeed());
         }
 
@@ -1548,6 +1609,57 @@ CPubKey CWallet::DeriveNewSeed(const CKey& key)
     return seed;
 }
 
+void CWallet::DeriveNewChildKeyBIP44(WalletBatch& batch, CKeyMetadata& metadata, CKey& secret, bool internal)
+{
+    // m / 44' / coin_type' / account' / chain / index
+    //
+    // Hardened down to the account, non-hardened below it, so an account xpub can
+    // derive receive addresses on its own. Shared with the Taler mobile wallet; see
+    // https://github.com/abkvme/taler.spec
+    // Rebuild the master key from the phrase. The key stored under seed_id IS the
+    // BIP-32 master private key; passing it back through MasterKeyFromSeed - as the
+    // legacy path does with its random seed - would hash it into a second, unrelated
+    // master. The addresses that came out were stable, so nothing looked wrong here,
+    // but they were not the addresses the published spec derives from the same
+    // phrase, and restoring the wallet anywhere else would have found nothing.
+    SecureString mnemonic;
+    if (!GetMnemonic(mnemonic)) {
+        throw std::runtime_error(std::string(__func__) + ": recovery phrase unavailable (wallet locked?)");
+    }
+    unsigned char seed_bytes[bip39::SEED_BYTES];
+    bip39::MnemonicToSeed(mnemonic, SecureString(), seed_bytes);
+
+    CExtKey masterKey;
+    bip44::MasterKeyFromSeed(seed_bytes, sizeof(seed_bytes), masterKey);
+    memory_cleanse(seed_bytes, sizeof(seed_bytes));
+
+    // The phrase must belong to this wallet: if it rebuilt a different master key,
+    // every address below would be wrong and silently so.
+    if (masterKey.key.GetPubKey().GetID() != hdChain.seed_id) {
+        throw std::runtime_error(std::string(__func__) + ": recovery phrase does not match this wallet's seed");
+    }
+
+    CExtKey accountKey;
+    if (!bip44::DeriveAccount(masterKey, hdChain.nCoinType, hdChain.nAccount, accountKey))
+        throw std::runtime_error(std::string(__func__) + ": account derivation failed");
+
+    const uint32_t chain = internal ? bip44::CHAIN_INTERNAL : bip44::CHAIN_EXTERNAL;
+    uint32_t& counter = internal ? hdChain.nInternalChainCounter : hdChain.nExternalChainCounter;
+
+    CExtKey childKey;
+    do {
+        if (!bip44::DeriveChild(accountKey, chain, counter, childKey))
+            throw std::runtime_error(std::string(__func__) + ": child derivation failed");
+        metadata.hdKeypath = bip44::FormatPath(hdChain.nCoinType, hdChain.nAccount, chain, counter);
+        counter++;
+    } while (HaveKey(childKey.key.GetPubKey().GetID()));
+
+    secret = childKey.key;
+    metadata.hd_seed_id = hdChain.seed_id;
+    if (!batch.WriteHDChain(hdChain))
+        throw std::runtime_error(std::string(__func__) + ": Writing HD chain model failed");
+}
+
 void CWallet::SetHDSeed(const CPubKey& seed)
 {
     LOCK(cs_wallet);
@@ -1558,6 +1670,72 @@ void CWallet::SetHDSeed(const CPubKey& seed)
     newHdChain.nVersion = CanSupportFeature(FEATURE_HD_SPLIT) ? CHDChain::VERSION_HD_CHAIN_SPLIT : CHDChain::VERSION_HD_BASE;
     newHdChain.seed_id = seed.GetID();
     SetHDChain(newHdChain, false);
+}
+
+void CWallet::LoadMnemonicEntropy(const std::vector<unsigned char>& entropy, bool crypted)
+{
+    if (crypted) {
+        vchCryptedMnemonicEntropy = entropy;
+    } else {
+        vchMnemonicEntropy = entropy;
+    }
+}
+
+bool CWallet::SetMnemonicEntropy(const std::vector<unsigned char, secure_allocator<unsigned char>>& entropy)
+{
+    LOCK(cs_wallet);
+    if (entropy.empty()) return false;
+
+    WalletBatch batch(*database);
+    if (IsCrypted()) {
+        CKeyingMaterial master_key;
+        if (!GetMasterKeyCopy(master_key)) return false; // locked
+        const CKeyingMaterial plaintext(entropy.begin(), entropy.end());
+        std::vector<unsigned char> ciphertext;
+        if (!EncryptEntropyBlob(master_key, plaintext, MnemonicEntropyIV(hdChain.seed_id), ciphertext)) return false;
+        vchCryptedMnemonicEntropy = ciphertext;
+        vchMnemonicEntropy.clear();
+        return batch.WriteCryptedMnemonicEntropy(ciphertext);
+    }
+
+    vchMnemonicEntropy.assign(entropy.begin(), entropy.end());
+    vchCryptedMnemonicEntropy.clear();
+    return batch.WriteMnemonicEntropy(vchMnemonicEntropy);
+}
+
+bool CWallet::GetMnemonic(SecureString& mnemonic_out) const
+{
+    LOCK(cs_wallet);
+    bip39::SecureBytes entropy;
+
+    if (!vchCryptedMnemonicEntropy.empty()) {
+        CKeyingMaterial master_key;
+        if (!GetMasterKeyCopy(master_key)) return false; // locked
+        CKeyingMaterial plaintext;
+        if (!DecryptEntropyBlob(master_key, vchCryptedMnemonicEntropy, MnemonicEntropyIV(hdChain.seed_id), plaintext)) return false;
+        entropy.assign(plaintext.begin(), plaintext.end());
+    } else if (!vchMnemonicEntropy.empty()) {
+        entropy.assign(vchMnemonicEntropy.begin(), vchMnemonicEntropy.end());
+    } else {
+        return false;
+    }
+
+    return bip39::MnemonicFromEntropy(entropy, mnemonic_out);
+}
+
+void CWallet::SetHDSeedBIP44(const CPubKey& seed, uint32_t coin_type, uint32_t account)
+{
+    LOCK(cs_wallet);
+    CHDChain newHdChain;
+    newHdChain.nVersion = CHDChain::VERSION_HD_BIP44;
+    newHdChain.seed_id = seed.GetID();
+    newHdChain.nCoinType = coin_type;
+    newHdChain.nAccount = account;
+    SetHDChain(newHdChain, false);
+
+    // Non-tolerable flag, so an older client refuses to open this wallet instead of
+    // deriving the legacy path from the same seed.
+    SetWalletFlag(WALLET_FLAG_BIP44_HD);
 }
 
 void CWallet::SetHDChain(const CHDChain& chain, bool memonly)
@@ -4178,7 +4356,7 @@ bool CWallet::Verify(const WalletLocation& location, bool salvage_wallet, std::s
     return WalletBatch::VerifyDatabaseFile(wallet_path, warning_string, error_string);
 }
 
-std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const WalletLocation& location, uint64_t wallet_creation_flags)
+std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const WalletLocation& location, uint64_t wallet_creation_flags, const SecureString* mnemonic)
 {
     const std::string& walletFile = location.GetName();
 
@@ -4276,7 +4454,11 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const WalletLocation& loc
 
         bool hd_upgrade = false;
         bool split_upgrade = false;
-        if (walletInstance->CanSupportFeature(FEATURE_HD) && !walletInstance->IsHDEnabled()) {
+        // Not for a wallet being created from a phrase: this would give it a random
+        // HD seed and put one key derived from it at the front of the keypool, so
+        // the first address the wallet ever handed out was the one address in it
+        // that the phrase could not recover.
+        if (mnemonic == nullptr && walletInstance->CanSupportFeature(FEATURE_HD) && !walletInstance->IsHDEnabled()) {
             walletInstance->WalletLogPrintf("Upgrading wallet to HD\n");
             walletInstance->SetMinVersion(FEATURE_HD);
 
@@ -4316,6 +4498,37 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const WalletLocation& loc
         if ((wallet_creation_flags & WALLET_FLAG_DISABLE_PRIVATE_KEYS)) {
             //selective allow to set flags
             walletInstance->SetWalletFlag(WALLET_FLAG_DISABLE_PRIVATE_KEYS);
+        } else if (mnemonic != nullptr) {
+            // Recovery-phrase wallet: the seed comes from the phrase, and the entropy
+            // behind it is stored so the words can be shown again later.
+            if (!bip39::MnemonicIsValidForWallet(*mnemonic)) {
+                InitError(strprintf(_("Error creating %s: the recovery phrase is not valid"), walletFile));
+                return nullptr;
+            }
+            bip39::SecureBytes entropy;
+            if (!bip39::MnemonicToEntropy(*mnemonic, entropy)) {
+                InitError(strprintf(_("Error creating %s: the recovery phrase could not be decoded"), walletFile));
+                return nullptr;
+            }
+
+            unsigned char seed_bytes[bip39::SEED_BYTES];
+            bip39::MnemonicToSeed(*mnemonic, SecureString(), seed_bytes);
+            CExtKey master;
+            bip44::MasterKeyFromSeed(seed_bytes, sizeof(seed_bytes), master);
+            memory_cleanse(seed_bytes, sizeof(seed_bytes));
+
+            // The BIP-32 master key is stored the way HD seeds already are, so wallet
+            // encryption, unlocking and backup all keep working unchanged.
+            const CPubKey seed_pubkey = walletInstance->DeriveNewSeed(master.key);
+            walletInstance->SetHDSeedBIP44(seed_pubkey, Params().BIP44CoinType(), bip44::DEFAULT_ACCOUNT);
+            if (!walletInstance->SetMnemonicEntropy(entropy)) {
+                InitError(strprintf(_("Error creating %s: could not store the recovery phrase"), walletFile));
+                return nullptr;
+            }
+            // Only now: refilling the keypool derives keys from the phrase, so the
+            // phrase has to be stored first. Anything already in the pool is
+            // discarded, so nothing that predates the phrase can be handed out.
+            walletInstance->NewKeyPool();
         } else {
             // generate a new seed
             CPubKey seed = walletInstance->GenerateNewSeed();

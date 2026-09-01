@@ -15,6 +15,16 @@ QT_TRANSLATE_NOOP("bitcoin-core", ""
 "-maxtxfee is set very high! Fees this large could be paid on a single "
 "transaction."),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
+"-newwalletmnemonic: %s already exists. Refusing to overwrite it - it may "
+"hold a recovery phrase."),
+QT_TRANSLATE_NOOP("bitcoin-core", ""
+"-newwalletmnemonic: %s is readable by your Windows user account; move it to "
+"safe storage and delete it."),
+QT_TRANSLATE_NOOP("bitcoin-core", ""
+"A new wallet was created from a recovery phrase. The phrase is stored IN "
+"CLEAR TEXT in %s - move it to safe offline storage and delete it from this "
+"machine."),
+QT_TRANSLATE_NOOP("bitcoin-core", ""
 "Can't generate a change-address key. Private keys are disabled for this "
 "wallet."),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
@@ -108,6 +118,12 @@ QT_TRANSLATE_NOOP("bitcoin-core", ""
 QT_TRANSLATE_NOOP("bitcoin-core", "%s corrupt, salvage failed"),
 QT_TRANSLATE_NOOP("bitcoin-core", "%s is set very high!"),
 QT_TRANSLATE_NOOP("bitcoin-core", "-maxmempool must be at least %d MB"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: cannot create %s"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: cannot restrict permissions on %s"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: cannot write %s"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: could not generate a recovery phrase"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: directory %s does not exist"),
+QT_TRANSLATE_NOOP("bitcoin-core", "-newwalletmnemonic: failed writing %s"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Cannot downgrade wallet"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Cannot resolve -%s address: '%s'"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Cannot write to data directory '%s'; check permissions."),
@@ -117,6 +133,9 @@ QT_TRANSLATE_NOOP("bitcoin-core", "Corrupted block database detected"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Do you want to rebuild the block database now?"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Done loading"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Error creating %s: You can't create non-HD wallets with this version."),
+QT_TRANSLATE_NOOP("bitcoin-core", "Error creating %s: could not store the recovery phrase"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Error creating %s: the recovery phrase could not be decoded"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Error creating %s: the recovery phrase is not valid"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Error initializing block database"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Error initializing wallet database environment %s!"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Error loading %s"),

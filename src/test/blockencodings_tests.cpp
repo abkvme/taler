@@ -9,6 +9,7 @@
 #include <random.h>
 
 #include <test/test_bitcoin.h>
+#include <validation.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -48,7 +49,7 @@ static CBlock BuildBlockTestCase() {
     bool mutated;
     block.hashMerkleRoot = BlockMerkleRoot(block, &mutated);
     assert(!mutated);
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block, chainActive.Height() + 1, Params().GetConsensus())) ++block.nNonce;
     return block;
 }
 
@@ -296,7 +297,7 @@ BOOST_AUTO_TEST_CASE(EmptyBlockRoundTripTest)
     bool mutated;
     block.hashMerkleRoot = BlockMerkleRoot(block, &mutated);
     assert(!mutated);
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block, chainActive.Height() + 1, Params().GetConsensus())) ++block.nNonce;
 
     // Test simple header round-trip with only coinbase
     {

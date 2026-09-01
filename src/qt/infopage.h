@@ -29,15 +29,19 @@ public:
 
     explicit ConnectivityChecker(QObject *parent = nullptr) : QThread(parent) {}
     void setItems(const std::vector<CheckItem>& items) { m_items = items; }
+    //! Identifies the run a result belongs to, so results from a superseded run can
+    //! be dropped instead of being painted onto rows that have since been rebuilt.
+    void setGeneration(int generation) { m_generation = generation; }
 
 Q_SIGNALS:
-    void checkResult(int tableIndex, int row, bool reachable);
+    void checkResult(int generation, int tableIndex, int row, bool reachable);
 
 protected:
     void run() override;
 
 private:
     std::vector<CheckItem> m_items;
+    int m_generation = 0;
     bool tcpConnect(const std::string& host, int port, int timeoutSec);
 };
 
@@ -55,7 +59,7 @@ public Q_SLOTS:
     void refreshData();
 
 private Q_SLOTS:
-    void onCheckResult(int tableIndex, int row, bool reachable);
+    void onCheckResult(int generation, int tableIndex, int row, bool reachable);
     void showContributeInfo();
 
 private:
@@ -70,7 +74,10 @@ private:
     QPushButton *refreshButton;
     QPushButton *contributeButton;
 
+    //! The running check, or nullptr. Never owned by InfoPage: a check can outlive
+    //! the page and frees itself when it stops. See refreshData().
     ConnectivityChecker *checker;
+    int m_generation;
 
     void populateTables();
     void setupTable(QTableWidget *table);

@@ -47,6 +47,11 @@ public:
     void showOutOfSyncWarning(bool fShow);
 
 Q_SIGNALS:
+    /** The user asked to create a wallet from the no-wallet page */
+    void createWalletRequested();
+    /** The user asked to restore a wallet from the no-wallet page */
+    void restoreWalletRequested();
+
     /** Notify that the user has requested more information about the out-of-sync warning */
     void requestedSyncWarningInfo();
 
@@ -76,6 +81,9 @@ public Q_SLOTS:
     void gotoSendCoinsPage(QString addr = "");
     /** Switch to nodes page */
     void gotoNodesPage();
+
+    //! Move the shared wallet selector bar onto the current wallet's overview page.
+    void placeWalletBar(QWidget* bar);
     /** Switch to about page */
     void gotoAboutPage();
 

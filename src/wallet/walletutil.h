@@ -12,6 +12,10 @@
 fs::path GetWalletDir();
 
 //! The WalletLocation class provides wallet information.
+//! Wallets found in the wallet directory, whether loaded or not. A wallet is either
+//! a Berkeley DB file or a directory containing one named wallet.dat.
+std::vector<fs::path> ListWalletDir();
+
 class WalletLocation final
 {
     std::string m_name;
@@ -29,6 +33,11 @@ public:
 
     //! Return whether the wallet exists.
     bool Exists() const;
+
+    //! Whether a wallet actually lives here. Exists() only says the path is there,
+    //! and for the unnamed default wallet that path IS the wallet directory, which
+    //! always exists - so Exists() answers "yes" for a datadir holding no wallet.
+    bool HasWalletData() const;
 };
 
 #endif // BITCOIN_WALLET_WALLETUTIL_H

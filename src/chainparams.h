@@ -79,6 +79,10 @@ public:
     const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
+    /** Registered SLIP-44 coin type for BIP-44 key derivation (wallet layer only,
+     *  no consensus or network effect). Mainnet holds 1524; test networks share 1
+     *  by SLIP-44 convention. See taler.spec for the derivation contract. */
+    uint32_t BIP44CoinType() const { return nBIP44CoinType; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
     const CCheckpointData& Checkpoints() const { return checkpointData; }
     const ChainTxData& TxData() const { return chainTxData; }
@@ -93,6 +97,7 @@ protected:
     std::vector<std::string> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string bech32_hrp;
+    uint32_t nBIP44CoinType;
     std::string strNetworkID;
     CBlock genesis;
     std::vector<SeedSpec6> vFixedSeeds;

@@ -39,6 +39,38 @@ QT_END_NAMESPACE
  */
 namespace GUIUtil
 {
+    /**
+     * The wallet the GUI opens on at start-up.
+     *
+     * Without this the first wallet the node happened to load won the selection,
+     * which the user had no way to influence. Stored by wallet name; the unnamed
+     * default wallet is a legitimate value, so "is it set at all" is a separate
+     * question from "what is it".
+     */
+    /**
+     * Validate a wallet name. The name becomes a directory in the wallet directory,
+     * so it is restricted to Latin letters, digits and hyphens - no spaces, no
+     * punctuation, nothing that could escape the directory or confuse a shell.
+     * Returns false and fills @p error with a message for the user.
+     */
+    bool isValidWalletName(const QString& name, QString& error);
+
+    /**
+     * How a wallet is shown to the user.
+     *
+     * The pre-existing wallet at the data directory root is loaded under the empty
+     * name, which is meaningless on screen. It is titled "legacy" everywhere, and it
+     * cannot be renamed: its name is what -wallet="" resolves to, so changing it
+     * would leave talerd creating an empty wallet in its place.
+     */
+    QString walletDisplayName(const QString& name);
+    bool isRenamableWallet(const QString& name);
+
+    bool hasDefaultWallet();
+    QString defaultWallet();
+    void setDefaultWallet(const QString& name);
+    void clearDefaultWallet();
+
     // Create human-readable string from date
     QString dateTimeStr(const QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);

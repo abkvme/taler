@@ -128,6 +128,20 @@ private:
 protected:
     using CryptedKeyMap = std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char>>>;
 
+    /**
+     * Copy of the in-memory master key, for derived classes that keep their own
+     * encrypted blobs alongside the key map - the wallet's BIP-39 entropy is the
+     * only such case. Returns false when the store is locked or unencrypted, so a
+     * caller can never accidentally encrypt with an empty key.
+     */
+    bool GetMasterKeyCopy(CKeyingMaterial& out) const
+    {
+        LOCK(cs_KeyStore);
+        if (vMasterKey.empty()) return false;
+        out = vMasterKey;
+        return true;
+    }
+
     bool SetCrypted();
 
     //! will encrypt previously unencrypted keys

@@ -8,6 +8,8 @@
 #endif
 
 #include <qt/optionsdialog.h>
+
+#include <qt/theme.h>
 #include <qt/forms/ui_optionsdialog.h>
 
 #include <qt/bitcoinunits.h>
@@ -132,6 +134,10 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 
     ui->thirdPartyTxUrls->setPlaceholderText("https://example.com/tx/%s");
 
+    ui->theme->addItem(tr("Follow the system"), QVariant(static_cast<int>(theme::Theme::System)));
+    ui->theme->addItem(tr("Light"), QVariant(static_cast<int>(theme::Theme::Light)));
+    ui->theme->addItem(tr("Dark"), QVariant(static_cast<int>(theme::Theme::Dark)));
+
     ui->unit->setModel(new BitcoinUnits(this));
 
     /* Widget-to-option mapper */
@@ -232,6 +238,7 @@ void OptionsDialog::setMapper()
 
     /* Display */
     mapper->addMapping(ui->lang, OptionsModel::Language);
+    mapper->addMapping(ui->theme, OptionsModel::Theme);
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->thirdPartyTxUrls, OptionsModel::ThirdPartyTxUrls);
 }

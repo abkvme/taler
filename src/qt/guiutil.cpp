@@ -53,6 +53,7 @@
 #include <QFont>
 #include <QKeyEvent>
 #include <QLineEdit>
+#include <QRegExp>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
@@ -75,6 +76,80 @@ static fs::detail::utf8_codecvt_facet utf8;
 #endif
 
 namespace GUIUtil {
+
+QString walletDisplayName(const QString& name)
+{
+    return name.isEmpty() ? QObject::tr("legacy") : name;
+}
+
+bool isRenamableWallet(const QString& name)
+{
+    return !name.isEmpty();
+}
+
+bool isValidWalletName(const QString& name, QString& error)
+{
+    if (name.isEmpty()) {
+        error = QObject::tr("Enter a name for the wallet.");
+        return false;
+    }
+    if (name.length() > 64) {
+        error = QObject::tr("The name is too long (64 characters at most).");
+        return false;
+    }
+    static const QRegExp allowed("[A-Za-z0-9-]+");
+    if (!allowed.exactMatch(name)) {
+        error = QObject::tr("Use Latin letters, digits and hyphens only - no spaces or other characters.");
+        return false;
+    }
+    if (name.startsWith('-') || name.endsWith('-')) {
+        error = QObject::tr("The name cannot start or end with a hyphen.");
+        return false;
+    }
+    // Names that would collide with the wallet directory's own contents.
+    static const QStringList reserved = {"removed", "backups", "database", "wallet.dat"};
+    if (reserved.contains(name, Qt::CaseInsensitive) ||
+        name.startsWith("__db.", Qt::CaseInsensitive) || name.startsWith("log.", Qt::CaseInsensitive)) {
+        error = QObject::tr("That name is reserved by the wallet directory.");
+        return false;
+    }
+    return true;
+}
+
+static const char* DEFAULT_WALLET_KEY = "DefaultWallet";
+
+bool hasDefaultWallet()
+{
+    QSettings settings;
+    return settings.contains(DEFAULT_WALLET_KEY);
+}
+
+QString defaultWallet()
+{
+    QSettings settings;
+    return settings.value(DEFAULT_WALLET_KEY).toString();
+}
+
+void setDefaultWallet(const QString& name)
+{
+    QSettings settings;
+    settings.setValue(DEFAULT_WALLET_KEY, name);
+
+    // A wallet that is not remembered would not be loaded at start-up, so making it
+    // the default has to imply loading it.
+    QStringList remembered = settings.value("RememberedWallets").toStringList();
+    if (!remembered.contains(name)) {
+        remembered << name;
+        settings.setValue("RememberedWallets", remembered);
+    }
+}
+
+void clearDefaultWallet()
+{
+    QSettings settings;
+    settings.remove(DEFAULT_WALLET_KEY);
+}
+
 
 QString dateTimeStr(const QDateTime &date)
 {

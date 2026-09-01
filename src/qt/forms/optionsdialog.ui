@@ -618,6 +618,30 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_Display">
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_0_Display">
+         <item>
+          <widget class="QLabel" name="themeLabel">
+           <property name="text">
+            <string>&amp;Appearance:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="buddy">
+            <cstring>theme</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QValueComboBox" name="theme">
+           <property name="toolTip">
+            <string>Choose how the wallet looks. &quot;Follow the system&quot; uses your desktop's own light or dark setting.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_1_Display">
          <item>
           <widget class="QLabel" name="langLabel">

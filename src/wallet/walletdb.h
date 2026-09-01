@@ -64,10 +64,19 @@ public:
     uint32_t nInternalChainCounter;
     CKeyID seed_id; //!< seed hash160
 
+    //! BIP-44 chains additionally record the coin type and account they derive from.
+    uint32_t nCoinType;
+    uint32_t nAccount;
+
     static const int VERSION_HD_BASE        = 1;
     static const int VERSION_HD_CHAIN_SPLIT = 2;
+    static const int VERSION_HD_BIP44       = 3;
+    //! Stays at VERSION_HD_CHAIN_SPLIT: a chain only becomes VERSION_HD_BIP44 when a
+    //! phrase-based wallet sets it, so ordinary wallets keep writing what they always did.
     static const int CURRENT_VERSION        = VERSION_HD_CHAIN_SPLIT;
     int nVersion;
+
+    bool IsBIP44() const { return nVersion >= VERSION_HD_BIP44; }
 
     CHDChain() { SetNull(); }
     ADD_SERIALIZE_METHODS;
@@ -79,6 +88,10 @@ public:
         READWRITE(seed_id);
         if (this->nVersion >= VERSION_HD_CHAIN_SPLIT)
             READWRITE(nInternalChainCounter);
+        if (this->nVersion >= VERSION_HD_BIP44) {
+            READWRITE(nCoinType);
+            READWRITE(nAccount);
+        }
     }
 
     void SetNull()
@@ -86,6 +99,8 @@ public:
         nVersion = CHDChain::CURRENT_VERSION;
         nExternalChainCounter = 0;
         nInternalChainCounter = 0;
+        nCoinType = 0;
+        nAccount = 0;
         seed_id.SetNull();
     }
 };
@@ -233,6 +248,13 @@ public:
 
     //! write the hdchain model (external chain child index counter)
     bool WriteHDChain(const CHDChain& chain);
+
+    //! BIP-39 entropy behind a recovery-phrase wallet, so the phrase can be shown
+    //! again later. Stored in the clear only while the wallet itself is unencrypted;
+    //! once encrypted it lives as "cmnemonic" under the wallet's master key.
+    bool WriteMnemonicEntropy(const std::vector<unsigned char>& entropy);
+    bool WriteCryptedMnemonicEntropy(const std::vector<unsigned char>& crypted_entropy);
+    bool EraseMnemonicEntropy();
 
     bool WriteWalletFlags(const uint64_t flags);
     //! Begin a new transaction

@@ -8,6 +8,7 @@
 #endif
 
 #include <qt/bitcoingui.h>
+#include <qt/theme.h>
 
 #include <chainparams.h>
 #include <qt/clientmodel.h>
@@ -28,6 +29,7 @@
 
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
+#include <univalue.h>
 #include <rpc/server.h>
 #include <ui_interface.h>
 #include <uint256.h>
@@ -375,6 +377,12 @@ void BitcoinApplication::parameterSetup()
     // print to the console unnecessarily.
     gArgs.SoftSetBoolArg("-printtoconsole", false);
 
+    // Appearance, before any window exists, so the app never flashes the wrong theme.
+    theme::Apply(theme::FromSettings());
+
+    // The GUI offers a creation wizard, so the node must not create a wallet behind it.
+    gArgs.SoftSetBoolArg("-createwalletonstart", false);
+
     m_node.initLogging();
     m_node.initParameterInteraction();
 }
@@ -420,8 +428,14 @@ void BitcoinApplication::addWallet(WalletModel* walletModel)
 #ifdef ENABLE_WALLET
     window->addWallet(walletModel);
 
-    if (m_wallet_models.empty()) {
-        window->setCurrentWallet(walletModel->getWalletName());
+    // Open on the wallet the user chose as default. Until it turns up (wallets load
+    // in whatever order the node reports them) the first one keeps the window from
+    // being empty, and is replaced when the default arrives.
+    const QString name = walletModel->getWalletName();
+    if (GUIUtil::hasDefaultWallet() && name == GUIUtil::defaultWallet()) {
+        window->setCurrentWallet(name);
+    } else if (m_wallet_models.empty()) {
+        window->setCurrentWallet(name);
     }
 
     connect(walletModel, SIGNAL(unload()), this, SLOT(removeWallet()));
@@ -462,6 +476,29 @@ void BitcoinApplication::initializeResult(bool success)
 
         for (auto& wallet : m_node.getWallets()) {
             addWallet(new WalletModel(std::move(wallet), m_node, platformStyle, optionsModel));
+        }
+
+        // Wallets created through the GUI are not in -wallet, so the node would not
+        // reload them on the next start. Remember them here and load them back.
+        {
+            QSettings settings;
+            const QStringList remembered = settings.value("RememberedWallets").toStringList();
+            for (const QString& name : remembered) {
+                bool already_loaded = false;
+                for (const auto& loaded : m_node.getWallets()) {
+                    if (loaded->getWalletName() == name.toStdString()) { already_loaded = true; break; }
+                }
+                if (already_loaded) continue;
+                try {
+                    UniValue params(UniValue::VARR);
+                    params.push_back(name.toStdString());
+                    m_node.executeRpc("loadwallet", params, std::string());
+                } catch (const std::exception&) {
+                    qWarning() << "Could not reload remembered wallet" << name;
+                } catch (const UniValue&) {
+                    qWarning() << "Could not reload remembered wallet" << name;
+                }
+            }
         }
 #endif
 

@@ -78,11 +78,17 @@ PlatformStyle::PlatformStyle(const QString &_name, bool _imagesOnButtons, bool _
     singleColor(0,0,0),
     textColor(0,0,0)
 {
-    // Icon + text color: use the palette's WindowText role on every platform
-    // so icons render in the same neutral "gray" that the rest of the UI text
-    // uses, and therefore stay readable on both light and dark themes.
-    textColor = QColor(QApplication::palette().color(QPalette::WindowText));
-    singleColor = textColor;
+    // Icon colour: the Taler blue from the project mark, fixed rather than derived
+    // from the palette.
+    //
+    // Deriving it from the palette samples it exactly once, when this object is
+    // built. The user can switch theme at any time afterwards, and every icon
+    // created before that keeps the old colour - white glyphs on a white
+    // background after a switch to the light theme, which is invisible rather than
+    // merely wrong. A fixed brand colour reads on both themes and never needs
+    // rebuilding.
+    singleColor = QColor(0x00, 0x88, 0xcc);
+    textColor = singleColor;
 }
 
 QImage PlatformStyle::SingleColorImage(const QString& filename) const

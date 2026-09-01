@@ -50,6 +50,11 @@ std::shared_ptr<CWallet> GetWallet(const std::string& name);
 
 //! Default for -keypool
 static const unsigned int DEFAULT_KEYPOOL_SIZE = 250;
+//! Look-ahead used when restoring from a recovery phrase. Much larger than the
+//! ordinary keypool, and extended further if used addresses turn up near its edge.
+static const int64_t DEFAULT_RESTORE_GAP_LIMIT = 1000;
+//! How many times a restore will widen the window before giving up.
+static const int MAX_RESTORE_EXTENSIONS = 20;
 //! -paytxfee default
 constexpr CAmount DEFAULT_PAY_TX_FEE = 0;
 //! -fallbackfee default
@@ -115,11 +120,23 @@ enum WalletFlags : uint64_t {
     // wallet flags in the upper section (> 1 << 31) will lead to not opening the wallet if flag is unknown
     // unknown wallet flags in the lower section <= (1 << 31) will be tolerated
 
+    // the wallet contains keys that were imported rather than derived, so its recovery
+    // phrase alone no longer restores everything it holds. Informational, and in the
+    // tolerated range on purpose: an older client should still open such a wallet.
+    WALLET_FLAG_HAS_IMPORTED_KEYS = (1ULL << 0),
+
     // will enforce the rule that the wallet can't contain any private keys (only watch-only/pubkeys)
     WALLET_FLAG_DISABLE_PRIVATE_KEYS = (1ULL << 32),
+
+    // the wallet derives keys with BIP-44 (m/44'/coin'/account'/chain/index) from a
+    // BIP-39 recovery phrase, instead of the legacy m/0'/0'/k' scheme. Deliberately in
+    // the non-tolerable range: a client that does not understand this flag must refuse
+    // to open the wallet rather than derive a different set of addresses from the same
+    // seed and hand out addresses the owner cannot see anywhere else.
+    WALLET_FLAG_BIP44_HD = (1ULL << 33),
 };
 
-static constexpr uint64_t g_known_wallet_flags = WALLET_FLAG_DISABLE_PRIVATE_KEYS;
+static constexpr uint64_t g_known_wallet_flags = WALLET_FLAG_DISABLE_PRIVATE_KEYS | WALLET_FLAG_BIP44_HD | WALLET_FLAG_HAS_IMPORTED_KEYS;
 
 /** A key pool entry */
 class CKeyPool
@@ -738,7 +755,12 @@ private:
     /* the HD chain data model (external chain counters) */
     CHDChain hdChain;
 
+    //! BIP-39 entropy: exactly one of these is populated on a phrase-based wallet.
+    std::vector<unsigned char> vchMnemonicEntropy;
+    std::vector<unsigned char> vchCryptedMnemonicEntropy;
+
     /* HD derive new child key (on internal or external chain) */
+    void DeriveNewChildKeyBIP44(WalletBatch& batch, CKeyMetadata& metadata, CKey& secret, bool internal);
     void DeriveNewChildKey(WalletBatch &batch, CKeyMetadata& metadata, CKey& secret, bool internal = false) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     std::set<int64_t> setInternalKeyPool;
@@ -1151,7 +1173,15 @@ public:
     static bool Verify(const WalletLocation& location, bool salvage_wallet, std::string& error_string, std::string& warning_string);
 
     /* Initializes the wallet, returns a new CWallet instance or a null pointer in case of an error */
-    static std::shared_ptr<CWallet> CreateWalletFromFile(const WalletLocation& location, uint64_t wallet_creation_flags = 0);
+    /**
+     * Load a wallet, creating it if the file does not exist.
+     *
+     * When @p mnemonic is given and the wallet is being created, it is set up as a
+     * recovery-phrase wallet: BIP-44 derivation from that phrase, with the entropy
+     * recorded so the phrase can be shown again. A phrase is ignored for a wallet
+     * that already exists - an existing wallet is never re-seeded.
+     */
+    static std::shared_ptr<CWallet> CreateWalletFromFile(const WalletLocation& location, uint64_t wallet_creation_flags = 0, const SecureString* mnemonic = nullptr);
 
     /**
      * Wallet post-init setup
@@ -1179,6 +1209,47 @@ public:
        caller must ensure the current wallet version is correct before calling
        this function). */
     void SetHDSeed(const CPubKey& key);
+
+    /**
+     * Install a seed and switch this wallet to BIP-44 derivation for the given coin
+     * type and account. Only valid on a wallet that has not derived keys yet: the
+     * caller is creating or restoring from a recovery phrase.
+     */
+    void SetHDSeedBIP44(const CPubKey& seed, uint32_t coin_type, uint32_t account);
+
+    /**
+     * Record the BIP-39 entropy this wallet was created from, so the recovery phrase
+     * can be shown again. Encrypted with the wallet's master key when the wallet is
+     * encrypted; refused outright if the wallet is locked.
+     */
+    bool SetMnemonicEntropy(const std::vector<unsigned char, secure_allocator<unsigned char>>& entropy);
+
+    //! Load an entropy record from disk (crypted or not). Wallet loading only.
+    void LoadMnemonicEntropy(const std::vector<unsigned char>& entropy, bool crypted);
+
+    //! True when this wallet has a recovery phrase recorded.
+    bool HasMnemonic() const { return !vchMnemonicEntropy.empty() || !vchCryptedMnemonicEntropy.empty(); }
+
+    /**
+     * Record that a key entered this wallet by import rather than derivation.
+     * On a recovery-phrase wallet this is the moment "my 24 words are my backup"
+     * stops being true, so it is stored and surfaced rather than left implicit.
+     */
+    void MarkImportedKeys()
+    {
+        if (!IsWalletFlagSet(WALLET_FLAG_HAS_IMPORTED_KEYS)) SetWalletFlag(WALLET_FLAG_HAS_IMPORTED_KEYS);
+    }
+
+    bool HasImportedKeys() const { return const_cast<CWallet*>(this)->IsWalletFlagSet(WALLET_FLAG_HAS_IMPORTED_KEYS); }
+
+    /**
+     * Return the recovery phrase. Requires the wallet to be unlocked when encrypted.
+     * The phrase is regenerated from the stored entropy rather than kept as text.
+     */
+    bool GetMnemonic(SecureString& mnemonic_out) const;
+
+    //! True when this wallet derives with BIP-44 from a recovery phrase.
+    bool IsBIP44HD() const { return hdChain.IsBIP44(); }
 
     /**
      * Blocks until the wallet state is up-to-date to /at least/ the current

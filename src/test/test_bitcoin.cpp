@@ -126,9 +126,10 @@ TestingSetup::~TestingSetup()
 
 TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
 {
-    // CreateAndProcessBlock() does not support building SegWit blocks, so don't activate in these tests.
-    // TODO: fix the code to support SegWit blocks.
-    UpdateVersionBitsParameters(Consensus::DEPLOYMENT_SEGWIT, 0, Consensus::BIP9Deployment::NO_TIMEOUT);
+    // Upstream deactivated the SegWit version-bits deployment here because
+    // CreateAndProcessBlock() cannot build SegWit blocks. Taler has no such
+    // deployment - witness activation is by height (Consensus::Params::WitnessHeight)
+    // - so there is nothing to switch off.
     // Generate a 100-block chain:
     coinbaseKey.MakeNewKey(true);
     CScript scriptPubKey = CScript() <<  ToByteVector(coinbaseKey.GetPubKey()) << OP_CHECKSIG;
@@ -162,7 +163,10 @@ TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>&
         IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
     }
 
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, chainparams.GetConsensus())) ++block.nNonce;
+    // Taler hashes with Lyra2Z and the algorithm is chosen by height, so the proof
+    // check takes the header and the height rather than a bare hash.
+    const int nBlockHeight = chainActive.Height() + 1;
+    while (!CheckProofOfWork(block, nBlockHeight, chainparams.GetConsensus())) ++block.nNonce;
 
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
     ProcessNewBlock(chainparams, shared_pblock, true, nullptr);

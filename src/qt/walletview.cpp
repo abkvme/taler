@@ -196,6 +196,11 @@ void WalletView::processNewTransaction(const QModelIndex& parent, int start, int
     Q_EMIT incomingTransaction(date, walletModel->getOptionsModel()->getDisplayUnit(), amount, type, address, label, walletModel->getWalletName());
 }
 
+void WalletView::setWalletBar(QWidget* bar)
+{
+    overviewPage->setWalletBar(bar);
+}
+
 void WalletView::gotoOverviewPage()
 {
     setCurrentWidget(overviewPage);

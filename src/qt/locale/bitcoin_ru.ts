@@ -591,7 +591,52 @@
 </source><translation /></message><message><source>Type: %1
 </source><translation /></message><message><source>Label: %1
 </source><translation /></message><message><source>Address: %1
-</source><translation /></message></context>
+</source><translation /></message><message>
+        <location line="+3"/>
+        <source>Create &amp;wallet...</source>
+        <translation>Создать &amp;кошелёк...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Create a new wallet backed up by a 24-word recovery phrase</source>
+        <translation>Создать новый кошелёк с резервной копией из 24 слов</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>&amp;Restore wallet...</source>
+        <translation>&amp;Восстановить кошелёк...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Restore a wallet from its 24-word recovery phrase</source>
+        <translation>Восстановить кошелёк по его фразе восстановления из 24 слов</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Show recovery &amp;phrase...</source>
+        <translation>Показать &amp;фразу восстановления...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Show the 24 words that back up this wallet</source>
+        <translation>Показать 24 слова, которые служат резервной копией этого кошелька</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>&amp;Manage wallets...</source>
+        <translation>&amp;Управление кошельками...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>List, rename or remove wallets, and see where they are stored</source>
+        <translation>Просмотр, переименование и удаление кошельков, а также их расположение на диске</translation>
+    </message>
+<message>
+        <location line="+122"/>
+        <source>Wallet in use</source>
+        <translation>Используемый кошелёк</translation>
+    </message>
+</context>
 <context>
     <name>CoinControlDialog</name>
     <message>
@@ -1259,6 +1304,31 @@
         <source>The supplied proxy address is invalid.</source>
         <translation>Введенный адрес прокси-сервера недействителен.</translation>
     </message>
+<message>
+        <location line="+8"/>
+        <source>&amp;Appearance:</source>
+        <translation>&amp;Оформление:</translation>
+    </message>
+<message>
+        <location line="+13"/>
+        <source>Choose how the wallet looks. &quot;Follow the system&quot; uses your desktop&apos;s own light or dark setting.</source>
+        <translation>Выберите оформление кошелька. «Как в системе» использует светлую или тёмную тему вашего рабочего стола.</translation>
+    </message>
+<message>
+        <location line="+23"/>
+        <source>Follow the system</source>
+        <translation>Как в системе</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Light</source>
+        <translation>Светлое</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Dark</source>
+        <translation>Тёмное</translation>
+    </message>
 </context>
 <context>
     <name>OverviewPage</name>
@@ -1408,6 +1478,23 @@
         <location filename="../overviewpage.cpp" line="0"/>
         <source>Encrypt your wallet first to enable staking.</source>
         <translation>Сначала зашифруйте кошелёк, чтобы включить стейкинг.</translation>
+    </message>
+<message>
+        <location line="-198"/>
+        <source>No transactions yet.
+Incoming and outgoing payments will appear here.</source>
+        <translation>Пока нет транзакций.
+Входящие и исходящие платежи появятся здесь.</translation>
+    </message>
+<message>
+        <location line="+126"/>
+        <source>Wallet: %1</source>
+        <translation>Кошелёк: %1</translation>
+    </message>
+<message>
+        <location line="-231"/>
+        <source>Available balance</source>
+        <translation>Доступный баланс</translation>
     </message>
 </context>
 <context>
@@ -1621,6 +1708,61 @@
     <message>
         <source>unknown</source>
         <translation>неизвестно</translation>
+    </message>
+<message>
+        <location filename="../walletmanagerdialog.cpp" line="+38"/>
+        <source>The name cannot be empty.</source>
+        <translation>Имя не может быть пустым.</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>The name cannot contain a path.</source>
+        <translation>Имя не может содержать путь.</translation>
+    </message>
+<message>
+        <location line="+6"/>
+        <source>That name is reserved by the wallet directory.</source>
+        <translation>Это имя зарезервировано каталогом кошельков.</translation>
+    </message>
+<message>
+        <location line="+251"/>
+        <source>Could not copy %1</source>
+        <translation>Не удалось скопировать %1</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>Could not copy the wallet file to %1</source>
+        <translation>Не удалось скопировать файл кошелька в %1</translation>
+    </message>
+<message>
+        <location filename="../asyncrpc.cpp" line="+37"/>
+        <source>Unknown error</source>
+        <translation>Неизвестная ошибка</translation>
+    </message>
+<message>
+        <location filename="../guiutil.cpp" line="+83"/>
+        <source>Enter a name for the wallet.</source>
+        <translation>Введите имя кошелька.</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>The name is too long (64 characters at most).</source>
+        <translation>Имя слишком длинное (не более 64 символов).</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>Use Latin letters, digits and hyphens only - no spaces or other characters.</source>
+        <translation>Используйте только латинские буквы, цифры и дефис — без пробелов и других символов.</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>The name cannot start or end with a hyphen.</source>
+        <translation>Имя не может начинаться или заканчиваться дефисом.</translation>
+    </message>
+<message>
+        <location filename="../guiutil.cpp" line="+82"/>
+        <source>legacy</source>
+        <translation>legacy</translation>
     </message>
 </context>
 <context>
@@ -3129,6 +3271,13 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <source>to</source>
         <translation>для</translation>
     </message>
+<message>
+        <location line="+54"/>
+        <source>No transactions to show.
+Once this wallet sends or receives, its history appears here.</source>
+        <translation>Нет транзакций для показа.
+Как только кошелёк отправит или получит средства, здесь появится история.</translation>
+    </message>
 </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
@@ -3142,6 +3291,28 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>No wallet has been loaded.</source>
         <translation>Не был загружен ни один кошелёк.</translation>
+    </message>
+<message>
+        <location filename="../walletframe.cpp" line="+39"/>
+        <source>&lt;b&gt;No wallet loaded&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Кошелёк не загружен&lt;/b&gt;</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>This node is running and staying in sync with the network.
+Create a new wallet, or restore one from its 24-word recovery phrase.</source>
+        <translation>Узел работает и остаётся синхронизированным с сетью.
+Создайте новый кошелёк или восстановите его по фразе из 24 слов.</translation>
+    </message>
+<message>
+        <location line="+8"/>
+        <source>Create new wallet</source>
+        <translation>Создать новый кошелёк</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Restore from 24 words</source>
+        <translation>Восстановить по 24 словам</translation>
     </message>
 </context>
 <context>
@@ -3804,4 +3975,564 @@ Visit the repository to learn how to contribute:</source>
 Посетите репозиторий, чтобы узнать, как внести свой вклад:</translation>
     </message>
 <message><source>Version</source><translation>Версия</translation></message></context>
-<context><name>AboutPage</name><message><source>Taler</source><translation>Taler</translation></message><message><source>Project</source><translation>Проект</translation></message><message><source>Website</source><translation>Веб-сайт</translation></message><message><source>GitHub</source><translation>GitHub</translation></message><message><source>GitHub (legacy)</source><translation>GitHub (legacy)</translation></message><message><source>Community</source><translation>Сообщество</translation></message><message><source>Telegram: @talercommunity</source><translation>Telegram: @talercommunity</translation></message><message><source>Network</source><translation>Сеть</translation></message><message><source>Seed Nodes</source><translation>Seed Nodes</translation></message><message><source>Explorer (talercoin.org)</source><translation>Explorer (talercoin.org)</translation></message><message><source>Explorer (talercrypto.com)</source><translation>Explorer (talercrypto.com)</translation></message><message><source>Development</source><translation>Разработка</translation></message><message><source>Issue Tracker</source><translation>Трекер задач</translation></message><message><source>Change Log</source><translation>Журнал изменений</translation></message><message><source>App Name</source><translation>Название приложения</translation></message><message><source>Version</source><translation>Версия</translation></message><message><source>Telegram</source><translation>Telegram</translation></message><message><source>Explorer</source><translation>Explorer</translation></message></context><context><name>CoinsTableModel</name><message><source>Transaction</source><translation /></message><message><source>Index</source><translation /></message><message><source>Address</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Destination address of the output.</source><translation /></message><message><source>Original transaction id.</source><translation /></message><message><source>Original transaction id index.</source><translation /></message><message><source>Age of the transaction in days.</source><translation /></message><message><source>Balance of the output.</source><translation /></message><message><source>Coin age in the output.</source><translation /></message></context><context><name>CoinsView</name><message><source>transaction is too young</source><translation /></message><message><source>transaction is mature</source><translation /></message><message><source>transaction has reached maximum probability</source><translation /></message><message><source>Copy address</source><translation /></message><message><source>Copy transaction id</source><translation /></message><message><source>Refresh</source><translation /></message><message><source>Export Minting Data</source><translation /></message><message><source>Comma separated file (*.csv)</source><translation /></message><message><source>Address</source><translation /></message><message><source>Transaction</source><translation /></message><message><source>Transaction Index</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Error exporting</source><translation /></message><message><source>Could not write to file %1.</source><translation /></message></context><context><name>bitcoin-core</name><message><source>Taler</source><translation /></message><message><source>abkv (https://github.com/abkvme) for %s</source><translation /></message><message><source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source><translation /></message><message><source>Can't generate a change-address key. Private keys are disabled for this wallet.</source><translation /></message><message><source>Cannot obtain a lock on data directory %s. %s is probably already running.</source><translation /></message><message><source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source><translation /></message><message><source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source><translation /></message><message><source>Distributed under the MIT software license, see the accompanying file %s or %s</source><translation /></message><message><source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source><translation /></message><message><source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source><translation /></message><message><source>Error: Listening for incoming connections failed (listen returned error %s)</source><translation /></message><message><source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source><translation /></message><message><source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source><translation /></message><message><source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source><translation /></message><message><source>Please contribute if you find %s useful. Visit %s for further information about the software.</source><translation /></message><message><source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source><translation /></message><message><source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source><translation /></message><message><source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source><translation /></message><message><source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source><translation /></message><message><source>The transaction amount is too small to send after the fee has been deducted</source><translation /></message><message><source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source><translation /></message><message><source>This is the transaction fee you may discard if change is smaller than dust at this level</source><translation /></message><message><source>This is the transaction fee you may pay when fee estimates are not available.</source><translation /></message><message><source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source><translation /></message><message><source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source><translation /></message><message><source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source><translation /></message><message><source>Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source><translation /></message><message><source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source><translation /></message><message><source>Warning: Private keys detected in wallet {%s} with disabled private keys</source><translation /></message><message><source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source><translation /></message><message><source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source><translation /></message><message><source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source><translation /></message><message><source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source><translation /></message><message><source>%s corrupt, salvage failed</source><translation /></message><message><source>%s is set very high!</source><translation /></message><message><source>-maxmempool must be at least %d MB</source><translation /></message><message><source>Cannot downgrade wallet</source><translation /></message><message><source>Cannot resolve -%s address: '%s'</source><translation /></message><message><source>Cannot write to data directory '%s'; check permissions.</source><translation /></message><message><source>Change index out of range</source><translation /></message><message><source>Copyright (C) %i-%i</source><translation /></message><message><source>Corrupted block database detected</source><translation /></message><message><source>Do you want to rebuild the block database now?</source><translation /></message><message><source>Done loading</source><translation /></message><message><source>Error creating %s: You can't create non-HD wallets with this version.</source><translation /></message><message><source>Error initializing block database</source><translation /></message><message><source>Error initializing wallet database environment %s!</source><translation /></message><message><source>Error loading %s</source><translation /></message><message><source>Error loading %s: Private keys can only be disabled during creation</source><translation /></message><message><source>Error loading %s: Wallet corrupted</source><translation /></message><message><source>Error loading %s: Wallet requires newer version of %s</source><translation /></message><message><source>Error loading %s: You can't disable HD on an already existing HD wallet</source><translation /></message><message><source>Error loading block database</source><translation /></message><message><source>Error loading wallet %s. Duplicate -wallet filename specified.</source><translation /></message><message><source>Error opening block database</source><translation /></message><message><source>Error reading from database, shutting down.</source><translation /></message><message><source>Error upgrading chainstate database</source><translation /></message><message><source>Error</source><translation /></message><message><source>Error: A fatal internal error occurred, see debug.log for details</source><translation /></message><message><source>Error: Disk space is low!</source><translation /></message><message><source>Failed to listen on any port. Use -listen=0 if you want this.</source><translation /></message><message><source>Failed to rescan the wallet during initialization</source><translation /></message><message><source>Fee exceeds maximum configured by -maxtxfee</source><translation /></message><message><source>Importing...</source><translation /></message><message><source>Incorrect or no genesis block found. Wrong datadir for network?</source><translation /></message><message><source>Information</source><translation /></message><message><source>Initialization sanity check failed. %s is shutting down.</source><translation /></message><message><source>Insufficient funds</source><translation /></message><message><source>Invalid -onion address or hostname: '%s'</source><translation /></message><message><source>Invalid -proxy address or hostname: '%s'</source><translation /></message><message><source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source><translation /></message><message><source>Invalid netmask specified in -whitelist: '%s'</source><translation /></message><message><source>Keypool ran out, please call keypoolrefill first</source><translation /></message><message><source>Loading P2P addresses...</source><translation /></message><message><source>Loading banlist...</source><translation /></message><message><source>Loading block index...</source><translation /></message><message><source>Loading wallet...</source><translation /></message><message><source>Need to specify a port with -whitebind: '%s'</source><translation /></message><message><source>Not enough file descriptors available.</source><translation /></message><message><source>Prune cannot be configured with a negative value.</source><translation /></message><message><source>Prune mode is incompatible with -txindex.</source><translation /></message><message><source>Pruning blockstore...</source><translation /></message><message><source>Reducing -maxconnections from %d to %d, because of system limitations.</source><translation /></message><message><source>Replaying blocks...</source><translation /></message><message><source>Rescanning...</source><translation /></message><message><source>Signing transaction failed</source><translation /></message><message><source>Specified -walletdir "%s" does not exist</source><translation /></message><message><source>Specified -walletdir "%s" is a relative path</source><translation /></message><message><source>Specified -walletdir "%s" is not a directory</source><translation /></message><message><source>Starting network threads...</source><translation /></message><message><source>The source code is available from %s.</source><translation /></message><message><source>The transaction amount is too small to pay the fee</source><translation /></message><message><source>The wallet will avoid paying less than the minimum relay fee.</source><translation /></message><message><source>This is experimental software.</source><translation /></message><message><source>This is the minimum transaction fee you pay on every transaction.</source><translation /></message><message><source>This is the transaction fee you will pay if you send a transaction.</source><translation /></message><message><source>Transaction amount too small</source><translation /></message><message><source>Transaction amounts must not be negative</source><translation /></message><message><source>Transaction fee and change calculation failed</source><translation /></message><message><source>Transaction has too long of a mempool chain</source><translation /></message><message><source>Transaction must have at least one recipient</source><translation /></message><message><source>Transaction too large for fee policy</source><translation /></message><message><source>Transaction too large</source><translation /></message><message><source>Unable to bind to %s on this computer (bind returned error %s)</source><translation /></message><message><source>Unable to bind to %s on this computer. %s is probably already running.</source><translation /></message><message><source>Unable to generate initial keys</source><translation /></message><message><source>Unable to generate keys</source><translation /></message><message><source>Unable to start HTTP server. See debug log for details.</source><translation /></message><message><source>Unknown network specified in -onlynet: '%s'</source><translation /></message><message><source>Unsupported argument -benchmark ignored, use -debug=bench.</source><translation /></message><message><source>Unsupported argument -debugnet ignored, use -debug=net.</source><translation /></message><message><source>Unsupported argument -tor found, use -onion.</source><translation /></message><message><source>Unsupported logging category %s=%s.</source><translation /></message><message><source>User Agent comment (%s) contains unsafe characters.</source><translation /></message><message><source>Verifying blocks...</source><translation /></message><message><source>Verifying wallet(s)...</source><translation /></message><message><source>Wallet %s resides outside wallet directory %s</source><translation /></message><message><source>Wallet needed to be rewritten: restart %s to complete</source><translation /></message><message><source>Warning</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -addressindex</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -txindex</source><translation /></message><message><source>Zapping all transactions from wallet...</source><translation /></message></context></TS>
+<context><name>AboutPage</name><message><source>Taler</source><translation>Taler</translation></message><message><source>Project</source><translation>Проект</translation></message><message><source>Website</source><translation>Веб-сайт</translation></message><message><source>GitHub</source><translation>GitHub</translation></message><message><source>GitHub (legacy)</source><translation>GitHub (legacy)</translation></message><message><source>Community</source><translation>Сообщество</translation></message><message><source>Telegram: @talercommunity</source><translation>Telegram: @talercommunity</translation></message><message><source>Network</source><translation>Сеть</translation></message><message><source>Seed Nodes</source><translation>Seed Nodes</translation></message><message><source>Explorer (talercoin.org)</source><translation>Explorer (talercoin.org)</translation></message><message><source>Explorer (talercrypto.com)</source><translation>Explorer (talercrypto.com)</translation></message><message><source>Development</source><translation>Разработка</translation></message><message><source>Issue Tracker</source><translation>Трекер задач</translation></message><message><source>Change Log</source><translation>Журнал изменений</translation></message><message><source>App Name</source><translation>Название приложения</translation></message><message><source>Version</source><translation>Версия</translation></message><message><source>Telegram</source><translation>Telegram</translation></message><message><source>Explorer</source><translation>Explorer</translation></message></context><context><name>CoinsTableModel</name><message><source>Transaction</source><translation /></message><message><source>Index</source><translation /></message><message><source>Address</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Destination address of the output.</source><translation /></message><message><source>Original transaction id.</source><translation /></message><message><source>Original transaction id index.</source><translation /></message><message><source>Age of the transaction in days.</source><translation /></message><message><source>Balance of the output.</source><translation /></message><message><source>Coin age in the output.</source><translation /></message></context><context><name>CoinsView</name><message><source>transaction is too young</source><translation /></message><message><source>transaction is mature</source><translation /></message><message><source>transaction has reached maximum probability</source><translation /></message><message><source>Copy address</source><translation /></message><message><source>Copy transaction id</source><translation /></message><message><source>Refresh</source><translation /></message><message><source>Export Minting Data</source><translation /></message><message><source>Comma separated file (*.csv)</source><translation /></message><message><source>Address</source><translation /></message><message><source>Transaction</source><translation /></message><message><source>Transaction Index</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Error exporting</source><translation /></message><message><source>Could not write to file %1.</source><translation /></message></context><context><name>bitcoin-core</name><message><source>Taler</source><translation /></message><message><source>abkv (https://github.com/abkvme) for %s</source><translation /></message><message><source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source><translation /></message><message><source>Can't generate a change-address key. Private keys are disabled for this wallet.</source><translation /></message><message><source>Cannot obtain a lock on data directory %s. %s is probably already running.</source><translation /></message><message><source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source><translation /></message><message><source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source><translation /></message><message><source>Distributed under the MIT software license, see the accompanying file %s or %s</source><translation /></message><message><source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source><translation /></message><message><source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source><translation /></message><message><source>Error: Listening for incoming connections failed (listen returned error %s)</source><translation /></message><message><source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source><translation /></message><message><source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source><translation /></message><message><source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source><translation /></message><message><source>Please contribute if you find %s useful. Visit %s for further information about the software.</source><translation /></message><message><source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source><translation /></message><message><source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source><translation /></message><message><source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source><translation /></message><message><source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source><translation /></message><message><source>The transaction amount is too small to send after the fee has been deducted</source><translation /></message><message><source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source><translation /></message><message><source>This is the transaction fee you may discard if change is smaller than dust at this level</source><translation /></message><message><source>This is the transaction fee you may pay when fee estimates are not available.</source><translation /></message><message><source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source><translation /></message><message><source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source><translation /></message><message><source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source><translation /></message><message><source>Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source><translation /></message><message><source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source><translation /></message><message><source>Warning: Private keys detected in wallet {%s} with disabled private keys</source><translation /></message><message><source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source><translation /></message><message><source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source><translation /></message><message><source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source><translation /></message><message><source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source><translation /></message><message><source>%s corrupt, salvage failed</source><translation /></message><message><source>%s is set very high!</source><translation /></message><message><source>-maxmempool must be at least %d MB</source><translation /></message><message><source>Cannot downgrade wallet</source><translation /></message><message><source>Cannot resolve -%s address: '%s'</source><translation /></message><message><source>Cannot write to data directory '%s'; check permissions.</source><translation /></message><message><source>Change index out of range</source><translation /></message><message><source>Copyright (C) %i-%i</source><translation /></message><message><source>Corrupted block database detected</source><translation /></message><message><source>Do you want to rebuild the block database now?</source><translation /></message><message><source>Done loading</source><translation /></message><message><source>Error creating %s: You can't create non-HD wallets with this version.</source><translation /></message><message><source>Error initializing block database</source><translation /></message><message><source>Error initializing wallet database environment %s!</source><translation /></message><message><source>Error loading %s</source><translation /></message><message><source>Error loading %s: Private keys can only be disabled during creation</source><translation /></message><message><source>Error loading %s: Wallet corrupted</source><translation /></message><message><source>Error loading %s: Wallet requires newer version of %s</source><translation /></message><message><source>Error loading %s: You can't disable HD on an already existing HD wallet</source><translation /></message><message><source>Error loading block database</source><translation /></message><message><source>Error loading wallet %s. Duplicate -wallet filename specified.</source><translation /></message><message><source>Error opening block database</source><translation /></message><message><source>Error reading from database, shutting down.</source><translation /></message><message><source>Error upgrading chainstate database</source><translation /></message><message><source>Error</source><translation /></message><message><source>Error: A fatal internal error occurred, see debug.log for details</source><translation /></message><message><source>Error: Disk space is low!</source><translation /></message><message><source>Failed to listen on any port. Use -listen=0 if you want this.</source><translation /></message><message><source>Failed to rescan the wallet during initialization</source><translation /></message><message><source>Fee exceeds maximum configured by -maxtxfee</source><translation /></message><message><source>Importing...</source><translation /></message><message><source>Incorrect or no genesis block found. Wrong datadir for network?</source><translation /></message><message><source>Information</source><translation /></message><message><source>Initialization sanity check failed. %s is shutting down.</source><translation /></message><message><source>Insufficient funds</source><translation /></message><message><source>Invalid -onion address or hostname: '%s'</source><translation /></message><message><source>Invalid -proxy address or hostname: '%s'</source><translation /></message><message><source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source><translation /></message><message><source>Invalid netmask specified in -whitelist: '%s'</source><translation /></message><message><source>Keypool ran out, please call keypoolrefill first</source><translation /></message><message><source>Loading P2P addresses...</source><translation /></message><message><source>Loading banlist...</source><translation /></message><message><source>Loading block index...</source><translation /></message><message><source>Loading wallet...</source><translation /></message><message><source>Need to specify a port with -whitebind: '%s'</source><translation /></message><message><source>Not enough file descriptors available.</source><translation /></message><message><source>Prune cannot be configured with a negative value.</source><translation /></message><message><source>Prune mode is incompatible with -txindex.</source><translation /></message><message><source>Pruning blockstore...</source><translation /></message><message><source>Reducing -maxconnections from %d to %d, because of system limitations.</source><translation /></message><message><source>Replaying blocks...</source><translation /></message><message><source>Rescanning...</source><translation /></message><message><source>Signing transaction failed</source><translation /></message><message><source>Specified -walletdir "%s" does not exist</source><translation /></message><message><source>Specified -walletdir "%s" is a relative path</source><translation /></message><message><source>Specified -walletdir "%s" is not a directory</source><translation /></message><message><source>Starting network threads...</source><translation /></message><message><source>The source code is available from %s.</source><translation /></message><message><source>The transaction amount is too small to pay the fee</source><translation /></message><message><source>The wallet will avoid paying less than the minimum relay fee.</source><translation /></message><message><source>This is experimental software.</source><translation /></message><message><source>This is the minimum transaction fee you pay on every transaction.</source><translation /></message><message><source>This is the transaction fee you will pay if you send a transaction.</source><translation /></message><message><source>Transaction amount too small</source><translation /></message><message><source>Transaction amounts must not be negative</source><translation /></message><message><source>Transaction fee and change calculation failed</source><translation /></message><message><source>Transaction has too long of a mempool chain</source><translation /></message><message><source>Transaction must have at least one recipient</source><translation /></message><message><source>Transaction too large for fee policy</source><translation /></message><message><source>Transaction too large</source><translation /></message><message><source>Unable to bind to %s on this computer (bind returned error %s)</source><translation /></message><message><source>Unable to bind to %s on this computer. %s is probably already running.</source><translation /></message><message><source>Unable to generate initial keys</source><translation /></message><message><source>Unable to generate keys</source><translation /></message><message><source>Unable to start HTTP server. See debug log for details.</source><translation /></message><message><source>Unknown network specified in -onlynet: '%s'</source><translation /></message><message><source>Unsupported argument -benchmark ignored, use -debug=bench.</source><translation /></message><message><source>Unsupported argument -debugnet ignored, use -debug=net.</source><translation /></message><message><source>Unsupported argument -tor found, use -onion.</source><translation /></message><message><source>Unsupported logging category %s=%s.</source><translation /></message><message><source>User Agent comment (%s) contains unsafe characters.</source><translation /></message><message><source>Verifying blocks...</source><translation /></message><message><source>Verifying wallet(s)...</source><translation /></message><message><source>Wallet %s resides outside wallet directory %s</source><translation /></message><message><source>Wallet needed to be rewritten: restart %s to complete</source><translation /></message><message><source>Warning</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -addressindex</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -txindex</source><translation /></message><message><source>Zapping all transactions from wallet...</source><translation /></message><message>
+        <location line="+3"/>
+        <source>-newwalletmnemonic: %s already exists. Refusing to overwrite it - it may hold a recovery phrase.</source>
+        <translation>-newwalletmnemonic: %s уже существует. Перезапись отменена — файл может содержать фразу восстановления.</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>-newwalletmnemonic: %s is readable by your Windows user account; move it to safe storage and delete it.</source>
+        <translation>-newwalletmnemonic: %s доступен для чтения вашей учётной записи Windows; перенесите его в надёжное место и удалите.</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>A new wallet was created from a recovery phrase. The phrase is stored IN CLEAR TEXT in %s - move it to safe offline storage and delete it from this machine.</source>
+        <translation>Создан новый кошелёк из фразы восстановления. Фраза хранится В ОТКРЫТОМ ВИДЕ в %s — перенесите её в надёжное офлайн-хранилище и удалите с этого компьютера.</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: cannot create %s</source>
+        <translation>-newwalletmnemonic: не удалось создать %s</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: cannot restrict permissions on %s</source>
+        <translation>-newwalletmnemonic: не удалось ограничить права доступа к %s</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: cannot write %s</source>
+        <translation>-newwalletmnemonic: не удалось записать %s</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: could not generate a recovery phrase</source>
+        <translation>-newwalletmnemonic: не удалось сгенерировать фразу восстановления</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: directory %s does not exist</source>
+        <translation>-newwalletmnemonic: каталог %s не существует</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>-newwalletmnemonic: failed writing %s</source>
+        <translation>-newwalletmnemonic: ошибка записи %s</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Error creating %s: could not store the recovery phrase</source>
+        <translation>Ошибка создания %s: не удалось сохранить фразу восстановления</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Error creating %s: the recovery phrase could not be decoded</source>
+        <translation>Ошибка создания %s: не удалось декодировать фразу восстановления</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Error creating %s: the recovery phrase is not valid</source>
+        <translation>Ошибка создания %s: фраза восстановления недействительна</translation>
+    </message>
+</context><context>
+    <name>MnemonicDialog</name>
+<message>
+        <location filename="../mnemonicdialog.cpp" line="+79"/>
+        <location line="+304"/>
+        <source>Create wallet</source>
+        <translation>Создание кошелька</translation>
+    </message>
+<message>
+        <location line="-303"/>
+        <location line="+303"/>
+        <source>Restore wallet</source>
+        <translation>Восстановление кошелька</translation>
+    </message>
+<message>
+        <location line="-303"/>
+        <location line="+433"/>
+        <source>Recovery phrase</source>
+        <translation>Фраза восстановления</translation>
+    </message>
+<message>
+        <location line="-417"/>
+        <source>Back</source>
+        <translation>Назад</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Next</source>
+        <translation>Далее</translation>
+    </message>
+<message>
+        <location line="+49"/>
+        <source>&lt;b&gt;Your wallet is backed up by 24 words.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Резервная копия вашего кошелька — это 24 слова.&lt;/b&gt;</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>In the next step you will see 24 words. Written down, they restore this wallet on any Taler wallet, on any computer, even if this one is lost.</source>
+        <translation>На следующем шаге вы увидите 24 слова. Записанные, они восстановят этот кошелёк в любом кошельке Taler, на любом компьютере, даже если этот будет утерян.</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>Anyone who sees those words owns your coins. Write them on paper. Do not store them in a file, a screenshot or a password manager.</source>
+        <translation>Любой, кто увидит эти слова, становится владельцем ваших монет. Запишите их на бумаге. Не храните их в файле, на снимке экрана или в менеджере паролей.</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>Write these 24 words down, in this order, and keep them safe.</source>
+        <translation>Запишите эти 24 слова в том же порядке и храните их в надёжном месте.</translation>
+    </message>
+<message>
+        <location line="+14"/>
+        <source>Show the words</source>
+        <translation>Показать слова</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>&lt;i&gt;A screenshot or a photo of this screen is not a safe backup - anything that reads your screen or your files can read the words too.&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Снимок экрана или фотография этого окна не являются надёжной резервной копией — всё, что читает ваш экран или файлы, прочитает и слова.&lt;/i&gt;</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>Confirm you wrote the words down.</source>
+        <translation>Подтвердите, что вы записали слова.</translation>
+    </message>
+<message>
+        <location line="+19"/>
+        <source>Enter the 24 words of the wallet you want to restore.</source>
+        <translation>Введите 24 слова кошелька, который вы хотите восстановить.</translation>
+    </message>
+<message>
+        <location line="+22"/>
+        <source>restored</source>
+        <translation>восстановленный</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>Name for the restored wallet</source>
+        <translation>Имя восстановленного кошелька</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>I know roughly when this wallet was created</source>
+        <translation>Я примерно знаю, когда был создан этот кошелёк</translation>
+    </message>
+<message>
+        <location line="+9"/>
+        <source>&lt;i&gt;A date only makes the scan faster. If you are not sure, leave it unticked and the whole chain is scanned - slower, but it cannot miss anything.&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Дата лишь ускоряет сканирование. Если вы не уверены, не отмечайте её — будет просканирована вся цепочка: медленнее, но ничего не будет пропущено.&lt;/i&gt;</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>&lt;b&gt;Set a passphrase for this wallet.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Задайте пароль для этого кошелька.&lt;/b&gt;</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>The passphrase protects this wallet file on this computer. It is not the same thing as your 24 words: the words recover your coins anywhere, even if you forget the passphrase or lose this computer.</source>
+        <translation>Пароль защищает файл этого кошелька на этом компьютере. Это не то же самое, что ваши 24 слова: слова восстановят ваши монеты где угодно, даже если вы забудете пароль или потеряете этот компьютер.</translation>
+    </message>
+<message>
+        <location line="+12"/>
+        <source>Passphrase</source>
+        <translation>Пароль</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Repeat passphrase</source>
+        <translation>Повторите пароль</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>wallet</source>
+        <translation>кошелёк</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Wallet name</source>
+        <translation>Имя кошелька</translation>
+    </message>
+<message>
+        <location line="+8"/>
+        <source>Continue without a passphrase</source>
+        <translation>Продолжить без пароля</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>&lt;i&gt;Without a passphrase the wallet stakes continuously with no unlocking. With one, you must unlock the wallet for it to stake.&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Без пароля кошелёк непрерывно участвует в стейкинге и его не нужно разблокировать. С паролем кошелёк нужно разблокировать, чтобы стейкинг работал.&lt;/i&gt;</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>These 24 words restore this wallet. Anyone who sees them owns it.</source>
+        <translation>Эти 24 слова восстанавливают этот кошелёк. Любой, кто их увидит, станет его владельцем.</translation>
+    </message>
+<message>
+        <location line="+47"/>
+        <source>Word %1</source>
+        <translation>Слово %1</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>Confirm you wrote the words down: type words %1, %2 and %3.</source>
+        <translation>Подтвердите, что вы записали слова: введите слова %1, %2 и %3.</translation>
+    </message>
+<message>
+        <location line="+17"/>
+        <source>Show my 24 words</source>
+        <translation>Показать мои 24 слова</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>I have written them down</source>
+        <translation>Я их записал</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <location line="+4"/>
+        <source>Continue</source>
+        <translation>Продолжить</translation>
+    </message>
+<message>
+        <location line="+9"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+<message>
+        <location line="+63"/>
+        <source>%1 of %2 words entered.</source>
+        <translation>Введено %1 из %2 слов.</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>&lt;b&gt;These words are not a valid recovery phrase.&lt;/b&gt; Check the spelling and the order - one wrong word is enough to fail this check.</source>
+        <translation>&lt;b&gt;Эти слова не являются действительной фразой восстановления.&lt;/b&gt; Проверьте написание и порядок — достаточно одного неверного слова.</translation>
+    </message>
+<message>
+        <location line="+6"/>
+        <source>Recovery phrase is valid.</source>
+        <translation>Фраза восстановления верна.</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>This wallet will not be encrypted.</source>
+        <translation>Этот кошелёк не будет зашифрован.</translation>
+    </message>
+<message>
+        <location line="+10"/>
+        <source>The two passphrases do not match.</source>
+        <translation>Пароли не совпадают.</translation>
+    </message>
+<message>
+        <location line="+14"/>
+        <source>Could not generate a recovery phrase: %1</source>
+        <translation>Не удалось сгенерировать фразу восстановления: %1</translation>
+    </message>
+<message>
+        <location line="+49"/>
+        <source>The wallet could not be created: %1</source>
+        <translation>Не удалось создать кошелёк: %1</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>&lt;b&gt;Wallet &quot;%1&quot; is ready.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Your 24 words are its backup. You can see them again from the wallet menu, as long as the wallet is unlocked.</source>
+        <translation>&lt;b&gt;Кошелёк «%1» готов.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Ваши 24 слова — это его резервная копия. Их можно посмотреть снова в меню кошелька, пока кошелёк разблокирован.</translation>
+    </message>
+<message>
+        <location line="+36"/>
+        <source>The wallet could not be restored: %1</source>
+        <translation>Не удалось восстановить кошелёк: %1</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>&lt;b&gt;Wallet &quot;%1&quot; was restored.&lt;/b&gt;&lt;br&gt;&lt;br&gt;%2</source>
+        <translation>&lt;b&gt;Кошелёк «%1» восстановлен.&lt;/b&gt;&lt;br&gt;&lt;br&gt;%2</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+<message>
+        <location line="+17"/>
+        <source>Restoring the wallet and scanning the chain. This can take a while.</source>
+        <translation>Восстановление кошелька и сканирование цепочки. Это может занять время.</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Working...</source>
+        <translation>Выполняется...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <location line="+44"/>
+        <source>Latin letters, digits and hyphens only. No spaces, and it cannot start or end with a hyphen — the name becomes a folder on disk.</source>
+        <translation>Только латинские буквы, цифры и дефис. Без пробелов; имя не может начинаться или заканчиваться дефисом — оно становится папкой на диске.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletManagerDialog</name>
+<message>
+        <location filename="../walletmanagerdialog.cpp" line="-210"/>
+        <source>Manage wallets</source>
+        <translation>Управление кошельками</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>Wallet</source>
+        <translation>Кошелёк</translation>
+    </message>
+<message>
+        <location line="+0"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+<message>
+        <location line="+0"/>
+        <source>Balance</source>
+        <translation>Баланс</translation>
+    </message>
+<message>
+        <location line="+0"/>
+        <source>File on disk</source>
+        <translation>Файл на диске</translation>
+    </message>
+<message>
+        <location line="+8"/>
+        <source>Create wallet...</source>
+        <translation>Создать кошелёк...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Restore wallet...</source>
+        <translation>Восстановить кошелёк...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Rename...</source>
+        <translation>Переименовать...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Remove...</source>
+        <translation>Удалить...</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+<message>
+        <location line="+20"/>
+        <source>Removing a wallet moves its file to the &quot;removed&quot; folder inside the wallet directory. Nothing is deleted, so a mistake can be undone by moving the folder back.</source>
+        <translation>Удаление кошелька перемещает его файл в папку «removed» внутри каталога кошельков. Ничего не удаляется, поэтому ошибку можно исправить, вернув папку обратно.</translation>
+    </message>
+<message>
+        <location line="+51"/>
+        <source>Could not list the wallet directory: %1</source>
+        <translation>Не удалось прочитать каталог кошельков: %1</translation>
+    </message>
+<message>
+        <location line="+37"/>
+        <location line="+180"/>
+        <location line="+36"/>
+        <source>[default wallet]</source>
+        <translation>[кошелёк по умолчанию]</translation>
+    </message>
+<message>
+        <location line="-215"/>
+        <source>  (active)</source>
+        <translation>  (активный)</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>not loaded</source>
+        <translation>не загружен</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>recovery phrase</source>
+        <translation>фраза восстановления</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>legacy (file backup only)</source>
+        <translation>устаревший (только резервная копия файла)</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>loaded</source>
+        <translation>загружен</translation>
+    </message>
+<message>
+        <location line="+85"/>
+        <source>Could not create %1</source>
+        <translation>Не удалось создать %1</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>Could not move the wallet to %1</source>
+        <translation>Не удалось переместить кошелёк в %1</translation>
+    </message>
+<message>
+        <location line="+13"/>
+        <location line="+7"/>
+        <location line="+5"/>
+        <location line="+34"/>
+        <location line="+9"/>
+        <source>Rename wallet</source>
+        <translation>Переименование кошелька</translation>
+    </message>
+<message>
+        <location line="-54"/>
+        <source>New name for &quot;%1&quot;:</source>
+        <translation>Новое имя для «%1»:</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>A wallet named &quot;%1&quot; already exists.</source>
+        <translation>Кошелёк с именем «%1» уже существует.</translation>
+    </message>
+<message>
+        <location line="+35"/>
+        <source>The wallet was not renamed: %1
+
+The original wallet is untouched.</source>
+        <translation>Кошелёк не был переименован: %1
+
+Исходный кошелёк не изменён.</translation>
+    </message>
+<message>
+        <location line="+9"/>
+        <source>Renamed to &quot;%1&quot;.
+
+The previous file was moved to the &quot;removed&quot; folder rather than deleted.</source>
+        <translation>Переименован в «%1».
+
+Прежний файл перемещён в папку «removed», а не удалён.</translation>
+    </message>
+<message>
+        <location line="+13"/>
+        <source>&lt;b&gt;Remove wallet &quot;%1&quot;?&lt;/b&gt;&lt;br&gt;&lt;br&gt;File: %2&lt;br&gt;&lt;br&gt;</source>
+        <translation>&lt;b&gt;Удалить кошелёк «%1»?&lt;/b&gt;&lt;br&gt;&lt;br&gt;Файл: %2&lt;br&gt;&lt;br&gt;</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>This is a legacy wallet: it has &lt;b&gt;no recovery phrase&lt;/b&gt;, so this file is the only copy of its keys.&lt;br&gt;&lt;br&gt;</source>
+        <translation>Это устаревший кошелёк: у него &lt;b&gt;нет фразы восстановления&lt;/b&gt;, поэтому этот файл — единственная копия его ключей.&lt;br&gt;&lt;br&gt;</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>&lt;b&gt;This wallet still holds %1 TLR.&lt;/b&gt;&lt;br&gt;&lt;br&gt;</source>
+        <translation>&lt;b&gt;На этом кошельке ещё есть %1 TLR.&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>The wallet will be moved to the &quot;removed&quot; folder in the wallet directory. Nothing is deleted, and you can bring it back by moving it out again.</source>
+        <translation>Кошелёк будет перемещён в папку «removed» в каталоге кошельков. Ничего не удаляется, и вы можете вернуть его, переместив обратно.</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <location line="+9"/>
+        <location line="+5"/>
+        <location line="+11"/>
+        <location line="+6"/>
+        <source>Remove wallet</source>
+        <translation>Удаление кошелька</translation>
+    </message>
+<message>
+        <location line="-21"/>
+        <source>Type the wallet name to confirm: %1</source>
+        <translation>Введите имя кошелька для подтверждения: %1</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>The name did not match. Nothing was removed.</source>
+        <translation>Имя не совпало. Ничего не удалено.</translation>
+    </message>
+<message>
+        <location line="+11"/>
+        <source>The wallet was not removed: %1</source>
+        <translation>Кошелёк не был удалён: %1</translation>
+    </message>
+<message>
+        <location line="+7"/>
+        <source>&quot;%1&quot; was moved to the &quot;removed&quot; folder in the wallet directory.</source>
+        <translation>«%1» перемещён в папку «removed» в каталоге кошельков.</translation>
+    </message>
+<message>
+        <location line="+6"/>
+        <source>Recovery phrase</source>
+        <translation>Фраза восстановления</translation>
+    </message>
+<message>
+        <location line="+47"/>
+        <source>Default wallet</source>
+        <translation>Кошелёк по умолчанию</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>%1  •  in use</source>
+        <translation>%1  •  используется</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>File name: %1</source>
+        <translation>Имя файла: %1</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>Standard (file backup)</source>
+        <translation>Обычный (резервная копия файла)</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>Not open</source>
+        <translation>Не открыт</translation>
+    </message>
+<message>
+        <location line="+4"/>
+        <source>A recovery-phrase wallet can be restored from its 24 words. A standard wallet can only be restored from a copy of its file.</source>
+        <translation>Кошелёк с фразой восстановления можно восстановить по 24 словам. Обычный кошелёк — только из копии его файла.</translation>
+    </message>
+<message>
+        <location line="+2"/>
+        <source>This wallet is not open, so its type and balance are unknown. Open it from the wallet selector to see them.</source>
+        <translation>Этот кошелёк не открыт, поэтому его тип и баланс неизвестны. Откройте его в списке кошельков, чтобы увидеть их.</translation>
+    </message>
+<message>
+        <location line="+14"/>
+        <location line="+8"/>
+        <source>Working...</source>
+        <translation>Выполняется...</translation>
+    </message>
+<message>
+        <location line="+67"/>
+        <source>Closing the wallet...</source>
+        <translation>Закрытие кошелька...</translation>
+    </message>
+<message>
+        <location line="+0"/>
+        <source>Default</source>
+        <translation>По умолчанию</translation>
+    </message>
+<message>
+        <location line="+1"/>
+        <source>Open this one at start</source>
+        <translation>Открывать при запуске</translation>
+    </message>
+<message>
+        <location line="+8"/>
+        <source>This wallet opens when the application starts.</source>
+        <translation>Этот кошелёк открывается при запуске приложения.</translation>
+    </message>
+<message>
+        <location line="+34"/>
+        <source>The legacy wallet cannot be renamed: its name is what the node resolves by default, and changing it would leave talerd creating an empty wallet in its place.</source>
+        <translation>Кошелёк legacy нельзя переименовать: его имя — это то, что узел использует по умолчанию, и его изменение привело бы к созданию talerd пустого кошелька вместо него.</translation>
+    </message>
+</context>
+</TS>

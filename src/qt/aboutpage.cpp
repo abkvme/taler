@@ -119,8 +119,7 @@ AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     // Network
     addSectionHeader(tr("Network"));
     addRow(tr("Seed Nodes"), "https://github.com/abkvme/taler-seeds", "github.com/abkvme/taler-seeds");
-    addRow(tr("Explorer"), "https://explorer.talercoin.org/", "explorer.talercoin.org");
-    addRow(tr("Explorer"), "https://explorer.talercrypto.com/", "explorer.talercrypto.com");
+    addRow(tr("Explorer"), "https://explorer.taler.tech/", "explorer.taler.tech");
 
     // Development
     addSectionHeader(tr("Development"));

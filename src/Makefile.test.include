@@ -26,6 +26,11 @@ BITCOIN_TEST_SUITE = \
   test/test_bitcoin.cpp
 
 # test_bitcoin binary #
+# Four upstream suites are not built: they exercise subsystems Taler does not
+# have. policy/fees.h and index/txindex.h do not exist in this tree, difficulty
+# retargeting is Taler's own algorithm rather than CalculateNextWorkRequired, and
+# there is no BIP9 version-bits deployment to compute a block version from
+# (witness activation is by height). The sources are kept for reference.
 BITCOIN_TESTS =\
   test/arith_uint256_tests.cpp \
   test/scriptnum10.h \
@@ -64,8 +69,6 @@ BITCOIN_TESTS =\
   test/net_tests.cpp \
   test/netbase_tests.cpp \
   test/pmt_tests.cpp \
-  test/policyestimator_tests.cpp \
-  test/pow_tests.cpp \
   test/prevector_tests.cpp \
   test/raii_event_tests.cpp \
   test/random_tests.cpp \
@@ -85,17 +88,17 @@ BITCOIN_TESTS =\
   test/timedata_tests.cpp \
   test/torcontrol_tests.cpp \
   test/transaction_tests.cpp \
-  test/txindex_tests.cpp \
   test/txvalidation_tests.cpp \
   test/txvalidationcache_tests.cpp \
   test/uint256_tests.cpp \
   test/util_tests.cpp \
-  test/validation_block_tests.cpp \
-  test/versionbits_tests.cpp
+  test/validation_block_tests.cpp
 
 if ENABLE_WALLET
 BITCOIN_TESTS += \
   wallet/test/accounting_tests.cpp \
+  wallet/test/bip39_tests.cpp \
+  wallet/test/bip44_tests.cpp \
   wallet/test/db_tests.cpp \
   wallet/test/psbt_wallet_tests.cpp \
   wallet/test/wallet_tests.cpp \
