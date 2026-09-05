@@ -1239,8 +1239,17 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
         assert(it != mapWallet.end());
         CWalletTx& wtx = it->second;
         int currentconfirm = wtx.GetDepthInMainChain();
-        // If the orig tx was not in block, none of its spends can be
-        assert(currentconfirm <= 0);
+        // A descendant of a transaction that is not in a block cannot itself be
+        // confirmed, so this means the wallet's view is inconsistent. Upstream
+        // asserts here; that was tolerable when only the abandontransaction RPC
+        // could reach this code, but the stranded-transaction sweep now runs it
+        // unattended on every staking node. Leave the transaction alone and say
+        // so - aborting the node would be the worse of the two failures.
+        if (currentconfirm > 0) {
+            WalletLogPrintf("%s: refusing to abandon %s, it is confirmed at depth %d\n",
+                            __func__, now.ToString(), currentconfirm);
+            continue;
+        }
         // if (currentconfirm < 0) {Tx and spends are already conflicted, no need to abandon}
         if (currentconfirm == 0 && !wtx.isAbandoned()) {
             // If the orig tx was not in block/mempool, none of its spends can be in mempool
@@ -1265,6 +1274,93 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
     }
 
     return true;
+}
+
+namespace {
+
+//! The block this transaction was mined in, if that block has been reorged away.
+//!
+//! Positive evidence rather than inference. The block must be one we know, must
+//! not be on the active chain, and must sit at or below our tip - otherwise we
+//! are simply behind it, which is the ordinary state of affairs while syncing
+//! and the trap MarkConflicted() documents.
+const CBlockIndex* ReorgedAwayBlock(const CWalletTx& wtx) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    if (wtx.hashUnset()) return nullptr;
+    const CBlockIndex* pindex = LookupBlockIndex(wtx.hashBlock);
+    if (pindex == nullptr) return nullptr;
+    if (chainActive.Contains(pindex)) return nullptr;
+    if (pindex->nHeight > chainActive.Height()) return nullptr;
+    return pindex;
+}
+
+//! Can this transaction only ever exist inside that one block?
+//!
+//! True of a coinbase, which is created by its block and belongs to no other,
+//! and of the coinstake of a proof-of-stake block, whose first output commits
+//! to that block through MakeCheckStakeScript(). Once the block is gone both are
+//! unmineable anywhere, forever.
+//!
+//! Deliberately false for an ordinary payment that happened to share the block:
+//! that one can and should be mined again, and abandoning it would free coins
+//! belonging to a live transaction. When the block cannot be read - a pruned
+//! node - we cannot prove anything, so we claim nothing.
+bool BoundToOneBlock(const CWalletTx& wtx, const CBlockIndex* pindex) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    if (wtx.IsCoinBase()) return true;
+
+    CBlock block;
+    if (!ReadBlockFromDisk(block, pindex, Params().GetConsensus())) return false;
+    if (!block.IsProofOfStake() || block.vtx.size() < 2) return false;
+    return block.vtx[1]->GetHash() == wtx.GetHash();
+}
+
+} // namespace
+
+void CWallet::ReleaseStrandedTransactions()
+{
+    AssertLockHeld(cs_main);
+    AssertLockHeld(cs_wallet);
+
+    // Two passes on purpose: abandoning walks descendants and clears cached
+    // balances, so it writes to mapWallet. No iterator into it may be alive
+    // while that happens.
+    std::vector<uint256> stranded;
+    const int64_t now = GetAdjustedTime();
+    for (const std::pair<const uint256, CWalletTx>& item : mapWallet) {
+        const CWalletTx& wtx = item.second;
+        if (wtx.isAbandoned() || wtx.fInMempool) continue;
+        // Cheap filters first: everything below this line reads a block off disk.
+        if (now - wtx.nTimeReceived <= STRANDED_TX_MIN_AGE) continue;
+        if (wtx.GetDepthInMainChain() != 0) continue;
+
+        const CBlockIndex* orphaned = ReorgedAwayBlock(wtx);
+        if (orphaned == nullptr) continue;
+        if (!BoundToOneBlock(wtx, orphaned)) continue;
+        stranded.push_back(item.first);
+    }
+
+    for (const uint256& hash : stranded) {
+        const auto it = mapWallet.find(hash);
+        if (it == mapWallet.end()) continue;
+        const bool is_coinbase = it->second.IsCoinBase();
+        const std::string block = it->second.hashBlock.ToString();
+
+        // One last chance to live. A coinstake from an older block format commits
+        // to nothing, so it could still be mined; if the mempool takes it the
+        // coins return that way and none of this is our business. A coinbase can
+        // never enter any mempool, by consensus rather than by policy, so there
+        // is nothing to ask.
+        if (!is_coinbase) {
+            CValidationState state;
+            if (mapWallet.at(hash).AcceptToMemoryPool(maxTxFee, state)) continue;
+        }
+
+        if (!TransactionCanBeAbandoned(hash)) continue;
+        WalletLogPrintf("Releasing stranded %s %s: block %s is no longer on the chain\n",
+                        is_coinbase ? "coinbase" : "coinstake", hash.ToString(), block);
+        AbandonTransaction(hash);
+    }
 }
 
 void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
@@ -1322,14 +1418,13 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
 }
 
 void CWallet::SyncTransaction(const CTransactionRef& ptx, const CBlockIndex *pindex, int posInBlock, bool update_tx) {
-    if ((pindex == nullptr) && (posInBlock == 0)) {
-        auto it = mapWallet.find(ptx->GetHash());
-        if (it != mapWallet.end()) {
-            it->second.setAbandoned();
-            NotifyTransactionChanged(this, ptx->GetHash(), CT_UPDATED);
-        }
-        return;
-    }
+    // A transaction arriving without a block - from the mempool, or because its
+    // block was just disconnected - goes back to being unconfirmed. It is not
+    // abandoned: on a reorg most of these are about to be mined again a block
+    // or two later, and freeing their inputs in the meantime would let the
+    // wallet spend coins out from under a payment that is still very much alive.
+    // Transactions that genuinely cannot come back are dealt with on evidence,
+    // by ReleaseStrandedTransactions().
     if (!AddToWalletIfInvolvingMe(ptx, pindex, posInBlock, update_tx))
         return; // Not one of ours
 
@@ -1341,7 +1436,7 @@ void CWallet::SyncTransaction(const CTransactionRef& ptx, const CBlockIndex *pin
 
 void CWallet::TransactionAddedToMempool(const CTransactionRef& ptx) {
     LOCK2(cs_main, cs_wallet);
-    SyncTransaction(ptx, nullptr, 1);
+    SyncTransaction(ptx);
 
     auto it = mapWallet.find(ptx->GetHash());
     if (it != mapWallet.end()) {
@@ -1378,20 +1473,14 @@ void CWallet::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const 
 
     m_last_block_processed = pindex;
 
+    // A stake block of ours that is reorged away leaves its coinstake behind:
+    // unconfirmed, impossible to mine anywhere else, and still holding the
+    // staked coin as spent. Sweep those out - but rarely, and only on evidence.
     if (IsInitialBlockDownload()) return;
-    static int64_t last = GetAdjustedTime();
-    if (GetAdjustedTime() - last > 60) {
-        last = GetAdjustedTime();
-        for (std::map<uint256, CWalletTx>::iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
-            const uint256& hash = (*it).first;
-            CWalletTx& wtx = (*it).second;
-            if ((wtx.GetDepthInMainChain() <= 0) && (!wtx.isAbandoned()) &&
-                    (!wtx.fInMempool) && (GetAdjustedTime() - wtx.nTimeReceived > 15*60)) {
-                wtx.setAbandoned();
-                NotifyTransactionChanged(this, wtx.GetHash(), CT_UPDATED);
-                WalletLogPrintf("clean orphan hash=%s\n", hash.ToString());
-            }
-        }
+    const int64_t now = GetAdjustedTime();
+    if (now - m_last_stranded_sweep > STRANDED_SWEEP_INTERVAL) {
+        m_last_stranded_sweep = now;
+        ReleaseStrandedTransactions();
     }
 }
 
@@ -1622,26 +1711,37 @@ void CWallet::DeriveNewChildKeyBIP44(WalletBatch& batch, CKeyMetadata& metadata,
     // master. The addresses that came out were stable, so nothing looked wrong here,
     // but they were not the addresses the published spec derives from the same
     // phrase, and restoring the wallet anywhere else would have found nothing.
-    SecureString mnemonic;
-    if (!GetMnemonic(mnemonic)) {
-        throw std::runtime_error(std::string(__func__) + ": recovery phrase unavailable (wallet locked?)");
-    }
-    unsigned char seed_bytes[bip39::SEED_BYTES];
-    bip39::MnemonicToSeed(mnemonic, SecureString(), seed_bytes);
-
-    CExtKey masterKey;
-    bip44::MasterKeyFromSeed(seed_bytes, sizeof(seed_bytes), masterKey);
-    memory_cleanse(seed_bytes, sizeof(seed_bytes));
-
-    // The phrase must belong to this wallet: if it rebuilt a different master key,
-    // every address below would be wrong and silently so.
-    if (masterKey.key.GetPubKey().GetID() != hdChain.seed_id) {
-        throw std::runtime_error(std::string(__func__) + ": recovery phrase does not match this wallet's seed");
-    }
-
+    // Everything down to the account is identical for every key of this wallet,
+    // and rebuilding it means a 2048-round PBKDF2 over the phrase. A keypool
+    // top-up derives thousands of keys, so a BulkDerivation guard holds the
+    // account key for the run; without one this is the original per-key path.
     CExtKey accountKey;
-    if (!bip44::DeriveAccount(masterKey, hdChain.nCoinType, hdChain.nAccount, accountKey))
-        throw std::runtime_error(std::string(__func__) + ": account derivation failed");
+    if (m_bulk_derivation && m_bip44_account_key) {
+        accountKey = *m_bip44_account_key;
+    } else {
+        SecureString mnemonic;
+        if (!GetMnemonic(mnemonic)) {
+            throw std::runtime_error(std::string(__func__) + ": recovery phrase unavailable (wallet locked?)");
+        }
+        unsigned char seed_bytes[bip39::SEED_BYTES];
+        bip39::MnemonicToSeed(mnemonic, SecureString(), seed_bytes);
+
+        CExtKey masterKey;
+        bip44::MasterKeyFromSeed(seed_bytes, sizeof(seed_bytes), masterKey);
+        memory_cleanse(seed_bytes, sizeof(seed_bytes));
+
+        // The phrase must belong to this wallet: if it rebuilt a different master key,
+        // every address below would be wrong and silently so.
+        if (masterKey.key.GetPubKey().GetID() != hdChain.seed_id) {
+            throw std::runtime_error(std::string(__func__) + ": recovery phrase does not match this wallet's seed");
+        }
+
+        if (!bip44::DeriveAccount(masterKey, hdChain.nCoinType, hdChain.nAccount, accountKey))
+            throw std::runtime_error(std::string(__func__) + ": account derivation failed");
+
+        // Only inside a guard, which owns wiping it again.
+        if (m_bulk_derivation) m_bip44_account_key = MakeUnique<CExtKey>(accountKey);
+    }
 
     const uint32_t chain = internal ? bip44::CHAIN_INTERNAL : bip44::CHAIN_EXTERNAL;
     uint32_t& counter = internal ? hdChain.nInternalChainCounter : hdChain.nExternalChainCounter;
@@ -1745,6 +1845,8 @@ void CWallet::SetHDChain(const CHDChain& chain, bool memonly)
         throw std::runtime_error(std::string(__func__) + ": writing chain failed");
 
     hdChain = chain;
+    // Any cached account key belongs to the old chain.
+    m_bip44_account_key.reset();
 }
 
 bool CWallet::IsHDEnabled() const
@@ -3261,8 +3363,11 @@ bool getCoinInfo (std::map<uint256, uint64_t>& cache, const COutPoint& out, uint
 
 // pos: create coin stake transaction
 //
-// taler: in this implementation we send PoS outputs ONLY to bech32 segwit addresses to increase segwit usage
-// and reduce blocks size.
+// Payouts go to DEFAULT_ADDRESS_TYPE, which is OutputType::LEGACY - so P2PKH, not
+// bech32. (An earlier comment here claimed segwit; it never was. The difference
+// matters: a bare P2WPKH output is only IsMine once its witness program has been
+// registered with LearnRelatedScripts, which a freshly restored wallet has not
+// done, so paying stakes to bech32 would make them invisible after a restore.)
 //
 bool CWallet::CreateCoinStake (CBlockHeader& header, int64_t nSearchInterval, CMutableTransaction &txNew, CAmount& nPosReward)
 {
@@ -3710,6 +3815,8 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
         }
         bool internal = false;
         WalletBatch batch(*database);
+        // Derive the account key once for the whole run rather than once per key.
+        BulkDerivation bulk(*this);
         for (int64_t i = missingInternal + missingExternal; i--;)
         {
             if (i < missingInternal) {

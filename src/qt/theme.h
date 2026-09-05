@@ -5,6 +5,7 @@
 #ifndef BITCOIN_QT_THEME_H
 #define BITCOIN_QT_THEME_H
 
+#include <QIcon>
 #include <QString>
 
 /**
@@ -34,6 +35,14 @@ void Save(Theme theme);
 //! Whether the desktop itself is currently dark. Used only to pick sensible colours
 //! for widgets we draw ourselves while running in System mode.
 bool SystemPrefersDark();
+
+/** A door with an arrow leaving through it: the toolbar's Exit button.
+ *
+ * Drawn rather than shipped as a pixmap so it stays sharp at any size and can be
+ * recoloured with the rest of the toolbar. White on transparent, because callers
+ * pass it through PlatformStyle::TextColorIcon() to take the theme's text colour.
+ */
+QIcon ExitDoorIcon();
 
 } // namespace theme
 

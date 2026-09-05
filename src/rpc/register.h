@@ -15,6 +15,8 @@ void RegisterBlockchainRPCCommands(CRPCTable &tableRPC);
 void RegisterNetRPCCommands(CRPCTable &tableRPC);
 /** Register miscellaneous RPC commands */
 void RegisterMiscRPCCommands(CRPCTable &tableRPC);
+/** Register API-sidecar RPC commands */
+void RegisterSidecarRPCCommands(CRPCTable &tableRPC);
 /** Register mining RPC commands */
 void RegisterMiningRPCCommands(CRPCTable &tableRPC);
 /** Register raw transaction RPC commands */
@@ -25,6 +27,7 @@ static inline void RegisterAllCoreRPCCommands(CRPCTable &t)
     RegisterBlockchainRPCCommands(t);
     RegisterNetRPCCommands(t);
     RegisterMiscRPCCommands(t);
+    RegisterSidecarRPCCommands(t);
     RegisterMiningRPCCommands(t);
     RegisterRawTransactionRPCCommands(t);
 }

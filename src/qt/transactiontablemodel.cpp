@@ -491,6 +491,11 @@ QString TransactionTableModel::formatTooltip(const TransactionRecord *rec) const
     return tooltip;
 }
 
+RewardSummary TransactionTableModel::summariseRewards(const QDateTime& now) const
+{
+    return SummariseRewards(priv->cachedWallet, now);
+}
+
 QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
@@ -569,7 +574,10 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
         {
             return addressColor(rec);
         }
-        if ((rec->isPoS) && (rec->type == TransactionRecord::Generated)) return QColor(0, 0, 255);
+        // Staking rewards in the application's accent, not a pure blue: 0,0,255 is
+        // nearly unreadable against a dark background, and the accent is the colour
+        // this wallet already uses to mean "ours".
+        if ((rec->isPoS) && (rec->type == TransactionRecord::Generated)) return QColor(0x00, 0x88, 0xcc);
         break;
     case TypeRole:
         return rec->type;

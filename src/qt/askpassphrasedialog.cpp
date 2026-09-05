@@ -7,6 +7,8 @@
 #endif
 
 #include <qt/askpassphrasedialog.h>
+
+#include <qt/guiutil.h>
 #include <qt/forms/ui_askpassphrasedialog.h>
 
 #include <qt/guiconstants.h>
@@ -93,6 +95,17 @@ AskPassphraseDialog::~AskPassphraseDialog()
 void AskPassphraseDialog::setModel(WalletModel *_model)
 {
     this->model = _model;
+
+    // Name the wallet in the title. Every one of these dialogs acts on the wallet
+    // currently on screen, but with several open "Change passphrase" alone does not
+    // say whose passphrase is about to change - and that is not a question a user
+    // should have to answer by remembering what the selector said.
+    if (model) {
+        const QString name = GUIUtil::walletDisplayName(model->getWalletName());
+        if (!name.isEmpty()) {
+            setWindowTitle(windowTitle() + QString(" ") + QChar(0x2014) + QString(" ") + name);
+        }
+    }
 }
 
 void AskPassphraseDialog::accept()

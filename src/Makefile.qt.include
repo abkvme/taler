@@ -66,6 +66,7 @@ QT_MOC_CPP = \
   qt/moc_askpassphrasedialog.cpp \
   qt/moc_bantablemodel.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
+  qt/moc_brandbanner.cpp \
   qt/moc_bitcoinamountfield.cpp \
   qt/moc_bitcoingui.cpp \
   qt/moc_bitcoinunits.cpp \
@@ -87,6 +88,7 @@ QT_MOC_CPP = \
   qt/moc_optionsdialog.cpp \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
+  qt/moc_rewardschart.cpp \
   qt/moc_peertablemodel.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvaluecombobox.cpp \
@@ -135,6 +137,7 @@ BITCOIN_QT_H = \
   qt/askpassphrasedialog.h \
   qt/bantablemodel.h \
   qt/bitcoinaddressvalidator.h \
+  qt/brandbanner.h \
   qt/bitcoinamountfield.h \
   qt/bitcoingui.h \
   qt/bitcoinunits.h \
@@ -176,6 +179,8 @@ BITCOIN_QT_H = \
   qt/transactiondesc.h \
   qt/transactiondescdialog.h \
   qt/transactionfilterproxy.h \
+  qt/rewardschart.h \
+  qt/rewardsummary.h \
   qt/transactionrecord.h \
   qt/transactiontablemodel.h \
   qt/transactionview.h \
@@ -250,6 +255,7 @@ RES_ICONS = \
 BITCOIN_QT_BASE_CPP = \
   qt/bantablemodel.cpp \
   qt/bitcoinaddressvalidator.cpp \
+  qt/brandbanner.cpp \
   qt/bitcoinamountfield.cpp \
   qt/bitcoingui.cpp \
   qt/bitcoinunits.cpp \
@@ -295,6 +301,8 @@ BITCOIN_QT_WALLET_CPP = \
   qt/transactiondesc.cpp \
   qt/transactiondescdialog.cpp \
   qt/transactionfilterproxy.cpp \
+  qt/rewardschart.cpp \
+  qt/rewardsummary.cpp \
   qt/transactionrecord.cpp \
   qt/transactiontablemodel.cpp \
   qt/transactionview.cpp \
@@ -314,7 +322,10 @@ if ENABLE_WALLET
 BITCOIN_QT_CPP += $(BITCOIN_QT_WALLET_CPP)
 endif
 
-RES_IMAGES =
+RES_IMAGES = \
+  qt/res/images/splash-en.jpg \
+  qt/res/images/splash-ru.jpg \
+  qt/res/images/splash-be.jpg
 
 RES_MOVIES = $(wildcard $(srcdir)/qt/res/movies/spinner-*.png)
 

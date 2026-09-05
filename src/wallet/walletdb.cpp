@@ -239,7 +239,6 @@ public:
     bool fAnyUnordered;
     int nFileVersion;
     std::vector<uint256> vWalletUpgrade;
-    std::vector<uint256> vWalletClear;
 
     CWalletScanState() {
         nKeys = nCKeys = nWatchKeys = nKeyMeta = m_unknown_records = 0;
@@ -303,11 +302,21 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             if (wtx.nOrderPos == -1)
                 wss.fAnyUnordered = true;
 
-            if ((wtx.GetDepthInMainChain() <= 0) && (GetAdjustedTime() - wtx.nTimeReceived > 60*60)) {
-                wss.vWalletClear.push_back(hash);
-            } else {
-                pwallet->LoadToWallet(wtx);
-            }
+            // Load it, whatever state it is in.
+            //
+            // This used to erase - permanently, from wallet.dat - any transaction
+            // that was unconfirmed and more than an hour old. A payment that had
+            // simply not been mined yet vanished from the wallet's history at the
+            // next start, and with it any record that the coins had been sent at
+            // all. Nothing about "unconfirmed for an hour" means dead: the fee may
+            // be low, the mempool may have dropped it, the node may have been off.
+            //
+            // Transactions that genuinely cannot come back are released at
+            // runtime, on evidence, by CWallet::ReleaseStrandedTransactions(), and
+            // that marks them abandoned rather than deleting them - so they stay
+            // visible as history. Deliberately discarding wallet history is what
+            // -zapwallettxes is for, and it is the user's decision, not ours.
+            pwallet->LoadToWallet(wtx);
         }
         else if (strType == "acentry")
         {
@@ -632,11 +641,6 @@ DBErrors WalletBatch::LoadWallet(CWallet* pwallet)
 
     for (uint256 hash : wss.vWalletUpgrade)
         WriteTx(pwallet->mapWallet.at(hash));
-
-    for (uint256 hash : wss.vWalletClear) {
-        pwallet->WalletLogPrintf("clear orphan tx (hash = %s)\n", hash.ToString());
-        EraseTx(hash);
-    }
 
     // Rewrite encrypted wallets of versions 0.4.0 and 0.5.0rc:
     if (wss.fIsEncrypted && (wss.nFileVersion == 40000 || wss.nFileVersion == 50000))

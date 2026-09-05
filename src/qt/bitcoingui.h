@@ -113,6 +113,13 @@ private:
     QAction *nodesAction = nullptr;
     QAction *aboutPageAction = nullptr;
     QAction* quitAction = nullptr;
+    //! The same thing as quitAction, on the toolbar. A separate action so it can
+    //! carry its own icon and styling, and so QAction::QuitRole - which relocates
+    //! quitAction into the application menu on macOS - cannot affect it.
+    QAction* exitToolbarAction = nullptr;
+    //! Settings on the toolbar. Separate from optionsAction for the same reason:
+    //! QAction::PreferencesRole relocates that one into the macOS application menu.
+    QAction* settingsToolbarAction = nullptr;
     QAction* sendCoinsAction = nullptr;
     QAction* sendCoinsMenuAction = nullptr;
     QAction* usedSendingAddressesAction = nullptr;
@@ -269,6 +276,9 @@ private Q_SLOTS:
     void optionsClicked();
     /** Show about dialog */
     void aboutClicked();
+
+    /** Ask before leaving, then leave. Wired to both Exit actions and the tray. */
+    void requestQuit();
     /** Show debug window */
     void showDebugWindow();
     /** Show debug window and set focus to the console */

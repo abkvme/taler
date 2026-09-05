@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QFrame>
+#include <QResizeEvent>
 
 AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     QWidget(parent),
@@ -32,17 +33,17 @@ AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     QVBoxLayout *titleLayout = new QVBoxLayout();
     titleLayout->setSpacing(2);
     QLabel *nameLabel = new QLabel(tr("Taler"));
-    nameLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
+    nameLabel->setStyleSheet("font-size: 26px; font-weight: bold;");
     titleLayout->addWidget(nameLabel);
     QLabel *versionLabel = new QLabel(QString::fromStdString(FormatFullVersion()));
-    versionLabel->setStyleSheet("font-size: 13px; color: #888;");
+    versionLabel->setStyleSheet("font-size: 14px; color: #888;");
     titleLayout->addWidget(versionLabel);
     QLabel *websiteLink = new QLabel(
         "<a href=\"https://taler.tech\" style=\"text-decoration: none; color: #1B8FBA;\">taler.tech</a>");
     websiteLink->setTextFormat(Qt::RichText);
     websiteLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
     websiteLink->setOpenExternalLinks(true);
-    websiteLink->setStyleSheet("font-size: 12px;");
+    websiteLink->setStyleSheet("font-size: 13px;");
     titleLayout->addWidget(websiteLink);
 
     headerLayout->addLayout(titleLayout);
@@ -56,28 +57,35 @@ AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     mainLayout->addWidget(sep);
     mainLayout->addSpacing(8);
 
-    // Grid: label on left, URL on right
-    QGridLayout *grid = new QGridLayout();
-    grid->setColumnStretch(0, 0);
-    grid->setColumnStretch(1, 1);
-    grid->setHorizontalSpacing(20);
-    grid->setVerticalSpacing(6);
+    // Each section is built as its own widget so the page can put them in one
+    // column or two without rebuilding anything - see arrangeSections().
+    QGridLayout *grid = nullptr;
     int row = 0;
 
-    auto addSectionHeader = [&](const QString &title) {
-        if (row > 0) {
-            grid->setRowMinimumHeight(row, 12);
-            row++;
-        }
-        QLabel *hdr = new QLabel(title);
-        hdr->setStyleSheet("font-size: 15px; font-weight: bold;");
-        grid->addWidget(hdr, row, 0, 1, 2);
-        row++;
+    auto beginSection = [&](const QString &title) {
+        QWidget *section = new QWidget(this);
+        QVBoxLayout *sectionLayout = new QVBoxLayout(section);
+        sectionLayout->setContentsMargins(0, 0, 0, 0);
+        sectionLayout->setSpacing(4);
+
+        QLabel *hdr = new QLabel(title, section);
+        hdr->setStyleSheet("font-size: 17px; font-weight: bold;");
+        sectionLayout->addWidget(hdr);
+
+        grid = new QGridLayout();
+        grid->setColumnStretch(0, 0);
+        grid->setColumnStretch(1, 1);
+        grid->setHorizontalSpacing(20);
+        grid->setVerticalSpacing(6);
+        sectionLayout->addLayout(grid);
+        row = 0;
+
+        m_sections.append(section);
     };
 
     auto addRow = [&](const QString &label, const QString &url, const QString &displayUrl) {
         QLabel *lbl = new QLabel(label);
-        lbl->setStyleSheet("font-size: 13px; padding-left: 12px;");
+        lbl->setStyleSheet("font-size: 15px; padding-left: 12px;");
         grid->addWidget(lbl, row, 0, Qt::AlignLeft | Qt::AlignVCenter);
 
         QLabel *link = new QLabel(
@@ -86,25 +94,25 @@ AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
         link->setTextFormat(Qt::RichText);
         link->setTextInteractionFlags(Qt::TextBrowserInteraction);
         link->setOpenExternalLinks(true);
-        link->setStyleSheet("font-size: 13px;");
+        link->setStyleSheet("font-size: 15px;");
         grid->addWidget(link, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
         row++;
     };
 
     auto addPlainRow = [&](const QString &label, const QString &value) {
         QLabel *lbl = new QLabel(label);
-        lbl->setStyleSheet("font-size: 13px; padding-left: 12px;");
+        lbl->setStyleSheet("font-size: 15px; padding-left: 12px;");
         grid->addWidget(lbl, row, 0, Qt::AlignLeft | Qt::AlignVCenter);
 
         QLabel *val = new QLabel(value);
-        val->setStyleSheet("font-size: 13px;");
+        val->setStyleSheet("font-size: 15px;");
         val->setTextInteractionFlags(Qt::TextSelectableByMouse);
         grid->addWidget(val, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
         row++;
     };
 
-    // Project
-    addSectionHeader(tr("Project"));
+    // Project - much the longest section, which is why it gets a column to itself.
+    beginSection(tr("Project"));
     addPlainRow(tr("App Name"), "Taler");
     addPlainRow(tr("Version"), QString::fromStdString(FormatFullVersion()));
     addRow(tr("Website"), "https://taler.tech/", "taler.tech");
@@ -112,30 +120,72 @@ AboutPage::AboutPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     addRow(tr("GitHub (legacy)"), "https://github.com/cryptadev/taler", "github.com/cryptadev/taler");
     addRow(tr("License"), "https://github.com/abkvme/taler/blob/main/COPYING", "MIT License");
 
-    // Community
-    addSectionHeader(tr("Community"));
+    beginSection(tr("Community"));
     addRow(tr("Telegram"), "https://t.me/talercommunity", "@talercommunity");
 
-    // Network
-    addSectionHeader(tr("Network"));
+    beginSection(tr("Network"));
     addRow(tr("Seed Nodes"), "https://github.com/abkvme/taler-seeds", "github.com/abkvme/taler-seeds");
     addRow(tr("Explorer"), "https://explorer.taler.tech/", "explorer.taler.tech");
 
-    // Development
-    addSectionHeader(tr("Development"));
+    beginSection(tr("Development"));
     addRow(tr("Issue Tracker"), "https://github.com/abkvme/taler/issues", "github.com/abkvme/taler/issues");
     addRow(tr("Change Log"), "https://github.com/abkvme/taler/blob/main/CHANGELOG.md", "github.com/abkvme/taler/.../CHANGELOG.md");
 
-    mainLayout->addLayout(grid);
+    m_columns = new QHBoxLayout();
+    m_columns->setContentsMargins(0, 0, 0, 0);
+    m_columns->setSpacing(40);
+    m_left_column = new QVBoxLayout();
+    m_right_column = new QVBoxLayout();
+    m_left_column->setSpacing(18);
+    m_right_column->setSpacing(18);
+    m_columns->addLayout(m_left_column, 1);
+    m_columns->addLayout(m_right_column, 1);
+    mainLayout->addLayout(m_columns);
+    arrangeSections();
     mainLayout->addStretch();
 
     // Footer
     QLabel *footerLabel = new QLabel(tr("Maintained by abkvme, 2025-2026"));
-    footerLabel->setStyleSheet("font-size: 11px; color: #888; padding: 4px 0;");
+    footerLabel->setStyleSheet("font-size: 12px; color: #888; padding: 4px 0;");
     footerLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(footerLabel);
 
     setLayout(mainLayout);
+}
+
+namespace {
+//! Below this the page keeps a single column: two narrow ones read worse than
+//! one wide one, and the long GitHub URLs need the room.
+const int TWO_COLUMN_WIDTH = 900;
+} // namespace
+
+void AboutPage::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    arrangeSections();
+}
+
+void AboutPage::arrangeSections()
+{
+    const int wanted = width() >= TWO_COLUMN_WIDTH ? 2 : 1;
+    if (wanted == m_column_count) return;
+    m_column_count = wanted;
+
+    // Empty both columns first. Taking an item out does not delete the widget it
+    // holds - those stay owned by the page - so they can simply be re-added.
+    for (QVBoxLayout *column : {m_left_column, m_right_column}) {
+        while (QLayoutItem *item = column->takeAt(0)) delete item;
+    }
+
+    for (int i = 0; i < m_sections.size(); ++i) {
+        const bool right = (wanted == 2 && i > 0);
+        (right ? m_right_column : m_left_column)->addWidget(m_sections[i]);
+    }
+    m_left_column->addStretch();
+    if (wanted == 2) m_right_column->addStretch();
+
+    // An empty column must not reserve half the page.
+    m_columns->setStretch(1, wanted == 2 ? 1 : 0);
 }
 
 void AboutPage::setClientModel(ClientModel *_clientModel)

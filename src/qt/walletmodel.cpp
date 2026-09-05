@@ -90,12 +90,24 @@ void WalletModel::pollBalanceChanged()
         return;
     }
 
-    if(fForceCheckBalanceChanged || m_node.getNumBlocks() != cachedNumBlocks)
+    // Use the height that came back with the balances, not a fresh reading.
+    //
+    // tryGetBalances returns both under one lock precisely so they describe the
+    // same instant. Asking the node again here reads a height from after the
+    // locks were released, and if a block landed in that window the poll stores
+    // the NEW height next to the OLD balance. Every later poll then sees the
+    // height it expects and skips the update, so the stale figure stays on
+    // screen until some later block happens to win the race.
+    //
+    // It is much more likely while staking: CreateCoinStake takes cs_main and
+    // cs_wallet every second, so the try-lock above fails often and the snapshot
+    // is far more likely to land on the wrong side of a block boundary.
+    if(fForceCheckBalanceChanged || numBlocks != cachedNumBlocks)
     {
         fForceCheckBalanceChanged = false;
 
         // Balance and number of transactions might have changed
-        cachedNumBlocks = m_node.getNumBlocks();
+        cachedNumBlocks = numBlocks;
 
         checkBalanceChanged(new_balances);
         if(transactionTableModel)

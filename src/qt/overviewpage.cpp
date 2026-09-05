@@ -3,9 +3,13 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <qt/overviewpage.h>
+#include <qt/rewardschart.h>
 #include <qt/forms/ui_overviewpage.h>
 
 #include <qt/askpassphrasedialog.h>
+#include <interfaces/node.h>
+
+#include <qt/asyncrpc.h>
 #include <qt/bitcoinunits.h>
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
@@ -18,11 +22,18 @@
 
 #include <algorithm>
 
+#include <QStyle>
+#include <QDateTime>
+#include <QEvent>
 #include <QAbstractItemDelegate>
 #include <QMessageBox>
 #include <QBoxLayout>
 #include <QFrame>
+#include <QApplication>
 #include <QPainter>
+#include <QDateTime>
+#include <QUrl>
+#include <QPushButton>
 #include <QTimer>
 
 #define DECORATION_SIZE 24
@@ -186,6 +197,13 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
         page->insertWidget(0, m_wallet_name_label);
     }
+    // Labels on the left, figures on the right: a column of amounts is read down
+    // its last digit, which only works if they share a right edge.
+    ui->gridLayout->setColumnStretch(1, 1);
+    buildRecoveryRow();
+
+    buildRewardsColumn();
+
     // Inside the left column, directly above the Balances card. At page level it
     // spanned both columns and pushed the transaction list down with it.
     ui->verticalLayout_2->insertWidget(0, m_balance_badge);
@@ -204,6 +222,10 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     m_empty_transactions->setProperty("class", "emptyState");
     m_empty_transactions->setWordWrap(true);
     m_empty_transactions->hide();
+    // The list resizes with the column without the page resizing, and the message
+    // is positioned by hand, so it has to hear about the list's own resizes too -
+    // otherwise it keeps whatever width it had when it was first placed.
+    ui->listTransactions->installEventFilter(this);
 
     // use a SingleColorIcon for the "out of sync warning" icon
     QIcon icon = platformStyle->SingleColorIcon(":/icons/warning");
@@ -264,6 +286,284 @@ static QString FormatBadgeAmount(int unit, const CAmount& amount)
     const int point = text.indexOf(QChar('.'));
     if (point >= 0) text.truncate(point + 3);
     return text + QString(" ") + BitcoinUnits::shortName(unit);
+}
+
+namespace {
+//! One status badge: a caption, a headline, and an optional quieter line under it.
+QFrame* MakeStatusBadge(QWidget* parent, QLabel** title, QLabel** value, QLabel** hint)
+{
+    QFrame* badge = new QFrame(parent);
+    badge->setProperty("badge", true);
+    badge->setProperty("badgeState", "idle");
+    QVBoxLayout* layout = new QVBoxLayout(badge);
+    layout->setContentsMargins(14, 10, 14, 12);
+    layout->setSpacing(1);
+
+    *title = new QLabel(badge);
+    (*title)->setProperty("badgeCaption", true);
+    *value = new QLabel(badge);
+    (*value)->setProperty("badgeValue", true);
+    layout->addWidget(*title);
+    layout->addWidget(*value);
+
+    if (hint) {
+        *hint = new QLabel(badge);
+        (*hint)->setProperty("badgeCaption", true);
+        layout->addWidget(*hint);
+    }
+    return badge;
+}
+} // namespace
+
+//! The last row of the Balances card: what to do when the balance looks wrong.
+//!
+//! Deliberately quiet and deliberately permanent. Quiet because a wallet that
+//! shouts about repairing itself does not inspire much confidence in the number
+//! above it; permanent because the case it exists for - a wallet restored from
+//! an older backup, which never knew about the addresses it used since - looks
+//! exactly like a correct wallet from the inside, so there is nothing for the
+//! application to detect and no moment at which to reveal a hidden button.
+void OverviewPage::buildRecoveryRow()
+{
+    m_recovery_row = new QWidget(this);
+    // Named so the stylesheet can stop it painting the window colour over the card.
+    m_recovery_row->setObjectName("recoveryRow");
+    QHBoxLayout* layout = new QHBoxLayout(m_recovery_row);
+    layout->setContentsMargins(0, 6, 0, 0);
+    layout->setSpacing(8);
+
+    m_recovery_hint = new QLabel(m_recovery_row);
+    m_recovery_hint->setProperty("class", "cardHint");
+    m_recovery_hint->setWordWrap(true);
+    m_recovery_hint->setText(tr("Balance looks wrong?"));
+    layout->addWidget(m_recovery_hint, 1);
+
+    m_recovery_button = new QPushButton(tr("Rescan wallet"), m_recovery_row);
+    m_recovery_button->setToolTip(tr("Search the whole chain again for this wallet's "
+                                     "history, deriving addresses beyond the ones it "
+                                     "already knows about"));
+    m_recovery_button->setCursor(Qt::PointingHandCursor);
+    connect(m_recovery_button, &QPushButton::clicked, this, &OverviewPage::recoverBalance);
+    layout->addWidget(m_recovery_button, 0);
+
+    ui->verticalLayout_4->addWidget(m_recovery_row);
+}
+
+void OverviewPage::recoverBalance()
+{
+    if (!walletModel) return;
+
+    // A scan of a chain the node has not finished downloading reports a
+    // plausible, wrong balance - the very thing the user came here to fix. The
+    // node refuses it too, but being told why here beats a raw RPC error.
+    //
+    // "Up to date" is the same test the status bar uses: a tip less than ninety
+    // minutes old. Two different answers to "am I synced?" in one window would be
+    // worse than either.
+    interfaces::Node& node = walletModel->node();
+    const int64_t tip_age = QDateTime::currentDateTime().toSecsSinceEpoch() -
+                            static_cast<int64_t>(node.getLastBlockTime());
+    if (node.isInitialBlockDownload() || tip_age >= 90 * 60) {
+        QMessageBox::information(
+            this, tr("Rescan wallet"),
+            tr("The node is still catching up with the network, so a rescan is not "
+               "possible yet.\n\nSearching an incomplete chain would report a balance "
+               "that looks believable but is wrong. Wait until the status bar shows "
+               "the node is up to date, then try again."));
+        return;
+    }
+
+    // Say the cost before asking, not after. On this chain a full scan reads
+    // every block from disk, and the wallet is unusable while it runs.
+    QMessageBox confirm(this);
+    confirm.setWindowTitle(tr("Rescan wallet"));
+    confirm.setIcon(QMessageBox::Question);
+    confirm.setText(tr("Search the whole chain for this wallet's history?"));
+    confirm.setInformativeText(tr(
+        "Use this when the balance looks lower than it should - typically after "
+        "restoring a wallet from an older backup, because the wallet does not know "
+        "about the addresses it used after that backup was taken.\n\n"
+        "The whole chain is read again and the address list is extended as history "
+        "is found. This takes several minutes, the wallet cannot be used while it "
+        "runs, and the wallet must be unlocked."));
+    QPushButton* start = confirm.addButton(tr("Rescan"), QMessageBox::AcceptRole);
+    QPushButton* cancel = confirm.addButton(tr("Cancel"), QMessageBox::RejectRole);
+    confirm.setDefaultButton(cancel);
+    confirm.setEscapeButton(cancel);
+    confirm.exec();
+    if (confirm.clickedButton() != start) return;
+
+    // Deriving addresses needs the keys. Asking here rather than letting the scan
+    // fail halfway is the difference between a prompt and a wasted ten minutes.
+    std::unique_ptr<WalletModel::UnlockContext> unlock(
+        new WalletModel::UnlockContext(walletModel->requestUnlock()));
+    if (!unlock->isValid()) return;
+
+    m_recovery_button->setEnabled(false);
+
+    // Off the GUI thread, behind a modal progress dialog: this reads every block
+    // on the chain, and a frozen window for that long looks like a crash.
+    const QByteArray encoded = QUrl::toPercentEncoding(walletModel->getWalletName());
+    const std::string uri = "/wallet/" + std::string(encoded.constData(), encoded.length());
+    UniValue result;
+    QString error;
+    const bool ok = RunNodeRpc(walletModel->node(), QStringLiteral("recoverwallet"),
+                               UniValue(UniValue::VARR), uri, result, error, this,
+                               tr("Searching the chain for this wallet's history. "
+                                  "This can take several minutes."));
+
+    m_recovery_button->setEnabled(true);
+
+    if (!ok) {
+        QMessageBox::warning(this, tr("Rescan wallet"),
+                             tr("The rescan could not be completed.\n\n%1").arg(error));
+        return;
+    }
+
+    // Say what it found, so the answer to "did that do anything?" is on screen
+    // rather than left to the user to work out from the balance.
+    const int passes = result.exists("passes") ? result["passes"].get_int() : 0;
+    QMessageBox::information(
+        this, tr("Rescan wallet"),
+        tr("The rescan finished after %n pass(es). The balance above is up to date.",
+           "", qMax(1, passes)));
+}
+
+void OverviewPage::buildRewardsColumn()
+{
+    // Two badges rather than one: the left says whether this wallet is earning,
+    // the right says what can be done next. They are allowed to disagree - a wallet
+    // that staked yesterday is healthy and also cannot start a new round yet.
+    m_staking_badge = MakeStatusBadge(this, &m_staking_badge_title, &m_staking_badge_value,
+                                      &m_staking_badge_hint);
+    m_ready_badge = MakeStatusBadge(this, &m_ready_badge_title, &m_ready_badge_value, nullptr);
+    m_staking_badge_title->setText(tr("Staking"));
+    m_ready_badge_title->setText(tr("New round"));
+
+    QHBoxLayout* badges = new QHBoxLayout();
+    badges->setContentsMargins(0, 0, 0, 0);
+    badges->setSpacing(12);
+    badges->addWidget(m_staking_badge, 1);
+    badges->addWidget(m_ready_badge, 1);
+
+    // The chart, in a card of the same shape as every other panel.
+    m_rewards_card = new QFrame(this);
+    m_rewards_card->setFrameShape(QFrame::StyledPanel);
+    QVBoxLayout* card_layout = new QVBoxLayout(m_rewards_card);
+    card_layout->setContentsMargins(14, 12, 14, 10);
+    card_layout->setSpacing(6);
+
+    QHBoxLayout* header = new QHBoxLayout();
+    QLabel* title = new QLabel(tr("Rewards, last 12 months"), m_rewards_card);
+    title->setProperty("class", "cardTitle");
+    // The total of the twelve bars, stated next to them so the chart does not have
+    // to be read to know what the year came to.
+    m_rewards_total = new QLabel(m_rewards_card);
+    m_rewards_total->setProperty("class", "cardTotal");
+    m_rewards_total->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    m_rewards_total->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    header->addWidget(title);
+    header->addStretch();
+    header->addWidget(m_rewards_total);
+
+    m_rewards_chart = new RewardsChart(m_rewards_card);
+    card_layout->addLayout(header);
+    card_layout->addWidget(m_rewards_chart);
+
+    ui->verticalLayout_3->insertLayout(0, badges);
+    ui->verticalLayout_3->insertWidget(1, m_rewards_card);
+
+    // Qt does not re-evaluate a stylesheet when a dynamic property changes, so the
+    // refresh below repolishes; do the same here to pick up the initial state.
+    m_rewards_timer = new QTimer(this);
+    m_rewards_timer->setSingleShot(true);
+    m_rewards_timer->setInterval(250);
+    connect(m_rewards_timer, SIGNAL(timeout()), this, SLOT(refreshRewards()));
+    refreshRewards();
+}
+
+void OverviewPage::applyBadgeState(QWidget* badge, const char* state)
+{
+    if (!badge) return;
+    if (badge->property("badgeState").toString() == QLatin1String(state)) return;
+
+    badge->setProperty("badgeState", state);
+    // A dynamic property used by a selector needs an explicit repolish, including
+    // for the labels inside, whose colour is chosen by the same selector.
+    badge->style()->unpolish(badge);
+    badge->style()->polish(badge);
+    for (QLabel* label : badge->findChildren<QLabel*>()) {
+        label->style()->unpolish(label);
+        label->style()->polish(label);
+    }
+    badge->update();
+}
+
+void OverviewPage::scheduleRewardsRefresh()
+{
+    if (m_rewards_timer && !m_rewards_timer->isActive()) m_rewards_timer->start();
+}
+
+void OverviewPage::refreshRewards()
+{
+    const QDateTime now = QDateTime::currentDateTime();
+
+    if (walletModel && walletModel->getTransactionTableModel()) {
+        m_rewards = walletModel->getTransactionTableModel()->summariseRewards(now);
+    } else {
+        m_rewards = RewardSummary();
+    }
+
+    const int unit = walletModel && walletModel->getOptionsModel()
+                         ? walletModel->getOptionsModel()->getDisplayUnit()
+                         : BitcoinUnits::BTC;
+
+    // --- how recently this wallet earned ---
+    const int days = m_rewards.daysSinceStaking(now);
+    if (days < 0) {
+        m_staking_badge_value->setText(tr("Never"));
+        applyBadgeState(m_staking_badge, "bad");
+    } else {
+        m_staking_badge_value->setText(days == 0 ? tr("Today")
+                                                 : tr("%n day(s) ago", "", days));
+        applyBadgeState(m_staking_badge, days < 7 ? "good" : (days <= 30 ? "warn" : "bad"));
+    }
+
+    // Mining is a footnote: on a proof-of-stake chain most wallets never mine, and
+    // an always-empty line is noise.
+    const int mined_days = m_rewards.daysSinceMining(now);
+    m_staking_badge_hint->setVisible(mined_days >= 0);
+    if (mined_days >= 0) {
+        m_staking_badge_hint->setText(mined_days == 0 ? tr("Mined today")
+                                                      : tr("Mined %n day(s) ago", "", mined_days));
+    }
+
+    // --- whether a new round can start ---
+    if (m_rewards.readyToStake(now)) {
+        m_ready_badge_value->setText(tr("Ready"));
+        applyBadgeState(m_ready_badge, "good");
+    } else {
+        const int wait_days = int((m_rewards.secondsUntilReady(now) + 24 * 60 * 60 - 1) / (24 * 60 * 60));
+        m_ready_badge_value->setText(tr("in %n day(s)", "", wait_days));
+        // Not a fault, so never red: it is simply not time yet.
+        applyBadgeState(m_ready_badge, "idle");
+    }
+
+    // --- the chart and its total ---
+    if (m_rewards_chart) m_rewards_chart->setSummary(m_rewards, unit);
+    if (m_rewards_total) {
+        m_rewards_total->setText(m_rewards.total > 0
+            ? BitcoinUnits::formatWithUnit(unit, m_rewards.total, false, BitcoinUnits::separatorAlways)
+            : QString());
+    }
+}
+
+bool OverviewPage::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == ui->listTransactions && event->type() == QEvent::Resize) {
+        updateTransactionsPlaceholder();
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void OverviewPage::setWalletBar(QWidget* bar)
@@ -385,11 +685,21 @@ void OverviewPage::setWalletModel(WalletModel *model)
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
 
         connect(model, SIGNAL(encryptionStatusChanged()), this, SLOT(updateStakingUi()));
+
+        // Rewards follow the transaction list. Every one of these can fire in bursts
+        // during a rescan, so they only ask for a refresh; the timer decides when.
+        if (TransactionTableModel* transactions = model->getTransactionTableModel()) {
+            connect(transactions, SIGNAL(modelReset()), this, SLOT(scheduleRewardsRefresh()));
+            connect(transactions, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(scheduleRewardsRefresh()));
+            connect(transactions, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(scheduleRewardsRefresh()));
+            connect(transactions, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(scheduleRewardsRefresh()));
+        }
         updateStakingUi();
     }
 
     // update the display unit, to not use the default ("BTC")
     updateDisplayUnit();
+    refreshRewards();
 }
 
 QString OverviewPage::formatStakingRemaining(int64_t seconds) const
@@ -489,6 +799,9 @@ void OverviewPage::updateDisplayUnit()
         txdelegate->unit = walletModel->getOptionsModel()->getDisplayUnit();
 
         ui->listTransactions->update();
+
+        // The chart's tooltips and its twelve-month total are amounts too.
+        refreshRewards();
     }
 }
 

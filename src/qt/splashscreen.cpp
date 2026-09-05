@@ -11,6 +11,7 @@
 
 #include <qt/splashscreen.h>
 
+#include <qt/brandbanner.h>
 #include <qt/networkstyle.h>
 
 #include <clientversion.h>
@@ -30,114 +31,61 @@
 SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const NetworkStyle *networkStyle) :
     QWidget(0, f), curAlignment(0), m_node(node)
 {
-    // set reference point, paddings
-    int paddingRight            = 50;
-    int paddingTop              = 50;
-    int titleVersionVSpace      = 27;
-    int titleCopyrightVSpace    = 50;
-
-    float fontFactor            = 1.0;
-    float devicePixelRatio      = 1.0;
+    float devicePixelRatio = 1.0;
 #if QT_VERSION > 0x050100
     devicePixelRatio = static_cast<QGuiApplication*>(QCoreApplication::instance())->devicePixelRatio();
 #endif
 
-    // define text to place
-    QString titleText       = tr(PACKAGE_NAME);
-    QString versionText     = QString("Version %1").arg(QString::fromStdString(FormatFullVersion()));
-    QString copyrightText   = QString::fromUtf8(CopyrightHolders(strprintf("\xc2\xA9 %u-%u ", 2009, COPYRIGHT_YEAR)).c_str());
-    QString titleAddText    = networkStyle->getTitleAddText();
+    const QPixmap artwork = brand::Artwork();
+    const QString titleText = tr(PACKAGE_NAME);
+    const QString titleAddText = networkStyle->getTitleAddText();
 
-    QString font            = QApplication::font().toString();
+    // The artwork carries the whole brand; the strip beneath it is ours, so the
+    // start-up progress has somewhere to live that does not sit on top of the
+    // picture. Height follows the artwork's own aspect ratio rather than a fixed
+    // number, so replacing the images cannot letterbox or stretch them.
+    const int imageWidth = brand::ARTWORK_WIDTH;
+    const int imageHeight = artwork.isNull() ? 400
+                                             : imageWidth * artwork.height() / artwork.width();
+    const int stripHeight = brand::ARTWORK_STRIP_HEIGHT;
+    const int margin = 12;
+    const QSize logicalSize(imageWidth, imageHeight + stripHeight);
 
-    // create a bitmap according to device pixelratio
-    QSize splashSize(480*devicePixelRatio,320*devicePixelRatio);
-    pixmap = QPixmap(splashSize);
-
+    pixmap = QPixmap(logicalSize * devicePixelRatio);
 #if QT_VERSION > 0x050100
-    // change to HiDPI if it makes sense
     pixmap.setDevicePixelRatio(devicePixelRatio);
 #endif
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    pixPaint.setRenderHint(QPainter::SmoothPixmapTransform);
+    pixPaint.setRenderHint(QPainter::Antialiasing);
 
-    // draw a slightly radial gradient
-    QRadialGradient gradient(QPoint(0,0), splashSize.width()/devicePixelRatio);
-    gradient.setColorAt(0, Qt::white);
-    gradient.setColorAt(1, QColor(247,247,247));
-    QRect rGradient(QPoint(0,0), splashSize);
-    pixPaint.fillRect(rGradient, gradient);
-
-    // draw the icon at top-left, scaled to fit nicely
-    QRect rectIcon(QPoint(16, 16), QSize(80, 80));
-
-    const QSize requiredSize(1024,1024);
-    QPixmap icon(networkStyle->getAppIcon().pixmap(requiredSize));
-
-    pixPaint.drawPixmap(rectIcon, icon);
-
-    // text starts to the right of the icon
-    int textLeft = rectIcon.right() + 16;
-
-    // check font size and drawing with
-    pixPaint.setFont(QFont(font, 28*fontFactor));
-    QFontMetrics fm = pixPaint.fontMetrics();
-    int titleTextWidth = fm.width(titleText);
-    if (titleTextWidth > 280) {
-        fontFactor = fontFactor * 280 / titleTextWidth;
+    const QRect imageRect(0, 0, imageWidth, imageHeight);
+    if (artwork.isNull()) {
+        pixPaint.fillRect(imageRect, QColor(10, 25, 48));
+    } else {
+        pixPaint.drawPixmap(imageRect, artwork);
     }
 
-    pixPaint.setFont(QFont(font, 26*fontFactor));
-    fm = pixPaint.fontMetrics();
-    titleTextWidth  = fm.width(titleText);
-    pixPaint.drawText(textLeft, paddingTop, titleText);
+    // Take the strip's colour from the artwork's own bottom edge so it reads as
+    // part of the picture rather than a bar bolted underneath, whatever artwork
+    // is dropped in later.
+    const QColor edge = brand::ArtworkEdge(artwork);
+    const bool dark_artwork = brand::ArtworkIsDark(artwork);
+    m_message_color = dark_artwork ? QColor(198, 210, 228) : QColor(55, 55, 55);
 
-    pixPaint.setFont(QFont(font, 13*fontFactor));
+    const QRect stripRect(0, imageHeight, imageWidth, stripHeight);
+    pixPaint.fillRect(stripRect, edge);
+    m_message_rect = stripRect.adjusted(margin, 0, -margin, 0);
 
-    // if the version string is too long, reduce size
-    fm = pixPaint.fontMetrics();
-    int versionTextWidth  = fm.width(versionText);
-    if(versionTextWidth > titleTextWidth+paddingRight-10) {
-        pixPaint.setFont(QFont(font, 10*fontFactor));
-        titleVersionVSpace -= 5;
-    }
-    pixPaint.drawText(textLeft, paddingTop+titleVersionVSpace, versionText);
-
-    // draw website URL
-    {
-        pixPaint.setFont(QFont(font, 10*fontFactor));
-        pixPaint.setPen(QColor(27,143,186));
-        pixPaint.drawText(textLeft, paddingTop+titleVersionVSpace+16, QString("taler.tech"));
-        pixPaint.setPen(QColor(100,100,100));
-    }
-
-    // draw copyright stuff
-    {
-        pixPaint.setFont(QFont(font, 10*fontFactor));
-        const int x = textLeft;
-        const int y = paddingTop+titleCopyrightVSpace;
-        QRect copyrightRect(x, y, pixmap.width()/devicePixelRatio - x - 10, pixmap.height()/devicePixelRatio - y);
-        pixPaint.drawText(copyrightRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, copyrightText);
-    }
-
-    // draw additional text if special network
-    if(!titleAddText.isEmpty()) {
-        QFont boldFont = QFont(font, 10*fontFactor);
-        boldFont.setWeight(QFont::Bold);
-        pixPaint.setFont(boldFont);
-        fm = pixPaint.fontMetrics();
-        int titleAddTextWidth  = fm.width(titleAddText);
-        pixPaint.drawText(pixmap.width()/devicePixelRatio-titleAddTextWidth-10,15,titleAddText);
-    }
+    // Version in the top-right corner, where every one of the images leaves room.
+    brand::DrawVersion(pixPaint, imageRect, margin, dark_artwork, titleAddText);
 
     pixPaint.end();
 
-    // Set window title
     setWindowTitle(titleText + " " + titleAddText);
 
-    // Resize window and move to center of desktop, disallow resizing
-    QRect r(QPoint(), QSize(pixmap.size().width()/devicePixelRatio,pixmap.size().height()/devicePixelRatio));
+    QRect r(QPoint(), logicalSize);
     resize(r.size());
     setFixedSize(r.size());
     move(QApplication::desktop()->screenGeometry().center() - r.center());
@@ -178,16 +126,18 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
     QMetaObject::invokeMethod(splash, "showMessage",
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
-        Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(55,55,55)));
+        Q_ARG(int, Qt::AlignVCenter|Qt::AlignHCenter),
+        Q_ARG(QColor, splash->messageColor()));
 }
 
 static void ShowProgress(SplashScreen *splash, const std::string &title, int nProgress, bool resume_possible)
 {
-    InitMessage(splash, title + std::string("\n") +
-            (resume_possible ? _("(press q to shutdown and continue later)")
-                                : _("press q to shutdown")) +
-            strprintf("\n%d", nProgress) + "%");
+    // One line: the progress strip is a single line high. The hint used to sit on
+    // a line of its own and is now folded in. Both strings are left exactly as
+    // they were, so nothing changes for translators.
+    InitMessage(splash, strprintf("%s %d%%  -  %s", title, nProgress,
+            resume_possible ? _("(press q to shutdown and continue later)")
+                            : _("press q to shutdown")));
 }
 #ifdef ENABLE_WALLET
 void SplashScreen::ConnectWallet(std::unique_ptr<interfaces::Wallet> wallet)
@@ -229,11 +179,18 @@ void SplashScreen::showMessage(const QString &message, int alignment, const QCol
 
 void SplashScreen::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     QPainter painter(this);
     painter.drawPixmap(0, 0, pixmap);
-    QRect r = rect().adjusted(5, 5, -5, -5);
     painter.setPen(curColor);
-    painter.drawText(r, curAlignment, curMessage);
+    QFont messageFont = painter.font();
+    messageFont.setPointSize(10);
+    painter.setFont(messageFont);
+    // Elided rather than wrapped: the strip is one line high, and a message that
+    // overflowed it used to paint across the artwork.
+    const QString text = QFontMetrics(messageFont).elidedText(curMessage, Qt::ElideRight,
+                                                              m_message_rect.width());
+    painter.drawText(m_message_rect, curAlignment, text);
 }
 
 void SplashScreen::closeEvent(QCloseEvent *event)

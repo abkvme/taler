@@ -9,6 +9,10 @@
 
 #include <qt/utilitydialog.h>
 
+#include <qt/brandbanner.h>
+
+#include <QTabWidget>
+
 #include <qt/forms/ui_helpmessagedialog.h>
 
 #include <qt/bitcoingui.h>
@@ -52,6 +56,27 @@ HelpMessageDialog::HelpMessageDialog(interfaces::Node& node, QWidget *parent, bo
     {
         setWindowTitle(tr("About %1").arg(tr(PACKAGE_NAME)));
 
+        // Two tabs rather than a picture with a scrolling box wedged under it.
+        // They answer different questions - "what is this" and "what are the
+        // terms" - and cramming both into one view served neither: the artwork
+        // was squashed and the licence got a letterbox to be read through.
+        ui->aboutLogo->setVisible(false);
+        ui->frame->setVisible(false);
+
+        QTabWidget *tabs = new QTabWidget(this);
+
+        BrandBanner *banner = new BrandBanner(tabs);
+        tabs->addTab(banner, tr("About"));
+
+        // Reparents the scroll area out of the dialog and into the tab.
+        tabs->addTab(ui->scrollArea, tr("License"));
+
+        ui->verticalLayout->insertWidget(0, tabs);
+        // Tall enough for the artwork at its natural size, so the first tab never
+        // opens already needing a scrollbar.
+        resize(brand::ARTWORK_WIDTH + 32,
+               banner->heightForWidth(brand::ARTWORK_WIDTH) + 120);
+
         /// HTML-format the license message from the core
         QString licenseInfo = QString::fromStdString(LicenseInfo());
         QString licenseInfoHTML = licenseInfo;
@@ -63,9 +88,13 @@ HelpMessageDialog::HelpMessageDialog(interfaces::Node& node, QWidget *parent, bo
         licenseInfoHTML.replace("\n", "<br>");
 
         ui->aboutMessage->setTextFormat(Qt::RichText);
+        ui->aboutMessage->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        ui->aboutMessage->setOpenExternalLinks(true);
         ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        // The licence tab gets its own padding; it was inheriting the dialog's.
+        ui->scrollAreaWidgetContents->layout()->setContentsMargins(12, 12, 12, 12);
         text = version + "\n" + licenseInfo;
-        ui->aboutMessage->setText(version + "<br><br>" + licenseInfoHTML);
+        ui->aboutMessage->setText(licenseInfoHTML);
         ui->aboutMessage->setWordWrap(true);
         ui->helpMessage->setVisible(false);
     } else {
@@ -150,11 +179,32 @@ void HelpMessageDialog::on_okButton_accepted()
 ShutdownWindow::ShutdownWindow(QWidget *parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(new QLabel(
-        tr("%1 is shutting down...").arg(tr(PACKAGE_NAME)) + "<br /><br />" +
-        tr("Do not shut down the computer until this window disappears.")));
-    setLayout(layout);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    // The application opened on this picture and it closes on it. Links are off:
+    // a click here would open a browser behind a window that is disappearing.
+    BrandBanner *banner = new BrandBanner(this);
+    banner->setLinksEnabled(false);
+    banner->setFixedSize(brand::ARTWORK_WIDTH, banner->heightForWidth(brand::ARTWORK_WIDTH));
+    layout->addWidget(banner);
+
+    // Same strip as the splash, in the artwork's own edge colour, so shutting
+    // down looks like the other end of starting up rather than a stray dialog.
+    const QPixmap artwork = brand::Artwork();
+    const QColor edge = brand::ArtworkEdge(artwork);
+    const bool dark_artwork = brand::ArtworkIsDark(artwork);
+
+    QLabel *message = new QLabel(
+        tr("%1 is shutting down...").arg(tr(PACKAGE_NAME)) + QString("<br/>") +
+        tr("Do not shut down the computer until this window disappears."), this);
+    message->setAlignment(Qt::AlignCenter);
+    message->setWordWrap(true);
+    message->setStyleSheet(QString("background-color: %1; color: %2; padding: 10px;")
+                               .arg(edge.name(),
+                                    dark_artwork ? QString("#c6d2e4") : QString("#373737")));
+    layout->addWidget(message);
 }
 
 QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI *window)

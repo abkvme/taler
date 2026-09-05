@@ -36,6 +36,23 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 {
     ui->setupUi(this);
 
+    // The inherited form stacks the two secondary buttons in a column of their
+    // own, which leaves them full-width and looking as important as OK. Put them
+    // on the same row, at the left, where secondary actions belong. The now-empty
+    // column collapses to nothing.
+    ui->verticalLayout_Buttons->removeWidget(ui->openBitcoinConfButton);
+    ui->verticalLayout_Buttons->removeWidget(ui->resetButton);
+    ui->horizontalLayout_Buttons->insertWidget(0, ui->openBitcoinConfButton);
+    ui->horizontalLayout_Buttons->insertWidget(1, ui->resetButton);
+    ui->horizontalLayout_Buttons->setSpacing(8);
+
+    // Room to breathe: the inherited spacing is tight enough that the tabs, the
+    // settings and the buttons all run together.
+    if (QLayout* dialogLayout = layout()) {
+        dialogLayout->setContentsMargins(16, 16, 16, 16);
+        dialogLayout->setSpacing(12);
+    }
+
     /* Main elements init */
     ui->databaseCache->setMinimum(nMinDbCache);
     ui->databaseCache->setMaximum(nMaxDbCache);

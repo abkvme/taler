@@ -56,6 +56,19 @@ namespace GUIUtil
     bool isValidWalletName(const QString& name, QString& error);
 
     /**
+     * The UI language, as a locale name such as "be_BY", "ru" or "en_US".
+     *
+     * Resolved the way the application resolves it when installing translators:
+     * the desktop's locale, overridden by the "language" setting, overridden by
+     * -lang. Shared rather than duplicated so that anything picking a
+     * language-specific asset cannot end up disagreeing with the translations.
+     */
+    QString languageTerritory();
+
+    /** Just the language part of the above, so "be_BY" becomes "be". */
+    QString language();
+
+    /**
      * How a wallet is shown to the user.
      *
      * The pre-existing wallet at the data directory root is loaded under the empty

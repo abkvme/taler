@@ -6,6 +6,8 @@
 #define BITCOIN_QT_SPLASHSCREEN_H
 
 #include <functional>
+#include <QColor>
+#include <QRect>
 #include <QSplashScreen>
 
 #include <memory>
@@ -31,6 +33,9 @@ class SplashScreen : public QWidget
 public:
     explicit SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const NetworkStyle *networkStyle);
     ~SplashScreen();
+
+    /** Colour that reads against whichever artwork the splash actually loaded. */
+    QColor messageColor() const { return m_message_color; }
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -58,6 +63,11 @@ private:
     QString curMessage;
     QColor curColor;
     int curAlignment;
+
+    //! The strip under the artwork, where start-up progress is written.
+    QRect m_message_rect;
+    //! Chosen from the artwork's own brightness, so light art gets dark text.
+    QColor m_message_color;
 
     interfaces::Node& m_node;
     std::unique_ptr<interfaces::Handler> m_handler_init_message;

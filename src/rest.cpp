@@ -664,7 +664,7 @@ bool api_net (HTTPRequest* req, const std::string& strURIPart) {
         UniValue obj(UniValue::VOBJ);
         obj.pushKV("id", "self");
         obj.pushKV("version", PROTOCOL_VERSION);
-        obj.pushKV("subversion", strSubVersion);
+        obj.pushKV("subversion", GetSubVersion());
         obj.pushKV("synced_headers", pindexBestHeader ? pindexBestHeader->nHeight : -1);
         obj.pushKV("synced_blocks", (int)chainActive.Height()); 
         nodes.push_back(obj);

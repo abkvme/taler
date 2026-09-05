@@ -54,6 +54,7 @@
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QRegExp>
+#include <QLocale>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
@@ -114,6 +115,27 @@ bool isValidWalletName(const QString& name, QString& error)
         return false;
     }
     return true;
+}
+
+QString languageTerritory()
+{
+    QSettings settings;
+    // 1) the desktop's own locale
+    QString lang_territory = QLocale::system().name();
+    // 2) overridden by the language chosen in Options
+    QString lang_territory_qsettings = settings.value("language", "").toString();
+    if (!lang_territory_qsettings.isEmpty())
+        lang_territory = lang_territory_qsettings;
+    // 3) overridden by -lang on the command line
+    lang_territory = QString::fromStdString(gArgs.GetArg("-lang", lang_territory.toStdString()));
+    return lang_territory;
+}
+
+QString language()
+{
+    const QString lang_territory = languageTerritory();
+    const int separator = lang_territory.lastIndexOf(QChar('_'));
+    return separator < 0 ? lang_territory : lang_territory.left(separator);
 }
 
 static const char* DEFAULT_WALLET_KEY = "DefaultWallet";

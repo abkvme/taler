@@ -33,6 +33,7 @@
 #include <rpc/server.h>
 #include <ui_interface.h>
 #include <uint256.h>
+#include <useragent.h>
 #include <util.h>
 #include <warnings.h>
 
@@ -65,6 +66,13 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #elif defined(QT_QPA_PLATFORM_COCOA)
 Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
+#if defined(QT_IMAGEFORMAT_JPEG)
+// The start-up artwork is JPEG. Nothing else in the application decodes one, and
+// a static build cannot load an image format plugin from disk, so without this
+// the splash falls back to its plain panel. The test binary has its own copy of
+// this block in qt/test/test_main.cpp.
+Q_IMPORT_PLUGIN(QJpegPlugin);
+#endif
 #endif
 
 // Declare meta types used for QMetaObject::invokeMethod
@@ -85,19 +93,12 @@ static std::string Translate(const char* psz)
     return QCoreApplication::translate("taler-core", psz).toStdString();
 }
 
+// Moved to GUIUtil so the splash screen picks its artwork from the same answer
+// the translators are loaded from; two copies of this logic would eventually
+// disagree and show a splash in one language and a UI in another.
 static QString GetLangTerritory()
 {
-    QSettings settings;
-    // Get desired locale (e.g. "de_DE")
-    // 1) System default language
-    QString lang_territory = QLocale::system().name();
-    // 2) Language from QSettings
-    QString lang_territory_qsettings = settings.value("language", "").toString();
-    if(!lang_territory_qsettings.isEmpty())
-        lang_territory = lang_territory_qsettings;
-    // 3) -lang command line argument
-    lang_territory = QString::fromStdString(gArgs.GetArg("-lang", lang_territory.toStdString()));
-    return lang_territory;
+    return GUIUtil::languageTerritory();
 }
 
 /** Set up translations */
@@ -553,6 +554,10 @@ static void SetupUIArgs()
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char *argv[])
 {
+    // Stated here rather than inferred later: this is the GUI binary, and the
+    // node reports that to the network. See useragent.h.
+    useragent::SetRunMode(useragent::RunMode::Gui);
+
     SetupEnvironment();
 
     std::unique_ptr<interfaces::Node> node = interfaces::MakeNode();

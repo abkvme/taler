@@ -49,7 +49,15 @@ std::vector<std::shared_ptr<CWallet>> GetWallets();
 std::shared_ptr<CWallet> GetWallet(const std::string& name);
 
 //! Default for -keypool
-static const unsigned int DEFAULT_KEYPOOL_SIZE = 250;
+//! Matches upstream. Every staked block consumes one key, so a wallet that
+//! stakes for a few months walks through a 250-key pool - and a backup restored
+//! afterwards can only find history as far as its pool reaches.
+static const unsigned int DEFAULT_KEYPOOL_SIZE = 1000;
+//! How often the wallet looks for transactions stranded by a reorg, and how old
+//! one must be before it is considered. Neither number is load-bearing: the
+//! decision itself rests on evidence, and these only keep the check rare.
+static const int64_t STRANDED_SWEEP_INTERVAL = 60;
+static const int64_t STRANDED_TX_MIN_AGE = 15 * 60;
 //! Look-ahead used when restoring from a recovery phrase. Much larger than the
 //! ordinary keypool, and extended further if used addresses turn up near its edge.
 static const int64_t DEFAULT_RESTORE_GAP_LIMIT = 1000;
@@ -743,6 +751,17 @@ private:
     /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
     void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
 
+    /** Abandon transactions that a reorg left unconfirmed and unmineable.
+     *
+     * A proof-of-stake block of ours that is reorged away leaves its coinstake
+     * in the wallet: unconfirmed forever, because its first output commits to a
+     * block that no longer exists, yet still marking the staked coin as spent.
+     * The coin then vanishes from the balance and stops staking, and nothing
+     * recovers it. This releases exactly those, and nothing else - see the
+     * evidence tests in wallet.cpp.
+     */
+    void ReleaseStrandedTransactions() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+
     /* Mark a transaction's inputs dirty, thus forcing the outputs to be recomputed */
     void MarkInputsDirty(const CTransactionRef& tx);
 
@@ -763,6 +782,46 @@ private:
     void DeriveNewChildKeyBIP44(WalletBatch& batch, CKeyMetadata& metadata, CKey& secret, bool internal);
     void DeriveNewChildKey(WalletBatch &batch, CKeyMetadata& metadata, CKey& secret, bool internal = false) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
+    /** Keeps the BIP-44 account key alive across a run of derivations.
+     *
+     * Deriving one key costs a full PBKDF2-HMAC-SHA512 pass over the recovery
+     * phrase (2048 rounds) plus a rebuild of the BIP-32 master and account key,
+     * because the phrase is the only thing the wallet stores. That is fine for
+     * one address and ruinous for a keypool top-up, which derives thousands:
+     * the per-key work is identical every time and only the last step differs.
+     *
+     * Scoped deliberately. The account key is private key material, so it is
+     * filled in on first use inside the guard and wiped when the guard goes out
+     * of scope - it never outlives the batch that needed it. Outside a guard
+     * nothing is cached and derivation behaves exactly as before.
+     */
+    class BulkDerivation
+    {
+    public:
+        explicit BulkDerivation(CWallet& wallet)
+            : m_wallet(wallet), m_outermost(!wallet.m_bulk_derivation)
+        {
+            m_wallet.m_bulk_derivation = true;
+        }
+        ~BulkDerivation()
+        {
+            if (!m_outermost) return;
+            m_wallet.m_bulk_derivation = false;
+            m_wallet.m_bip44_account_key.reset();
+        }
+        BulkDerivation(const BulkDerivation&) = delete;
+        BulkDerivation& operator=(const BulkDerivation&) = delete;
+
+    private:
+        CWallet& m_wallet;
+        const bool m_outermost;
+    };
+
+    //! Non-null only while a BulkDerivation guard is alive. CExtKey holds its
+    //! secret in a secure_allocator buffer, so wiping is the destructor's job.
+    std::unique_ptr<CExtKey> m_bip44_account_key;
+    bool m_bulk_derivation = false;
+
     std::set<int64_t> setInternalKeyPool;
     std::set<int64_t> setExternalKeyPool;
     std::set<int64_t> set_pre_split_keypool;
@@ -771,6 +830,10 @@ private:
     std::atomic<uint64_t> m_wallet_flags{0};
 
     int64_t nTimeFirstKey = 0;
+
+    //! Per wallet, not per process: with several wallets open a single static
+    //! would let one wallet's sweep silence every other wallet's.
+    int64_t m_last_stranded_sweep = 0;
 
     /**
      * Private version of AddWatchOnly method which does not accept a

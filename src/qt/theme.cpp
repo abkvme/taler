@@ -5,7 +5,13 @@
 #include <qt/theme.h>
 
 #include <QApplication>
+#include <QIcon>
+#include <QPainter>
+#include <QPainterPath>
 #include <QPalette>
+#include <QPixmap>
+#include <QProxyStyle>
+#include <QStyleFactory>
 #include <QSettings>
 #include <QString>
 #include <QStyle>
@@ -28,20 +34,31 @@ struct Colours {
     QString accentText; //!< text drawn on top of the accent
     QString selection;
     QString danger;
+    QString dangerHover;
+    QString success;   //!< earning, ready - the green states
+    QString warning;   //!< slowing down - the amber state
+    QString neutral;   //!< a state that is neither good nor bad, only "not yet"
+    QString overlay_scrim; //!< dims the page behind the start-up sync panel
 };
 
 const Colours DARK = {
     "#16181d", "#1e2128", "#262b34", "#2f353f",
     "#e8eaed", "#9aa2ad",
     "#0088cc", "#17a0e6", "#ffffff",
-    "#0088cc", "#e5534b",
+    "#0088cc", "#e5534b", "#f0655d",
+    "#2ea043", "#c99a2e", "#39404b",
+    "rgba(0, 0, 0, 200)",
 };
 
 const Colours LIGHT = {
     "#f5f6f8", "#ffffff", "#eef1f5", "#d9dee5",
     "#1b1f24", "#6b7280",
     "#0088cc", "#0b9ae0", "#ffffff",
-    "#0088cc", "#d1342b",
+    "#0088cc", "#d1342b", "#e04a41",
+    "#2f9e44", "#c98a11", "#e3e8ef",
+    // Lighter than the dark theme's: on a pale page a near-black scrim reads as
+    // a fault rather than as depth.
+    "rgba(27, 31, 36, 140)",
 };
 
 /**
@@ -62,6 +79,9 @@ QWidget {
 }
 QMainWindow, QDialog { background-color: %WINDOW%; }
 QLabel { background: transparent; }
+/* Bare containers that sit inside a card must not repaint the window colour over
+   it. The base QWidget rule above is what makes them, so they have to opt out. */
+QWidget#recoveryRow { background: transparent; }
 QToolTip {
     background-color: %SURFACE2%;
     color: %TEXT%;
@@ -88,6 +108,56 @@ QLabel#balanceBadgeValue {
     background: transparent;
 }
 
+/* ---- status badges ---------------------------------------------------
+   Same shape as the balance badge above, coloured by a dynamic property. Qt does
+   not re-evaluate a stylesheet when such a property changes, so OverviewPage
+   repolishes the badge and its labels; the colours themselves stay here. */
+QFrame[badge="true"] {
+    border: none;
+    border-radius: %RADIUS%;
+    background-color: %NEUTRAL%;
+}
+QFrame[badgeState="good"] { background-color: %SUCCESS%; }
+QFrame[badgeState="warn"] { background-color: %WARNING%; }
+QFrame[badgeState="bad"]  { background-color: %DANGER%; }
+
+QFrame[badge="true"] QLabel {
+    background: transparent;
+    color: %TEXT%;
+}
+QFrame[badgeState="good"] QLabel,
+QFrame[badgeState="warn"] QLabel,
+QFrame[badgeState="bad"] QLabel {
+    color: %ACCENTTEXT%;
+}
+QLabel[badgeCaption="true"] {
+    font-size: 11px;
+}
+QFrame[badgeState="good"] QLabel[badgeCaption="true"],
+QFrame[badgeState="warn"] QLabel[badgeCaption="true"],
+QFrame[badgeState="bad"] QLabel[badgeCaption="true"] {
+    /* Slightly held back, so the headline still leads on a saturated ground. */
+    color: rgba(255, 255, 255, 200);
+}
+QFrame[badgeState="idle"] QLabel[badgeCaption="true"] { color: %MUTED%; }
+QLabel[badgeValue="true"] {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* ---- rewards chart ---------------------------------------------------- */
+RewardsChart {
+    qproperty-barColor: %ACCENT%;
+    qproperty-labelColor: %MUTED%;
+    qproperty-gridColor: %BORDER%;
+    background: transparent;
+}
+QLabel[class="cardTotal"] {
+    font-size: 13px;
+    font-weight: 600;
+    color: %ACCENT%;
+}
+
 /* ---- typography ------------------------------------------------------
    One scale for the whole application, applied through dynamic properties so a
    page does not have to invent its own bold labels. */
@@ -102,6 +172,15 @@ QLabel[class="cardTitle"] {
     font-weight: 600;
     padding: 2px 0 6px 0;
 }
+/* A page's own heading: what this screen is, and one line on what it is for.
+   Full-strength text and larger, unlike cardTitle, which labels a panel inside
+   a page and is deliberately quiet. */
+QLabel[class="pageTitle"] {
+    color: %TEXT%;
+    font-size: 17px;
+    font-weight: bold;
+}
+QLabel[class="pageSubtitle"] { color: %MUTED%; }
 QLabel[class="cardHint"] { color: %MUTED%; }
 QLabel[class="heroCaption"] { color: %MUTED%; }
 QLabel[class="heroBalance"] {
@@ -115,6 +194,29 @@ QLabel[class="secondaryValue"] { color: %TEXT%; }
 QLabel[class="emptyState"] {
     color: %MUTED%;
     background: transparent;
+}
+
+/* ---- start-up sync overlay -------------------------------------------
+   The "recent transactions may not be visible" panel shown while the wallet
+   catches up. Its form used to hard-code a near-white card with dark grey text,
+   which stayed white in dark mode and was the first thing a user saw. Colours
+   belong here with everything else so the two themes cannot drift apart. */
+QWidget#bgWidget {
+    background: %OVERLAY_SCRIM%;
+}
+QWidget#contentWidget {
+    background-color: %SURFACE%;
+    border: 1px solid %BORDER%;
+    border-radius: %RADIUS%;
+}
+QWidget#contentWidget QLabel { color: %TEXT%; }
+/* The progress figures read as secondary next to the warning itself. */
+QWidget#contentWidget QLabel#labelSyncDone { color: %MUTED%; }
+/* Flat, disabled, and only ever a picture: no button chrome around the glyph. */
+QPushButton#warningIcon {
+    background: transparent;
+    border: none;
+    padding: 0px;
 }
 
 /* ---- cards -----------------------------------------------------------
@@ -180,6 +282,19 @@ QToolBar QToolButton:checked {
     border-radius: 8px;
 }
 QToolBar QToolButton:disabled { color: %BORDER%; }
+/* The stretch that pushes Exit to the far right must not paint over the bar. */
+QToolBar QWidget#toolbarSpacer { background: transparent; }
+/* Exit is not navigation, so it does not take the accent the tabs use. It stays
+   quiet until pointed at, then warms towards the danger colour - enough to say
+   what it does without making the toolbar look alarming. */
+QToolBar QToolButton#settingsButton, QToolBar QToolButton#exitButton { color: %MUTED%; }
+QToolBar QToolButton#settingsButton:hover { background-color: %SURFACE2%; color: %TEXT%; }
+QToolBar QToolButton#exitButton { color: %MUTED%; }
+QToolBar QToolButton#exitButton:hover {
+    background-color: %DANGER%;
+    color: %ACCENTTEXT%;
+}
+QToolBar QToolButton#exitButton:pressed { background-color: %DANGER%; }
 
 /* ---- icon buttons outside the toolbar -------------------------------- */
 QToolButton {
@@ -215,6 +330,12 @@ QPushButton {
     padding: 7px 16px;
     min-height: 18px;
 }
+/* Focus, without the dotted rectangle the platform would otherwise stamp inside
+   the button. Same border the widget already has, in the accent colour, so
+   nothing moves when focus arrives. */
+QPushButton:focus { border-color: %ACCENT%; }
+QToolButton:focus { border-color: %ACCENT%; }
+QCheckBox:focus::indicator, QRadioButton:focus::indicator { border-color: %ACCENT%; }
 QPushButton:hover { border-color: %ACCENT%; }
 QPushButton:pressed { background-color: %BORDER%; }
 QPushButton:disabled { color: %MUTED%; border-color: %BORDER%; }
@@ -334,7 +455,61 @@ QTabBar::tab {
     border-radius: 8px;
 }
 QTabBar::tab:hover { background-color: %SURFACE2%; color: %TEXT%; }
-QTabBar::tab:selected { background-color: %SURFACE2%; color: %TEXT%; }
+/* Keyboard focus on an unselected tab reads like hover; on the selected one the
+   accent fill already says where you are, so it needs nothing further. */
+QTabBar::tab:focus { background-color: %SURFACE2%; color: %TEXT%; }
+/* The selected tab takes the accent outright. A tab that differs from its
+   neighbours only by a slightly lighter grey makes the reader hunt for it. */
+QTabBar::tab:selected {
+    background-color: %ACCENT%;
+    color: %ACCENTTEXT%;
+    font-weight: bold;
+}
+QTabBar::tab:selected:hover { background-color: %ACCENTHOVER%; }
+
+/* ---- options dialog --------------------------------------------------
+   Its form is inherited and dates from a plainer era: two stacked full-width
+   secondary buttons, and a note that carried the same weight as the settings
+   above it. The layout is straightened out in OptionsDialog's constructor; what
+   is left is telling the three kinds of button apart. */
+QLabel#overriddenByCommandLineInfoLabel,
+QLabel#overriddenByCommandLineLabel {
+    color: %MUTED%;
+}
+QPushButton#openBitcoinConfButton, QPushButton#resetButton {
+    background-color: transparent;
+    border: 1px solid %BORDER%;
+    color: %MUTED%;
+}
+QPushButton#openBitcoinConfButton:hover, QPushButton#resetButton:hover {
+    border-color: %ACCENT%;
+    color: %TEXT%;
+}
+/* OK is the one action that commits, so it is the only one that looks like it. */
+QPushButton#okButton {
+    background-color: %ACCENT%;
+    border: 1px solid %ACCENT%;
+    color: %ACCENTTEXT%;
+    font-weight: bold;
+    min-width: 84px;
+}
+QPushButton#okButton:hover { background-color: %ACCENTHOVER%; border-color: %ACCENTHOVER%; }
+QPushButton#okButton:focus { border-color: %ACCENTTEXT%; }
+
+/* The one button in a dialog that does something irreversible. Red, so it is
+   never the one clicked by reflex - the safe answer stays the default. */
+QPushButton#dangerButton {
+    background-color: %DANGER%;
+    border: 1px solid %DANGER%;
+    color: %ACCENTTEXT%;
+    font-weight: bold;
+}
+QPushButton#dangerButton:hover {
+    background-color: %DANGERHOVER%;
+    border-color: %DANGERHOVER%;
+}
+QPushButton#dangerButton:focus { border-color: %ACCENTTEXT%; }
+QPushButton#cancelButton { min-width: 84px; }
 
 /* ---- scrollbars ----------------------------------------------------- */
 QScrollBar:vertical { background: transparent; width: 10px; margin: 2px; }
@@ -365,6 +540,9 @@ QStatusBar::item { border: none; }
 
     qss.replace("%RADIUS%", "12px"); // single radius for every container
     qss.replace("%WINDOW%", c.window);
+    // A scrim, not a colour: dark themes need to darken and light themes to
+    // darken less, but both must keep the page behind it faintly readable.
+    qss.replace("%OVERLAY_SCRIM%", c.overlay_scrim);
     qss.replace("%SURFACE2%", c.surface2); // before %SURFACE% so the longer key wins
     qss.replace("%SURFACE%", c.surface);
     qss.replace("%BORDER%", c.border);
@@ -373,12 +551,154 @@ QStatusBar::item { border: none; }
     qss.replace("%ACCENTHOVER%", c.accentHover);
     qss.replace("%ACCENTTEXT%", c.accentText);
     qss.replace("%ACCENT%", c.accent);
+    qss.replace("%DANGERHOVER%", c.dangerHover); // before %DANGER% so the longer key wins
     qss.replace("%DANGER%", c.danger);
+    qss.replace("%SUCCESS%", c.success);
+    qss.replace("%WARNING%", c.warning);
+    qss.replace("%NEUTRAL%", c.neutral);
     return qss;
 }
 
 //! Keep the palette in step with the stylesheet, so widgets that draw themselves
 //! (native dialogs, some item delegates) do not stay in the old colours.
+//! Colours of the theme currently applied, for the few things painted in code.
+const Colours* g_current = nullptr;
+
+//! A message-box icon in our own colours: a filled disc with a white glyph.
+QIcon GlyphIcon(const QString& glyph, const QColor& colour)
+{
+    QIcon icon;
+    for (int size : {32, 48, 64}) {
+        QPixmap pixmap(size, size);
+        pixmap.fill(Qt::transparent);
+
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(colour);
+        painter.drawEllipse(QRectF(1, 1, size - 2, size - 2));
+
+        QFont font = QApplication::font();
+        font.setPixelSize(int(size * 0.62));
+        font.setBold(true);
+        painter.setFont(font);
+        painter.setPen(QColor("#ffffff"));
+        painter.drawText(QRect(0, 0, size, size), Qt::AlignCenter, glyph);
+        painter.end();
+
+        icon.addPixmap(pixmap);
+    }
+    return icon;
+}
+
+/**
+ * The platform draws message-box icons in its own grey, which on the dark theme is
+ * very nearly invisible against the dialog behind it. This paints the four of them
+ * instead, in the colours the rest of the application already uses to mean the
+ * same things.
+ */
+} // namespace
+
+QIcon theme::ExitDoorIcon()
+{
+    QIcon icon;
+    for (int size : {16, 24, 32, 48}) {
+        QPixmap pixmap(size, size);
+        pixmap.fill(Qt::transparent);
+
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        // Drawn on a 64x64 grid and scaled, so every size comes out consistent.
+        const qreal k = size / 64.0;
+        QPen pen(QColor("#ffffff"));
+        pen.setWidthF(6.0 * k);
+        pen.setCapStyle(Qt::RoundCap);
+        pen.setJoinStyle(Qt::RoundJoin);
+        painter.setPen(pen);
+        painter.setBrush(Qt::NoBrush);
+
+        // Three sides of the door frame, open towards the arrow.
+        QPainterPath frame;
+        frame.moveTo(38 * k, 11 * k);
+        frame.lineTo(15 * k, 11 * k);
+        frame.lineTo(15 * k, 53 * k);
+        frame.lineTo(38 * k, 53 * k);
+        painter.drawPath(frame);
+
+        // And the way out through it.
+        painter.drawLine(QPointF(30 * k, 32 * k), QPointF(55 * k, 32 * k));
+        QPainterPath head;
+        head.moveTo(45 * k, 22 * k);
+        head.lineTo(55 * k, 32 * k);
+        head.lineTo(45 * k, 42 * k);
+        painter.drawPath(head);
+        painter.end();
+
+        icon.addPixmap(pixmap);
+    }
+    return icon;
+}
+
+namespace {
+
+//! True while one of our own stylesheets is applied.
+//!
+//! The dotted focus rectangle is only worth suppressing when something replaces
+//! it. Under the System theme we apply no stylesheet at all, so the platform's
+//! focus ring is the only indication a keyboard user gets and it has to stay.
+bool g_own_focus_styling = false;
+
+class AccentIconStyle : public QProxyStyle
+{
+public:
+    explicit AccentIconStyle(QStyle* base) : QProxyStyle(base) {}
+
+    void drawPrimitive(PrimitiveElement element, const QStyleOption* option,
+                       QPainter* painter, const QWidget* widget) const override
+    {
+        // The dotted rectangle the platform draws inside a focused button or tab
+        // fights every other line in the interface, and on a filled accent button
+        // it reads as damage. Our stylesheets mark focus with an accent border
+        // instead, which is the same information drawn in the app's own language.
+        if (element == QStyle::PE_FrameFocusRect && g_own_focus_styling) return;
+        QProxyStyle::drawPrimitive(element, option, painter, widget);
+    }
+
+    QIcon standardIcon(StandardPixmap pixmap, const QStyleOption* option,
+                       const QWidget* widget) const override
+    {
+        if (g_current) {
+            switch (pixmap) {
+            case SP_MessageBoxQuestion:
+                return GlyphIcon(QString(QChar('?')), QColor(g_current->accent));
+            case SP_MessageBoxInformation:
+                return GlyphIcon(QString(QChar('i')), QColor(g_current->accent));
+            case SP_MessageBoxWarning:
+                return GlyphIcon(QString(QChar('!')), QColor(g_current->warning));
+            case SP_MessageBoxCritical:
+                return GlyphIcon(QString(QChar('!')), QColor(g_current->danger));
+            default:
+                break;
+            }
+        }
+        return QProxyStyle::standardIcon(pixmap, option, widget);
+    }
+};
+
+//! Installed once. QApplication deletes the style it replaces, so the proxy is
+//! given a fresh instance of the platform style rather than the live one.
+void InstallIconStyle()
+{
+    static bool installed = false;
+    if (installed) return;
+    installed = true;
+
+    QStyle* base = QStyleFactory::create(QApplication::style()->objectName());
+    qApp->setStyle(new AccentIconStyle(base));
+}
+
 void ApplyPalette(const Colours& c)
 {
     QPalette p;
@@ -413,13 +733,24 @@ void Apply(Theme t)
 {
     if (!qApp) return;
 
+    // Before the palette and stylesheet: replacing the style resets the palette,
+    // so it has to happen first or the theme is undone as it is applied.
+    InstallIconStyle();
+
     if (t == Theme::System) {
+        // Even here the message-box icons stay ours - the platform's grey glyph is
+        // the thing being fixed, and it is no more native for being unreadable.
+        g_current = &LIGHT;
+        if (SystemPrefersDark()) g_current = &DARK;
+        g_own_focus_styling = false;
         qApp->setStyleSheet(QString());
         qApp->setPalette(qApp->style()->standardPalette());
         return;
     }
 
     const Colours& c = (t == Theme::Dark) ? DARK : LIGHT;
+    g_current = &c;
+    g_own_focus_styling = true;
     ApplyPalette(c);
     qApp->setStyleSheet(BuildStyleSheet(c));
 }

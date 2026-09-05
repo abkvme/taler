@@ -14,6 +14,8 @@
 #include <netbase.h>
 #include <policy/policy.h>
 #include <rpc/protocol.h>
+#include <sidecar.h>
+#include <useragent.h>
 #include <sync.h>
 #include <timedata.h>
 #include <ui_interface.h>
@@ -460,7 +462,13 @@ static UniValue getnetworkinfo(const JSONRPCRequest& request)
     LOCK(cs_main);
     UniValue obj(UniValue::VOBJ);
     obj.pushKV("version",       CLIENT_VERSION);
-    obj.pushKV("subversion",    strSubVersion);
+    obj.pushKV("subversion",    GetSubVersion());
+    // What the subversion above is made of, so it does not have to be parsed back.
+    obj.pushKV("runmode",       useragent::RunModeTag());
+    const sidecar::Registration sidecar_registration = sidecar::Current();
+    obj.pushKV("sidecar", sidecar_registration.registered
+                              ? UniValue(sidecar_registration.name + ":" + sidecar_registration.version)
+                              : NullUniValue);
     obj.pushKV("protocolversion",PROTOCOL_VERSION);
     if(g_connman)
         obj.pushKV("localservices", strprintf("%016x", g_connman->GetLocalServices()));

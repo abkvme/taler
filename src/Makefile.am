@@ -161,6 +161,8 @@ BITCOIN_CORE_H = \
   script/sign.h \
   script/standard.h \
   shutdown.h \
+  sidecar.h \
+  useragent.h \
   streams.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
@@ -229,6 +231,8 @@ libbitcoin_server_a_SOURCES = \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
+  sidecar.cpp \
+  useragent.cpp \
   net_processing.cpp \
   noui.cpp \
   outputtype.cpp \
@@ -240,6 +244,7 @@ libbitcoin_server_a_SOURCES = \
   rpc/mining.cpp \
   rpc/misc.cpp \
   rpc/net.cpp \
+  rpc/sidecar.cpp \
   rpc/rawtransaction.cpp \
   rpc/server.cpp \
   rpc/util.cpp \

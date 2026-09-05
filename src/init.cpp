@@ -35,6 +35,8 @@
 #include <script/sigcache.h>
 #include <scheduler.h>
 #include <shutdown.h>
+#include <sidecar.h>
+#include <useragent.h>
 #include <timedata.h>
 #include <txdb.h>
 #include <txmempool.h>
@@ -1283,10 +1285,14 @@ bool AppInitMain()
             return InitError(strprintf(_("User Agent comment (%s) contains unsafe characters."), cmt));
         uacomments.push_back(cmt);
     }
-    strSubVersion = FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, uacomments);
-    if (strSubVersion.size() > MAX_SUBVERSION_LENGTH) {
-        return InitError(strprintf(_("Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments."),
-            strSubVersion.size(), MAX_SUBVERSION_LENGTH));
+    // The agent is composed from the run mode, any registered API sidecar and
+    // these comments, and is rebuilt whenever a sidecar comes or goes - so it is
+    // assembled in one place rather than here. See useragent.h.
+    useragent::SetOperatorComments(uacomments);
+    std::string useragent_error;
+    if (!useragent::Rebuild(&useragent_error)) {
+        return InitError(strprintf(_("Total length of network version string exceeds the maximum: %s. Reduce the number or size of uacomments."),
+            useragent_error));
     }
 
     if (gArgs.IsArgSet("-onlynet")) {
@@ -1742,6 +1748,9 @@ bool AppInitMain()
     uiInterface.InitMessage(_("Done loading"));
 
     g_wallet_init_interface.Start(scheduler);
+
+    // A sidecar that stops answering should stop being advertised.
+    sidecar::StartExpiryTask(scheduler);
 
 #ifdef ENABLE_WALLET
     if (gArgs.GetBoolArg("-gen", false)) { generateCoin (7); } else

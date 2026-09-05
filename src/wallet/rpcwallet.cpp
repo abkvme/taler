@@ -3299,10 +3299,36 @@ static UniValue restorewallet(const JSONRPCRequest& request)
     if (!wallet) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet creation failed.");
     }
-    if (!wallet_passphrase.empty() && !wallet->EncryptWallet(wallet_passphrase)) {
-        throw JSONRPCError(RPC_WALLET_ENCRYPTION_FAILED, "Error: Failed to encrypt the wallet.");
+    if (!wallet_passphrase.empty()) {
+        if (!wallet->EncryptWallet(wallet_passphrase)) {
+            throw JSONRPCError(RPC_WALLET_ENCRYPTION_FAILED, "Error: Failed to encrypt the wallet.");
+        }
+        // EncryptWallet leaves the wallet locked, and everything below this point
+        // has to derive keys: a locked keypool cannot be topped up, so the
+        // look-ahead window would never be built, the scan would find nothing,
+        // and the restore would hand back an empty wallet. Unlock for the
+        // duration of the scan and lock again at the end.
+        //
+        // Deliberately not the other way round - encrypting after the scan would
+        // write thousands of freshly derived private keys to disk in the clear
+        // first, and leave a window where a restored wallet holding funds sits
+        // unencrypted if encryption then failed.
+        if (!wallet->Unlock(wallet_passphrase)) {
+            throw JSONRPCError(RPC_WALLET_PASSPHRASE_INCORRECT,
+                               "Error: could not unlock the wallet that was just encrypted.");
+        }
     }
     CWallet* const pwallet = wallet.get();
+    // Whatever happens below, the wallet must not be left unlocked.
+    class RelockOnExit
+    {
+    public:
+        RelockOnExit(CWallet* wallet, bool active) : m_wallet(wallet), m_active(active) {}
+        ~RelockOnExit() { if (m_active) m_wallet->Lock(); }
+    private:
+        CWallet* const m_wallet;
+        const bool m_active;
+    } relock(pwallet, !wallet_passphrase.empty());
 
     CBlockIndex* pindexStart = nullptr;
     {
@@ -3353,6 +3379,126 @@ static UniValue restorewallet(const JSONRPCRequest& request)
     obj.pushKV("balance", ValueFromAmount(balance.Total));
     obj.pushKV("immature_balance", ValueFromAmount(balance.Immature));
     obj.pushKV("warning", warning);
+    return obj;
+}
+
+static UniValue recoverwallet(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) return NullUniValue;
+
+    if (request.fHelp || request.params.size() > 2) {
+        throw std::runtime_error(
+            "recoverwallet ( gap_limit start_height )\n"
+            "\nRescans the whole chain for this wallet, deriving addresses ahead of what it\n"
+            "already knows so that history it has never seen is found.\n"
+            "\nThis is the cure for a wallet that under-reports its balance: an ordinary\n"
+            "rescan only looks for the addresses the wallet has already derived, so a wallet\n"
+            "restored from an older backup - or one that was locked while it scanned, because\n"
+            "a locked wallet cannot extend its address window - stays blind to everything it\n"
+            "used after that point. The wallet must be unlocked.\n"
+            "\nArguments:\n"
+            "1. gap_limit     (numeric, optional) How many unused addresses to keep ahead.\n"
+            "                 Defaults to the same window a restore uses.\n"
+            "2. start_height  (numeric, optional, default=0) Scan from this height. Leave it\n"
+            "                 alone unless you know when the wallet was first used.\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"scanned_from_height\": n,   (numeric) where the scan started\n"
+            "  \"gap_limit\": n,             (numeric) addresses derived ahead, after any widening\n"
+            "  \"passes\": n,                (numeric) how many scans it took to settle\n"
+            "  \"balance\": x.xxx,           (numeric) balance once the scan finished\n"
+            "  \"immature_balance\": x.xxx   (numeric) rewards not yet mature\n"
+            "}\n"
+            "\nExamples:\n"
+            + HelpExampleCli("recoverwallet", "")
+            + HelpExampleRpc("recoverwallet", "")
+        );
+    }
+
+    // The same two refusals a restore makes, for the same reason: a scan that can
+    // only see part of the chain reports a plausible, wrong balance - which is the
+    // very thing the caller is here to fix.
+    if (fPruneMode) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Recovering a wallet requires a full, unpruned chain. Run this node without -prune (a -reindex is needed to rebuild the pruned blocks).");
+    }
+    if (IsInitialBlockDownload()) {
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Cannot recover a wallet while the node is still syncing: the scan would find only part of the history. Wait for the sync to finish.");
+    }
+
+    int64_t gap_limit = DEFAULT_RESTORE_GAP_LIMIT;
+    if (!request.params[0].isNull()) {
+        gap_limit = request.params[0].get_int64();
+        if (gap_limit < 20 || gap_limit > 100000) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "gap_limit must be between 20 and 100000");
+        }
+    }
+
+    CBlockIndex* pindexStart = nullptr;
+    {
+        LOCK(cs_main);
+        pindexStart = chainActive.Genesis();
+        if (!request.params[1].isNull()) {
+            const int height = request.params[1].get_int();
+            if (height < 0 || height > chainActive.Height()) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "start_height is outside the chain");
+            }
+            pindexStart = chainActive[height];
+        }
+        if (!pindexStart) pindexStart = chainActive.Genesis();
+    }
+
+    // Deriving the look-ahead needs the keys, so the wallet has to be open. This
+    // is the check that the whole problem traces back to: TopUpKeyPool() gives up
+    // silently on a locked wallet, which is how a scan ends up finding nothing.
+    EnsureWalletIsUnlocked(pwallet);
+
+    int passes = 0;
+    int64_t derived = gap_limit;
+    {
+        // Scan, and if the scan used up addresses, widen and scan again. Used
+        // addresses are counted through the HD chain counters rather than by
+        // reading key paths, because this has to work for legacy m/0'/0'/n'
+        // wallets as well as BIP-44 ones - and a legacy wallet is exactly the
+        // kind that needs recovering.
+        for (int round = 0; round < MAX_RESTORE_EXTENSIONS; ++round) {
+            if (!pwallet->TopUpKeyPool(derived)) {
+                throw JSONRPCError(RPC_WALLET_ERROR, "Unable to derive the look-ahead addresses");
+            }
+
+            uint32_t external_before, internal_before;
+            {
+                LOCK(pwallet->cs_wallet);
+                external_before = pwallet->GetHDChain().nExternalChainCounter;
+                internal_before = pwallet->GetHDChain().nInternalChainCounter;
+            }
+
+            WalletRescanReserver reserver(pwallet);
+            if (!reserver.reserve()) {
+                throw JSONRPCError(RPC_WALLET_ERROR, "Wallet is currently rescanning. Abort the existing rescan or wait.");
+            }
+            pwallet->ScanForWalletTransactions(pindexStart, nullptr, reserver, true);
+            ++passes;
+
+            LOCK(pwallet->cs_wallet);
+            const bool consumed_addresses =
+                pwallet->GetHDChain().nExternalChainCounter != external_before ||
+                pwallet->GetHDChain().nInternalChainCounter != internal_before;
+            // Nothing new was used, so the window already reached past the end of
+            // this wallet's history and there is nothing further out to find.
+            if (!consumed_addresses) break;
+            derived += gap_limit;
+        }
+    }
+
+    UniValue obj(UniValue::VOBJ);
+    obj.pushKV("scanned_from_height", pindexStart ? pindexStart->nHeight : 0);
+    obj.pushKV("gap_limit", derived);
+    obj.pushKV("passes", passes);
+    const BalanceInfo balance = pwallet->GetBalance();
+    obj.pushKV("balance", ValueFromAmount(balance.Total));
+    obj.pushKV("immature_balance", ValueFromAmount(balance.Immature));
     return obj;
 }
 
@@ -5286,6 +5432,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "getnewmnemonic",                   &getnewmnemonic,                {} },
     { "wallet",             "listwalletdir",                    &listwalletdir,                 {} },
     { "wallet",             "restorewallet",                    &restorewallet,                 {"wallet_name","mnemonic","birthday_time","gap_limit","passphrase"} },
+    { "wallet",             "recoverwallet",                    &recoverwallet,                 {"gap_limit","start_height"} },
     { "wallet",             "getwalletmnemonic",                &getwalletmnemonic,             {} },
     { "wallet",             "dumpprivkey",                      &dumpprivkey,                   {"address"}  },
     { "wallet",             "dumpwallet",                       &dumpwallet,                    {"filename"} },

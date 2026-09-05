@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="doc/taler-banner.jpg" width="900"
+       alt="Taler Blockchain — privacy by design, high performance and efficiency, secure and open source, supports PoS and PoW. taler.tech / explorer.taler.tech">
+</p>
+
 [![Linux x64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-x64.yml?event=push&label=Linux%20x64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-x64.yml)
 [![Linux ARM64](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-linux-arm64.yml?event=push&label=Linux%20ARM64&logo=linux&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-linux-arm64.yml)
 [![macOS](https://img.shields.io/github/actions/workflow/status/abkvme/taler/build-macos.yml?event=push&label=macOS&logo=apple&logoColor=white)](https://github.com/abkvme/taler/actions/workflows/build-macos.yml)

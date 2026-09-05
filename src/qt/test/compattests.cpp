@@ -2,8 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <qt/paymentrequestplus.h> // this includes protobuf's port.h which defines its own bswap macos
-
+// Upstream includes qt/paymentrequestplus.h first, to pull in protobuf's port.h
+// and its competing bswap macros before compat/byteswap.h. Taler carries no BIP70
+// payment requests and no protobuf, so there is nothing to order around.
 #include <qt/test/compattests.h>
 
 #include <compat/byteswap.h>

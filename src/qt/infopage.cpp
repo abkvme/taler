@@ -133,6 +133,53 @@ void ConnectivityChecker::run()
 }
 
 // InfoPage implementation
+namespace {
+
+//! The three things worth pulling out of a peer's BIP-14 user agent.
+struct PeerVersion
+{
+    QString version;
+    QString mode;
+    QString api;
+};
+
+//! Split "/Taler:0.20.0(SERV; api:1.2.0; eu-1)/" into its parts.
+//!
+//! Tolerant by design: peers predating this run older clients that send no
+//! comments at all, and any peer may send something unexpected. Anything not
+//! recognised is simply left out rather than guessed at.
+PeerVersion ParsePeerSubVersion(QString subVersion)
+{
+    PeerVersion parsed;
+    subVersion.remove(QChar('/'));
+
+    const int colon = subVersion.indexOf(QChar(':'));
+    if (colon >= 0) subVersion = subVersion.mid(colon + 1);
+
+    const int open_paren = subVersion.indexOf(QChar('('));
+    if (open_paren < 0) {
+        parsed.version = subVersion.trimmed();
+        return parsed;
+    }
+
+    parsed.version = subVersion.left(open_paren).trimmed();
+    QString comments = subVersion.mid(open_paren + 1);
+    const int close_paren = comments.lastIndexOf(QChar(')'));
+    if (close_paren >= 0) comments = comments.left(close_paren);
+
+    for (const QString& raw : comments.split(QChar(';'))) {
+        const QString comment = raw.trimmed();
+        if (comment == QLatin1String("GUI") || comment == QLatin1String("SERV")) {
+            parsed.mode = comment;
+        } else if (comment.startsWith(QLatin1String("api:"))) {
+            parsed.api = comment.mid(4);
+        }
+    }
+    return parsed;
+}
+
+} // namespace
+
 InfoPage::InfoPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     QWidget(parent),
     clientModel(nullptr),
@@ -142,12 +189,26 @@ InfoPage::InfoPage(const PlatformStyle *_platformStyle, QWidget *parent) :
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    // Top bar: refresh button only
+    // Top bar: what this page is, then the one action it offers. The left of this
+    // row was empty, which left the page opening on an unexplained pair of tables.
     QHBoxLayout *topBar = new QHBoxLayout();
-    topBar->addStretch();
+
+    QVBoxLayout *heading = new QVBoxLayout();
+    heading->setSpacing(2);
+    QLabel *pageTitle = new QLabel(tr("Nodes"));
+    pageTitle->setProperty("class", "pageTitle");
+    heading->addWidget(pageTitle);
+    QLabel *pageSubtitle = new QLabel(
+        tr("Seed nodes this wallet starts from, and the peers it has found on the network."));
+    pageSubtitle->setProperty("class", "pageSubtitle");
+    pageSubtitle->setWordWrap(true);
+    heading->addWidget(pageSubtitle);
+    topBar->addLayout(heading, 1);
+
     refreshButton = new QPushButton(tr("Refresh"));
     connect(refreshButton, &QPushButton::clicked, this, &InfoPage::refreshData);
-    topBar->addWidget(refreshButton);
+    // Level with the title rather than centred against two lines of text.
+    topBar->addWidget(refreshButton, 0, Qt::AlignTop);
     mainLayout->addLayout(topBar);
 
     // Main splitter: left (seeds) | right (discovered)
@@ -207,11 +268,15 @@ InfoPage::InfoPage(const PlatformStyle *_platformStyle, QWidget *parent) :
     discoveredTable = new QTableWidget();
     setupTable(discoveredTable);
     // Add Version column for discovered peers
-    discoveredTable->setColumnCount(3);
-    discoveredTable->setHorizontalHeaderLabels({tr("Node"), tr("Version"), tr("Status")});
+    // Mode and API come out of the peer's BIP-14 comment list, which older peers
+    // do not fill in - their cells stay blank rather than claiming anything.
+    discoveredTable->setColumnCount(5);
+    discoveredTable->setHorizontalHeaderLabels(
+        {tr("Node"), tr("Version"), tr("Mode"), tr("API"), tr("Status")});
     discoveredTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    discoveredTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    discoveredTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    for (int column = 1; column <= 4; ++column) {
+        discoveredTable->horizontalHeader()->setSectionResizeMode(column, QHeaderView::ResizeToContents);
+    }
     discLayout->addWidget(discoveredTable);
     splitter->addWidget(discoveredGroup);
 
@@ -358,19 +423,22 @@ void InfoPage::populateTables()
             discoveredTable->insertRow(row);
             discoveredTable->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(stats.addrName)));
 
-            // Extract version: cleanSubVer is like "/Taler:0.18.44.7/" - strip name prefix and slashes
-            QString subVer = QString::fromStdString(stats.cleanSubVer);
-            subVer.remove('/');
-            int colonPos = subVer.indexOf(':');
-            if (colonPos >= 0)
-                subVer = subVer.mid(colonPos + 1);
-            discoveredTable->setItem(row, 1, new QTableWidgetItem(subVer));
+            // cleanSubVer looks like "/Taler:0.20.0(SERV; api:1.2.0; eu-1)/". Split it
+            // into the number, the run mode and the API version.
+            //
+            // Everything here is a claim made by a remote peer, not a fact this
+            // node verified. It is shown as plain table text and can do nothing,
+            // but it should not be read as anything more than what the peer said.
+            PeerVersion peer = ParsePeerSubVersion(QString::fromStdString(stats.cleanSubVer));
+            discoveredTable->setItem(row, 1, new QTableWidgetItem(peer.version));
+            discoveredTable->setItem(row, 2, new QTableWidgetItem(peer.mode));
+            discoveredTable->setItem(row, 3, new QTableWidgetItem(peer.api));
 
             // Connected peers are green by default
             QTableWidgetItem *statusItem = new QTableWidgetItem(QString::fromUtf8("\xe2\x97\x8f"));
             statusItem->setForeground(QColor(0, 180, 0));
             statusItem->setTextAlignment(Qt::AlignCenter);
-            discoveredTable->setItem(row, 2, statusItem);
+            discoveredTable->setItem(row, 4, statusItem);
         }
     }
 }

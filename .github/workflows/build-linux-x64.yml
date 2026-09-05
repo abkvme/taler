@@ -52,6 +52,21 @@ jobs:
           sed -i 's|-lboost_\([a-z_]*\)|-l:libboost_\1.a|g' src/Makefile
           make -j$(nproc)
 
+      - name: GUI unit tests
+        # This job already builds Qt, so the GUI tests cost a rebuild of one small
+        # binary rather than a second Qt toolchain. Offscreen: no display here.
+        run: |
+          ./configure \
+            --with-incompatible-bdb \
+            --with-gui \
+            --enable-tests \
+            BDB_LIBS="-L$(pwd)/db18/lib -ldb_cxx-18.1" \
+            BDB_CFLAGS="-I$(pwd)/db18/include" \
+            CXXFLAGS="-O2"
+          sed -i 's|-lboost_\([a-z_]*\)|-l:libboost_\1.a|g' src/Makefile
+          make -j$(nproc) src/qt/test/test_bitcoin-qt
+          QT_QPA_PLATFORM=offscreen ./src/qt/test/test_bitcoin-qt
+
       - name: Create bin directory and copy binaries
         run: |
           mkdir -p bin

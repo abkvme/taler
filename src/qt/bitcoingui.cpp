@@ -20,6 +20,7 @@
 #include <qt/optionsdialog.h>
 #include <qt/optionsmodel.h>
 #include <qt/platformstyle.h>
+#include <qt/theme.h>
 #include <qt/rpcconsole.h>
 #include <qt/utilitydialog.h>
 
@@ -50,6 +51,8 @@
 #include <QListWidget>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QToolButton>
 #include <QMimeData>
 #include <QProgressDialog>
 #include <QSettings>
@@ -313,6 +316,33 @@ void BitcoinGUI::createActions()
     quitAction->setStatusTip(tr("Quit application"));
     quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     quitAction->setMenuRole(QAction::QuitRole);
+
+    // Leaving is a normal thing to want to do and was buried in a menu. On the
+    // toolbar it needs its own action: quitAction carries QAction::QuitRole,
+    // which macOS relocates into the application menu.
+    // A door with an arrow through it, not a cross: a cross means "close this
+    // window", and this closes the application. Drawn rather than shipped as a
+    // pixmap so it takes the toolbar's own colour.
+    //
+    // Two states, because hovering fills the button with the danger colour and
+    // the icon has to survive that. At rest it is colourised like every other
+    // toolbar icon; hovered, it is plain white. A stylesheet cannot do this -
+    // its `color` reaches the label, never the icon - so the white pixmaps are
+    // registered against QIcon::Active, which is the mode a toolbar button asks
+    // for while the pointer is over it.
+    QIcon exitIcon = platformStyle->TextColorIcon(theme::ExitDoorIcon());
+    const QIcon exitIconHovered = theme::ExitDoorIcon();
+    for (const QSize& size : exitIconHovered.availableSizes()) {
+        exitIcon.addPixmap(exitIconHovered.pixmap(size), QIcon::Active);
+    }
+    exitToolbarAction = new QAction(exitIcon, tr("Exit"), this);
+    exitToolbarAction->setStatusTip(tr("Close Taler"));
+    exitToolbarAction->setToolTip(exitToolbarAction->statusTip());
+
+    settingsToolbarAction = new QAction(platformStyle->TextColorIcon(":/icons/options"), tr("Settings"), this);
+    settingsToolbarAction->setStatusTip(tr("Change how Taler behaves"));
+    settingsToolbarAction->setToolTip(settingsToolbarAction->statusTip());
+    settingsToolbarAction->setEnabled(false);
     aboutAction = new QAction(platformStyle->TextColorIcon(":/icons/about"), tr("&About %1").arg(tr(PACKAGE_NAME)), this);
     aboutAction->setStatusTip(tr("Show information about %1").arg(tr(PACKAGE_NAME)));
     aboutAction->setMenuRole(QAction::AboutRole);
@@ -364,7 +394,9 @@ void BitcoinGUI::createActions()
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the %1 help message to get a list with possible Taler command-line options").arg(tr(PACKAGE_NAME)));
 
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(requestQuit()));
+    connect(exitToolbarAction, SIGNAL(triggered()), this, SLOT(requestQuit()));
+    connect(settingsToolbarAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
@@ -372,7 +404,7 @@ void BitcoinGUI::createActions()
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
     connect(openRPCConsoleAction, SIGNAL(triggered()), this, SLOT(showDebugWindow()));
     // prevents an open debug window from becoming stuck/unusable on client shutdown
-    connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
+
 
 #ifdef ENABLE_WALLET
     if(walletFrame)
@@ -463,13 +495,42 @@ void BitcoinGUI::createToolBars()
         toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
         toolbar->setMovable(false);
         toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        // Left: the places money moves through. Overview is the icon alone - it is
+        // the home tab, the one the application opens on, and a house needs no
+        // caption; the three that follow keep their names because "send" and
+        // "receive" are not reliably distinguishable as pictures.
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
   //      toolbar->addAction(coinsAction);
-        toolbar->addAction(nodesAction);
+
+        QWidget* toolbarSpacer = new QWidget(toolbar);
+        toolbarSpacer->setObjectName("toolbarSpacer");
+        toolbarSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        toolbar->addWidget(toolbarSpacer);
+
+        // Right: reference and housekeeping. Info and Nodes are still tabs and
+        // still show which one is open; Settings and Exit are actions. All four
+        // are icons alone - dropping the labels is what separates the everyday
+        // half of the toolbar from the occasional half - and the words survive in
+        // the tooltip and the status bar.
         toolbar->addAction(aboutPageAction);
+        toolbar->addAction(nodesAction);
+        toolbar->addAction(settingsToolbarAction);
+        toolbar->addAction(exitToolbarAction);
+
+        for (QAction* action : {overviewAction, aboutPageAction, nodesAction,
+                                settingsToolbarAction, exitToolbarAction}) {
+            if (QToolButton* button = qobject_cast<QToolButton*>(toolbar->widgetForAction(action))) {
+                button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            }
+        }
+        // Only these two are styled apart from the tabs; Info and Nodes keep the
+        // tab look so a checked one still reads as the page you are on.
+        if (QWidget* w = toolbar->widgetForAction(settingsToolbarAction)) w->setObjectName("settingsButton");
+        if (QWidget* w = toolbar->widgetForAction(exitToolbarAction)) w->setObjectName("exitButton");
+
         overviewAction->setChecked(true);
 
 #ifdef ENABLE_WALLET
@@ -802,6 +863,45 @@ void BitcoinGUI::optionsClicked()
     OptionsDialog dlg(this, enableWallet);
     dlg.setModel(clientModel->getOptionsModel());
     dlg.exec();
+}
+
+void BitcoinGUI::requestQuit()
+{
+    // Exit is one click away on the toolbar now, so it has to ask. Staking stops
+    // the moment the wallet closes, and a node that is asked to leave mid-write
+    // has work to finish, so this is not a keystroke to spend by accident.
+    QMessageBox confirm(this);
+    confirm.setWindowTitle(tr("Exit Taler"));
+    confirm.setIcon(QMessageBox::Question);
+    confirm.setText(tr("Close Taler?"));
+    // Only mention staking when there is staking to lose. Telling someone their
+    // staking will stop when they are not staking is noise, and noise in a
+    // confirmation is how people learn to dismiss them unread.
+    bool is_staking = false;
+#ifdef ENABLE_WALLET
+    if (walletFrame) is_staking = walletFrame->anyWalletStaking();
+#endif
+    confirm.setInformativeText(
+        is_staking
+            ? tr("The node will stop, and this wallet will stop staking until you open "
+                 "it again. Shutting down can take a moment while the chain state is "
+                 "written to disk.")
+            : tr("The node will stop. Shutting down can take a moment while the chain "
+                 "state is written to disk."));
+    QPushButton* leave = confirm.addButton(tr("Exit"), QMessageBox::AcceptRole);
+    // Red, because it is the irreversible one. Staying keeps the default styling
+    // and the keyboard, so the reflex answer is the harmless answer.
+    leave->setObjectName("dangerButton");
+    QPushButton* stay = confirm.addButton(tr("Stay"), QMessageBox::RejectRole);
+    // Staying is the safe answer, so it is the one Return and Escape pick.
+    confirm.setDefaultButton(stay);
+    confirm.setEscapeButton(stay);
+    confirm.exec();
+    if (confirm.clickedButton() != leave) return;
+
+    // Only now: the console was being hidden before the user had answered.
+    if (rpcConsole) rpcConsole->hide();
+    qApp->quit();
 }
 
 void BitcoinGUI::aboutClicked()
@@ -1164,6 +1264,7 @@ void BitcoinGUI::showEvent(QShowEvent *event)
     openRPCConsoleAction->setEnabled(true);
     aboutAction->setEnabled(true);
     optionsAction->setEnabled(true);
+    if (settingsToolbarAction) settingsToolbarAction->setEnabled(true);
 }
 
 #ifdef ENABLE_WALLET

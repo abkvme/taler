@@ -9,12 +9,13 @@
 #include <chainparams.h>
 #include <qt/test/rpcnestedtests.h>
 #include <util.h>
+#include <qt/test/rewardsummarytests.h>
+#include <qt/test/splashtests.h>
 #include <qt/test/uritests.h>
 #include <qt/test/compattests.h>
 
 #ifdef ENABLE_WALLET
 #include <qt/test/addressbooktests.h>
-#include <qt/test/paymentservertests.h>
 #include <qt/test/wallettests.h>
 #endif
 
@@ -36,6 +37,11 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #elif defined(QT_QPA_PLATFORM_COCOA)
 Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
+#if defined(QT_IMAGEFORMAT_JPEG)
+// Needed to decode the start-up artwork. Kept in step with the same block in
+// bitcoin.cpp; SplashTests::artworkDecodes() fails if the two ever drift.
+Q_IMPORT_PLUGIN(QJpegPlugin);
+#endif
 #endif
 
 extern void noui_connect();
@@ -53,6 +59,12 @@ int main(int argc, char *argv[])
     gArgs.ForceSetArg("-datadir", pathTemp.string());
 
     bool fInvalid = false;
+
+    // Pull the resource bundle in. A qrc object registers itself from a static
+    // initialiser and exports nothing anyone references, so a static library
+    // simply drops it - which is why bitcoin.cpp does the same thing. Without it
+    // every ":/..." lookup in a test comes back null.
+    Q_INIT_RESOURCE(bitcoin);
 
     // Prefer the "minimal" platform for the test instead of the normal default
     // platform ("xcb", "windows", or "cocoa") so tests can't unintentionally
@@ -74,18 +86,19 @@ int main(int argc, char *argv[])
     if (QTest::qExec(&test1) != 0) {
         fInvalid = true;
     }
-#ifdef ENABLE_WALLET
-    PaymentServerTests test2;
-    if (QTest::qExec(&test2) != 0) {
-        fInvalid = true;
-    }
-#endif
     RPCNestedTests test3;
     if (QTest::qExec(&test3) != 0) {
         fInvalid = true;
     }
     CompatTests test4;
     if (QTest::qExec(&test4) != 0) {
+        fInvalid = true;
+    }
+    SplashTests splash_tests;
+    if (QTest::qExec(&splash_tests) != 0)
+        fInvalid = true;
+    RewardSummaryTests reward_summary_tests;
+    if (QTest::qExec(&reward_summary_tests) != 0) {
         fInvalid = true;
     }
 #ifdef ENABLE_WALLET

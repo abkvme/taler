@@ -38,6 +38,13 @@ public:
     void setClientModel(ClientModel *clientModel);
 
     bool addWallet(WalletModel *walletModel);
+
+    /** Is any open wallet currently staking?
+     *
+     * Staking is a timed unlock held per wallet, so "are we staking" is a
+     * question about all of them, not just the one on screen.
+     */
+    bool anyWalletStaking();
     bool setCurrentWallet(const QString& name);
     bool removeWallet(const QString &name);
     void removeAllWallets();

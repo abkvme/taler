@@ -10,8 +10,9 @@
 
 #include <chainparams.h>
 
-#include <QResizeEvent>
 #include <QPropertyAnimation>
+#include <QResizeEvent>
+#include <QStyle>
 
 ModalOverlay::ModalOverlay(QWidget *parent) :
 QWidget(parent),
@@ -22,6 +23,11 @@ layerIsVisible(false),
 userClosed(false)
 {
     ui->setupUi(this);
+    // Drawn from the theme rather than baked into the form: the old :/icons/warning
+    // pixmap kept its own colours whatever the application was wearing. Going
+    // through the style means the proxy installed by theme::Apply() answers, so
+    // this is the same glyph every message box uses.
+    ui->warningIcon->setIcon(style()->standardIcon(QStyle::SP_MessageBoxWarning));
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     if (parent) {
         parent->installEventFilter(this);

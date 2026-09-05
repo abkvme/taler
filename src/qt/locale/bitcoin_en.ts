@@ -4,12 +4,7 @@
 <context>
     <name>AboutPage</name>
     <message>
-        <location filename="../aboutpage.cpp" line="+34"/>
-        <source>Taler</source>
-        <translation type="unfinished">Taler</translation>
-    </message>
-    <message>
-        <location line="+73"/>
+        <location filename="../aboutpage.cpp" line="+115"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -44,7 +39,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <source>Community</source>
         <translation type="unfinished"></translation>
     </message>
@@ -54,27 +49,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Explorer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+20"/>
         <source>Maintained by abkvme, 2025-2026</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-13"/>
+        <location line="-22"/>
         <source>Network</source>
         <translation type="unfinished">Network</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-91"/>
+        <source>Taler</source>
+        <translation type="unfinished">Taler</translation>
+    </message>
+    <message>
+        <location line="+92"/>
         <source>Seed Nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Development</source>
         <translation type="unfinished"></translation>
     </message>
@@ -263,7 +263,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="+46"/>
+        <location filename="../askpassphrasedialog.cpp" line="+48"/>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -303,7 +303,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+56"/>
         <source>Confirm wallet encryption</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,12 +318,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-58"/>
+        <location line="-69"/>
         <source>Start staking</source>
         <translation type="unfinished">Start staking</translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+69"/>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR TALER&lt;/b&gt;!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -387,12 +387,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-227"/>
+        <location line="-238"/>
         <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
         <translation>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</translation>
     </message>
     <message>
-        <location line="+115"/>
+        <location line="+126"/>
         <location line="+6"/>
         <source>Start staking failed</source>
         <translation>Start staking failed</translation>
@@ -419,17 +419,17 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+345"/>
+        <location filename="../bitcoingui.cpp" line="+375"/>
         <source>Sign &amp;message...</source>
         <translation>Sign &amp;message...</translation>
     </message>
     <message>
-        <location line="+619"/>
+        <location line="+692"/>
         <source>Synchronizing with network...</source>
         <translation>Synchronizing with network...</translation>
     </message>
     <message>
-        <location line="-732"/>
+        <location line="-832"/>
         <source>&amp;Overview</source>
         <translation>&amp;Overview</translation>
     </message>
@@ -482,6 +482,27 @@
         <location line="+1"/>
         <source>Quit application</source>
         <translation>Quit application</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <location line="+553"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-552"/>
+        <source>Close Taler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Change how Taler behaves</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -584,7 +605,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+548"/>
+        <location line="+484"/>
+        <source>Exit Taler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Close Taler?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>The node will stop, and this wallet will stop staking until you open it again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The node will stop. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Stay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+116"/>
         <source>Click to disable network activity.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -609,17 +655,17 @@
         <translation>Reindexing blocks on disk...</translation>
     </message>
     <message>
-        <location line="+316"/>
+        <location line="+317"/>
         <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1051"/>
+        <location line="-1152"/>
         <source>Send coins to a Taler address</source>
         <translation>Send coins to a Taler address</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+129"/>
         <source>Backup wallet to another location</source>
         <translation>Backup wallet to another location</translation>
     </message>
@@ -644,12 +690,12 @@
         <translation>&amp;Verify message...</translation>
     </message>
     <message>
-        <location line="+706"/>
+        <location line="+779"/>
         <source>Taler</source>
         <translation>Taler</translation>
     </message>
     <message>
-        <location line="-959"/>
+        <location line="-1059"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -664,7 +710,7 @@
         <translation>&amp;Receive</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+104"/>
         <source>&amp;Show / Hide</source>
         <translation>&amp;Show / Hide</translation>
     </message>
@@ -689,7 +735,7 @@
         <translation>Verify messages to ensure they were signed with specified Taler addresses</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+70"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
@@ -709,12 +755,12 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-239"/>
         <source>Request payments (generates QR codes and taler: URIs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+105"/>
+        <location line="+132"/>
         <source>Show the list of used sending addresses and labels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -734,7 +780,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+545"/>
+        <location line="+618"/>
         <source>%n active connection(s) to Taler network</source>
         <translation>
             <numerusform>%n active connection to Taler network</numerusform>
@@ -795,22 +841,22 @@
         <translation>Up to date</translation>
     </message>
     <message>
-        <location line="-630"/>
+        <location line="-703"/>
         <source>Show the %1 help message to get a list with possible Taler command-line options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+119"/>
+        <location line="+154"/>
         <source>Wallet in use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+241"/>
+        <location line="+240"/>
         <source>%1 client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+256"/>
+        <location line="+295"/>
         <source>Connecting to peers...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -820,7 +866,7 @@
         <translation>Catching up...</translation>
     </message>
     <message>
-        <location line="+151"/>
+        <location line="+152"/>
         <source>Date: %1
 </source>
         <translation type="unfinished"></translation>
@@ -891,7 +937,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bitcoingui.cpp" line="-984"/>
+        <location filename="../bitcoingui.cpp" line="-1085"/>
         <source>&amp;Nodes</source>
         <translation>&amp;Nodes</translation>
     </message>
@@ -899,6 +945,14 @@
         <location line="+1"/>
         <source>Show network seed nodes and discovered peers</source>
         <translation>Show network seed nodes and discovered peers</translation>
+    </message>
+</context>
+<context>
+    <name>BrandBanner</name>
+    <message>
+        <location filename="../brandbanner.cpp" line="+108"/>
+        <source>Open %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1341,7 +1395,7 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <location filename="../utilitydialog.cpp" line="+41"/>
+        <location filename="../utilitydialog.cpp" line="+45"/>
         <source>version</source>
         <translation type="unfinished">version</translation>
     </message>
@@ -1357,7 +1411,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+12"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
         <source>Command-line options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1365,12 +1429,12 @@
 <context>
     <name>InfoPage</name>
     <message>
-        <location filename="../infopage.cpp" line="+128"/>
+        <location filename="../infopage.cpp" line="+161"/>
         <source>Refresh</source>
         <translation>Refresh</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+32"/>
         <source>Learn how to add your node to the seed list</source>
         <translation>Learn how to add your node to the seed list</translation>
     </message>
@@ -1380,7 +1444,17 @@
         <translation>Hardcoded Seeds</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="-25"/>
+        <source>Nodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Seed nodes this wallet starts from, and the peers it has found on the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
         <source>Community Seeds</source>
         <translation>Community Seeds</translation>
     </message>
@@ -1400,19 +1474,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+117"/>
+        <location line="+121"/>
         <source>Unavailable - remote seed list could not be fetched</source>
         <translation>Unavailable - remote seed list could not be fetched</translation>
     </message>
     <message>
-        <location line="-132"/>
-        <location line="+52"/>
+        <location line="-136"/>
+        <location line="+56"/>
         <source>Node</source>
         <translation>Node</translation>
     </message>
     <message>
-        <location line="-52"/>
-        <location line="+52"/>
+        <location line="-56"/>
+        <location line="+56"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
@@ -1770,7 +1844,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished">Form</translation>
     </message>
     <message>
-        <location line="+119"/>
+        <location line="+106"/>
         <source>Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the taler network, as detailed below.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1787,7 +1861,7 @@ Visit the repository to learn how to contribute:</translation>
     <message>
         <location line="+7"/>
         <location line="+26"/>
-        <location filename="../modaloverlay.cpp" line="+146"/>
+        <location filename="../modaloverlay.cpp" line="+152"/>
         <source>Unknown...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2161,7 +2235,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation>&amp;Cancel</translation>
     </message>
     <message>
-        <location filename="../optionsdialog.cpp" line="+114"/>
+        <location filename="../optionsdialog.cpp" line="+131"/>
         <source>default</source>
         <translation>default</translation>
     </message>
@@ -2240,13 +2314,13 @@ Visit the repository to learn how to contribute:</translation>
         <translation>Form</translation>
     </message>
     <message>
-        <location line="+62"/>
-        <location line="+532"/>
+        <location line="+75"/>
+        <location line="+343"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</source>
         <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the Taler network after a connection is established, but this process has not completed yet.</translation>
     </message>
     <message>
-        <location line="-285"/>
+        <location line="-122"/>
         <source>Watch-only:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2266,17 +2340,17 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-236"/>
+        <location line="-223"/>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
         <translation>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+99"/>
         <source>Immature:</source>
         <translation>Immature:</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-16"/>
         <source>Mined balance that has not yet matured</source>
         <translation>Mined balance that has not yet matured</translation>
     </message>
@@ -2291,7 +2365,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation>Total:</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+48"/>
         <source>Your current total balance</source>
         <translation>Your current total balance</translation>
     </message>
@@ -2306,12 +2380,12 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+195"/>
+        <location line="+32"/>
         <source>Recent transactions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-463"/>
+        <location line="-287"/>
         <source>Unconfirmed transactions to watch-only addresses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2321,12 +2395,13 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+128"/>
+        <location line="+115"/>
         <source>Current total balance in watch-only addresses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+243"/>
+        <location filename="../overviewpage.cpp" line="+440"/>
         <source>Staking</source>
         <translation>Staking</translation>
     </message>
@@ -2377,7 +2452,7 @@ Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../overviewpage.cpp" line="+440"/>
+        <location filename="../overviewpage.cpp" line="+338"/>
         <source>Not staking</source>
         <translation>Not staking</translation>
     </message>
@@ -2392,23 +2467,145 @@ Visit the repository to learn how to contribute:</translation>
         <translation>Stop staking?</translation>
     </message>
     <message>
-        <location line="-231"/>
+        <location line="-558"/>
         <source>Available balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+38"/>
         <source>No transactions yet.
 Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+118"/>
+        <source>Balance looks wrong?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+27"/>
+        <location line="+11"/>
+        <location line="+39"/>
+        <location line="+9"/>
+        <source>Rescan wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-85"/>
+        <source>Search the whole chain again for this wallet&apos;s history, deriving addresses beyond the ones it already knows about</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>The node is still catching up with the network, so a rescan is not possible yet.
+
+Searching an incomplete chain would report a balance that looks believable but is wrong. Wait until the status bar shows the node is up to date, then try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Search the whole chain for this wallet&apos;s history?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Use this when the balance looks lower than it should - typically after restoring a wallet from an older backup, because the wallet does not know about the addresses it used after that backup was taken.
+
+The whole chain is read again and the address list is extended as history is found. This takes several minutes, the wallet cannot be used while it runs, and the wallet must be unlocked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Rescan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Searching the chain for this wallet&apos;s history. This can take several minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The rescan could not be completed.
+
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+9"/>
+        <source>The rescan finished after %n pass(es). The balance above is up to date.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>New round</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Rewards, last 12 months</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+67"/>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+1"/>
+        <source>%n day(s) ago</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Mined today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+1"/>
+        <source>Mined %n day(s) ago</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+4"/>
+        <source>in %n day(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+106"/>
         <source>Wallet: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+88"/>
         <source>Are you sure you want to stop staking?</source>
         <translation>Are you sure you want to stop staking?</translation>
     </message>
@@ -2454,7 +2651,7 @@ Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished">Amount</translation>
     </message>
     <message>
-        <location filename="../guiutil.cpp" line="+82"/>
+        <location filename="../guiutil.cpp" line="+83"/>
         <source>legacy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2479,7 +2676,7 @@ Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+102"/>
         <source>Enter a Taler address (e.g. %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2614,7 +2811,7 @@ Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../guiutil.cpp" line="-881"/>
+        <location filename="../guiutil.cpp" line="-902"/>
         <location filename="../walletmanagerdialog.cpp" line="+6"/>
         <source>That name is reserved by the wallet directory.</source>
         <translation type="unfinished"></translation>
@@ -3330,6 +3527,14 @@ Incoming and outgoing payments will appear here.</source>
     </message>
 </context>
 <context>
+    <name>RewardsChart</name>
+    <message>
+        <location filename="../rewardschart.cpp" line="+101"/>
+        <source>No rewards yet in this wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
@@ -3813,7 +4018,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <location filename="../utilitydialog.cpp" line="+83"/>
+        <location filename="../utilitydialog.cpp" line="+99"/>
         <source>%1 is shutting down...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4353,7 +4558,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+209"/>
+        <location line="+217"/>
         <source>(no label)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4596,7 +4801,7 @@ Once this wallet sends or receives, its history appears here.</source>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+1129"/>
+        <location filename="../bitcoingui.cpp" line="+1230"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4849,7 +5054,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+207"/>
+        <location filename="../walletmodel.cpp" line="+219"/>
         <source>Send Coins</source>
         <translation type="unfinished">Send Coins</translation>
     </message>
@@ -4914,7 +5119,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <translation type="unfinished">Export the data in the current tab to a file</translation>
     </message>
     <message>
-        <location line="+238"/>
+        <location line="+243"/>
         <source>Backup Wallet</source>
         <translation type="unfinished"></translation>
     </message>

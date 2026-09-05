@@ -153,6 +153,14 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
     fi
     _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin)],[-lqminimal])
     AC_DEFINE(QT_QPA_PLATFORM_MINIMAL, 1, [Define this symbol if the minimal qt platform exists])
+    dnl The start-up artwork is JPEG. A static build has no plugin directory to
+    dnl load an image format from, so without this linked in the decoder is simply
+    dnl absent and QPixmap hands back a null image. depends/ always builds it
+    dnl (-qt-libjpeg), so this is here for anyone linking a static system Qt: it is
+    dnl optional because the splash falls back to a plain panel, which is not worth
+    dnl failing a build over.
+    _BITCOIN_QT_CHECK_STATIC_PLUGINS_OPTIONAL([Q_IMPORT_PLUGIN(QJpegPlugin)],[-lqjpeg -lqtlibjpeg],
+      [AC_DEFINE(QT_IMAGEFORMAT_JPEG, 1, [Define this symbol if the static Qt JPEG image plugin is linked in])])
     if test "x$TARGET_OS" = xwindows; then
       _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)],[-lqwindows])
       AC_DEFINE(QT_QPA_PLATFORM_WINDOWS, 1, [Define this symbol if the qt platform is windows])
@@ -352,6 +360,27 @@ dnl Requires: INCLUDES and LIBS must be populated as necessary.
 dnl Inputs: $1: A series of Q_IMPORT_PLUGIN().
 dnl Inputs: $2: The libraries that resolve $1.
 dnl Output: QT_LIBS is prepended or configure exits.
+dnl Internal. Like _BITCOIN_QT_CHECK_STATIC_PLUGINS, but for a plugin the build
+dnl can manage without: on failure it leaves QT_LIBS alone and carries on rather
+dnl than failing configure.
+dnl Inputs: $1: A series of Q_IMPORT_PLUGIN().
+dnl Inputs: $2: The libraries that resolve them.
+dnl Inputs: $3: Run if the plugin resolved.
+dnl Output: QT_LIBS may be prepended with $2 and $3 may have run.
+AC_DEFUN([_BITCOIN_QT_CHECK_STATIC_PLUGINS_OPTIONAL],[
+  AC_MSG_CHECKING(for optional static Qt plugins: $2)
+  CHECK_OPTIONAL_PLUGINS_TEMP_LIBS="$LIBS"
+  LIBS="$2 $QT_LIBS $LIBS"
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    #define QT_STATICPLUGIN
+    #include <QtPlugin>
+    $1]],
+    [[return 0;]])],
+    [AC_MSG_RESULT(yes); QT_LIBS="$2 $QT_LIBS"; $3],
+    [AC_MSG_RESULT(no)])
+  LIBS="$CHECK_OPTIONAL_PLUGINS_TEMP_LIBS"
+])
+
 AC_DEFUN([_BITCOIN_QT_CHECK_STATIC_PLUGINS],[
   AC_MSG_CHECKING(for static Qt plugins: $2)
   CHECK_STATIC_PLUGINS_TEMP_LIBS="$LIBS"
@@ -374,6 +403,11 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
       QT_LIBS="$QT_LIBS -L$qt_plugin_path/platforms"
       if test -d "$qt_plugin_path/accessible"; then
         QT_LIBS="$QT_LIBS -L$qt_plugin_path/accessible"
+      fi
+      dnl The start-up artwork is a JPEG, and the decoder for it is a plugin that
+      dnl lives here rather than in lib/.
+      if test -d "$qt_plugin_path/imageformats"; then
+        QT_LIBS="$QT_LIBS -L$qt_plugin_path/imageformats"
       fi
      if test "x$use_pkgconfig" = xyes; then
      : dnl

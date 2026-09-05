@@ -646,6 +646,42 @@
         <source>Wallet in use</source>
         <translation>Використовуваний гаманець</translation>
     </message>
+    <message>
+        <source>Exit</source>
+        <translation>Вихід</translation>
+    </message>
+    <message>
+        <source>Close Taler</source>
+        <translation>Закрити Taler</translation>
+    </message>
+    <message>
+        <source>Exit Taler</source>
+        <translation>Вихід з Taler</translation>
+    </message>
+    <message>
+        <source>Close Taler?</source>
+        <translation>Закрити Taler?</translation>
+    </message>
+    <message>
+        <source>The node will stop, and this wallet will stop staking until you open it again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation>Вузол буде зупинено, і цей гаманець припинить стейкінг, доки ви не відкриєте його знову. Завершення роботи може зайняти деякий час, доки стан ланцюжка записується на диск.</translation>
+    </message>
+    <message>
+        <source>Stay</source>
+        <translation>Залишитися</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Налаштування</translation>
+    </message>
+    <message>
+        <source>Change how Taler behaves</source>
+        <translation>Змінити налаштування роботи Taler</translation>
+    </message>
+    <message>
+        <source>The node will stop. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation>Вузол буде зупинено. Завершення роботи може зайняти деякий час, доки стан ланцюжка записується на диск.</translation>
+    </message>
 </context>
 <context>
     <name>CoinControlDialog</name>
@@ -893,6 +929,14 @@
     <message>
         <source>Command-line options</source>
         <translation>Параметри командного рядка</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Про програму</translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation>Ліцензія</translation>
     </message>
 </context>
 <context>
@@ -1501,6 +1545,111 @@ Incoming and outgoing payments will appear here.</source>
         <location line="-231"/>
         <source>Available balance</source>
         <translation>Доступний баланс</translation>
+    </message>
+<message>
+        <location line="+103"/>
+        <source>New round</source>
+        <translation>Новий раунд</translation>
+    </message>
+<message>
+        <location line="+16"/>
+        <source>Rewards, last 12 months</source>
+        <translation>Винагороди за останні 12 місяців</translation>
+    </message>
+<message>
+        <location line="+67"/>
+        <source>Never</source>
+        <translation>Ніколи</translation>
+    </message>
+<message>
+        <location line="+3"/>
+        <source>Today</source>
+        <translation>Сьогодні</translation>
+    </message>
+<message>
+        <location line="+9"/>
+        <source>Mined today</source>
+        <translation>Видобуто сьогодні</translation>
+    </message>
+<message>
+        <location line="+5"/>
+        <source>Ready</source>
+        <translation>Готово</translation>
+    </message>
+<message numerus="yes">
+        <location line="+1"/>
+        <source>%n day(s) ago</source>
+        <translation><numerusform>%n день тому</numerusform><numerusform>%n дні тому</numerusform><numerusform>%n днів тому</numerusform></translation>
+    </message>
+<message numerus="yes">
+        <location line="+1"/>
+        <source>Mined %n day(s) ago</source>
+        <translation><numerusform>Видобуто %n день тому</numerusform><numerusform>Видобуто %n дні тому</numerusform><numerusform>Видобуто %n днів тому</numerusform></translation>
+    </message>
+<message numerus="yes">
+        <location line="+4"/>
+        <source>in %n day(s)</source>
+        <translation><numerusform>через %n день</numerusform><numerusform>через %n дні</numerusform><numerusform>через %n днів</numerusform></translation>
+    </message>
+    <message>
+        <source>Balance looks wrong?</source>
+        <translation>Баланс виглядає неправильним?</translation>
+    </message>
+    <message>
+        <source>Rescan wallet</source>
+        <translation>Пересканувати гаманець</translation>
+    </message>
+    <message>
+        <source>Search the whole chain again for this wallet&apos;s history, deriving addresses beyond the ones it already knows about</source>
+        <translation>Заново переглянути весь ланцюжок у пошуках історії цього гаманця, створюючи адреси за межами вже відомих йому</translation>
+    </message>
+    <message>
+        <source>Search the whole chain for this wallet&apos;s history?</source>
+        <translation>Переглянути весь ланцюжок у пошуках історії цього гаманця?</translation>
+    </message>
+    <message>
+        <source>Rescan</source>
+        <translation>Пересканувати</translation>
+    </message>
+    <message>
+        <source>Searching the chain for this wallet&apos;s history. This can take several minutes.</source>
+        <translation>Пошук історії цього гаманця в ланцюжку. Це може зайняти кілька хвилин.</translation>
+    </message>
+    <message>
+        <source>Use this when the balance looks lower than it should - typically after restoring a wallet from an older backup, because the wallet does not know about the addresses it used after that backup was taken.
+
+The whole chain is read again and the address list is extended as history is found. This takes several minutes, the wallet cannot be used while it runs, and the wallet must be unlocked.</source>
+        <translation>Використовуйте це, коли баланс виглядає меншим, ніж має бути — зазвичай після відновлення гаманця зі старої резервної копії, тому що гаманець не знає про адреси, які він використовував після створення цієї копії.
+
+Весь ланцюжок читається заново, а список адрес розширюється в міру знаходження історії. Це займає кілька хвилин, гаманець не можна використовувати під час роботи, і гаманець має бути розблокований.</translation>
+    </message>
+    <message>
+        <source>The rescan could not be completed.
+
+%1</source>
+        <translation>Не вдалося завершити пересканування.
+
+%1</translation>
+    </message>
+    <message numerus="yes">
+        <source>The rescan finished after %n pass(es). The balance above is up to date.</source>
+        <translation>
+            <numerusform>Пересканування завершено за %n прохід. Баланс вище актуальний.</numerusform>
+            <numerusform>Пересканування завершено за %n проходи. Баланс вище актуальний.</numerusform>
+            <numerusform>Пересканування завершено за %n проходів. Баланс вище актуальний.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>The node is still catching up with the network, so a rescan is not possible yet.
+
+Searching an incomplete chain would report a balance that looks believable but is wrong. Wait until the status bar shows the node is up to date, then try again.</source>
+        <translation>Вузол усе ще синхронізується з мережею, тому пересканування поки неможливе.
+
+Пошук по неповному ланцюжку покаже баланс, який виглядає правдоподібно, але є неправильним. Дочекайтеся, коли в рядку стану з&apos;явиться повідомлення про те, що вузол синхронізований, і спробуйте знову.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
     </message>
 </context>
 <context>
@@ -3998,7 +4147,15 @@ Visit the repository to learn how to contribute:</source>
 
 Відвідайте репозиторій, щоб дізнатися, як зробити внесок:</translation>
     </message>
-<message><source>Version</source><translation>Версія</translation></message></context>
+<message><source>Version</source><translation>Версія</translation></message>    <message>
+        <source>Nodes</source>
+        <translation>Вузли</translation>
+    </message>
+    <message>
+        <source>Seed nodes this wallet starts from, and the peers it has found on the network.</source>
+        <translation>Стартові вузли, з яких починає цей гаманець, і учасники мережі, яких він знайшов.</translation>
+    </message>
+</context>
 <context><name>AboutPage</name><message><source>Taler</source><translation>Taler</translation></message><message><source>Project</source><translation>Проект</translation></message><message><source>Website</source><translation>Веб-сайт</translation></message><message><source>GitHub</source><translation>GitHub</translation></message><message><source>GitHub (legacy)</source><translation>GitHub (legacy)</translation></message><message><source>Community</source><translation>Спільнота</translation></message><message><source>Telegram: @talercommunity</source><translation>Telegram: @talercommunity</translation></message><message><source>Network</source><translation>Мережа</translation></message><message><source>Seed Nodes</source><translation>Seed Nodes</translation></message><message><source>Explorer (talercoin.org)</source><translation>Explorer (talercoin.org)</translation></message><message><source>Explorer (talercrypto.com)</source><translation>Explorer (talercrypto.com)</translation></message><message><source>Development</source><translation>Розробка</translation></message><message><source>Issue Tracker</source><translation>Трекер задач</translation></message><message><source>Change Log</source><translation>Журнал змін</translation></message><message><source>App Name</source><translation>Назва програми</translation></message><message><source>Version</source><translation>Версія</translation></message><message><source>Telegram</source><translation>Telegram</translation></message><message><source>Explorer</source><translation>Explorer</translation></message></context><context><name>CoinsTableModel</name><message><source>Transaction</source><translation /></message><message><source>Index</source><translation /></message><message><source>Address</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Destination address of the output.</source><translation /></message><message><source>Original transaction id.</source><translation /></message><message><source>Original transaction id index.</source><translation /></message><message><source>Age of the transaction in days.</source><translation /></message><message><source>Balance of the output.</source><translation /></message><message><source>Coin age in the output.</source><translation /></message></context><context><name>CoinsView</name><message><source>transaction is too young</source><translation /></message><message><source>transaction is mature</source><translation /></message><message><source>transaction has reached maximum probability</source><translation /></message><message><source>Copy address</source><translation /></message><message><source>Copy transaction id</source><translation /></message><message><source>Refresh</source><translation /></message><message><source>Export Minting Data</source><translation /></message><message><source>Comma separated file (*.csv)</source><translation /></message><message><source>Address</source><translation /></message><message><source>Transaction</source><translation /></message><message><source>Transaction Index</source><translation /></message><message><source>Age</source><translation /></message><message><source>CoinDay</source><translation /></message><message><source>Balance</source><translation /></message><message><source>Error exporting</source><translation /></message><message><source>Could not write to file %1.</source><translation /></message></context><context><name>bitcoin-core</name><message><source>Taler</source><translation /></message><message><source>abkv (https://github.com/abkvme) for %s</source><translation /></message><message><source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source><translation /></message><message><source>Can't generate a change-address key. Private keys are disabled for this wallet.</source><translation /></message><message><source>Cannot obtain a lock on data directory %s. %s is probably already running.</source><translation /></message><message><source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source><translation /></message><message><source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source><translation /></message><message><source>Distributed under the MIT software license, see the accompanying file %s or %s</source><translation /></message><message><source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source><translation /></message><message><source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source><translation /></message><message><source>Error: Listening for incoming connections failed (listen returned error %s)</source><translation /></message><message><source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source><translation /></message><message><source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source><translation /></message><message><source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source><translation /></message><message><source>Please contribute if you find %s useful. Visit %s for further information about the software.</source><translation /></message><message><source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source><translation /></message><message><source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source><translation /></message><message><source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source><translation /></message><message><source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source><translation /></message><message><source>The transaction amount is too small to send after the fee has been deducted</source><translation /></message><message><source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source><translation /></message><message><source>This is the transaction fee you may discard if change is smaller than dust at this level</source><translation /></message><message><source>This is the transaction fee you may pay when fee estimates are not available.</source><translation /></message><message><source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source><translation /></message><message><source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source><translation /></message><message><source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source><translation /></message><message><source>Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source><translation /></message><message><source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source><translation /></message><message><source>Warning: Private keys detected in wallet {%s} with disabled private keys</source><translation /></message><message><source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source><translation /></message><message><source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source><translation /></message><message><source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source><translation /></message><message><source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source><translation /></message><message><source>%s corrupt, salvage failed</source><translation /></message><message><source>%s is set very high!</source><translation /></message><message><source>-maxmempool must be at least %d MB</source><translation /></message><message><source>Cannot downgrade wallet</source><translation /></message><message><source>Cannot resolve -%s address: '%s'</source><translation /></message><message><source>Cannot write to data directory '%s'; check permissions.</source><translation /></message><message><source>Change index out of range</source><translation /></message><message><source>Copyright (C) %i-%i</source><translation /></message><message><source>Corrupted block database detected</source><translation /></message><message><source>Do you want to rebuild the block database now?</source><translation /></message><message><source>Done loading</source><translation /></message><message><source>Error creating %s: You can't create non-HD wallets with this version.</source><translation /></message><message><source>Error initializing block database</source><translation /></message><message><source>Error initializing wallet database environment %s!</source><translation /></message><message><source>Error loading %s</source><translation /></message><message><source>Error loading %s: Private keys can only be disabled during creation</source><translation /></message><message><source>Error loading %s: Wallet corrupted</source><translation /></message><message><source>Error loading %s: Wallet requires newer version of %s</source><translation /></message><message><source>Error loading %s: You can't disable HD on an already existing HD wallet</source><translation /></message><message><source>Error loading block database</source><translation /></message><message><source>Error loading wallet %s. Duplicate -wallet filename specified.</source><translation /></message><message><source>Error opening block database</source><translation /></message><message><source>Error reading from database, shutting down.</source><translation /></message><message><source>Error upgrading chainstate database</source><translation /></message><message><source>Error</source><translation /></message><message><source>Error: A fatal internal error occurred, see debug.log for details</source><translation /></message><message><source>Error: Disk space is low!</source><translation /></message><message><source>Failed to listen on any port. Use -listen=0 if you want this.</source><translation /></message><message><source>Failed to rescan the wallet during initialization</source><translation /></message><message><source>Fee exceeds maximum configured by -maxtxfee</source><translation /></message><message><source>Importing...</source><translation /></message><message><source>Incorrect or no genesis block found. Wrong datadir for network?</source><translation /></message><message><source>Information</source><translation /></message><message><source>Initialization sanity check failed. %s is shutting down.</source><translation /></message><message><source>Insufficient funds</source><translation /></message><message><source>Invalid -onion address or hostname: '%s'</source><translation /></message><message><source>Invalid -proxy address or hostname: '%s'</source><translation /></message><message><source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source><translation /></message><message><source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source><translation /></message><message><source>Invalid netmask specified in -whitelist: '%s'</source><translation /></message><message><source>Keypool ran out, please call keypoolrefill first</source><translation /></message><message><source>Loading P2P addresses...</source><translation /></message><message><source>Loading banlist...</source><translation /></message><message><source>Loading block index...</source><translation /></message><message><source>Loading wallet...</source><translation /></message><message><source>Need to specify a port with -whitebind: '%s'</source><translation /></message><message><source>Not enough file descriptors available.</source><translation /></message><message><source>Prune cannot be configured with a negative value.</source><translation /></message><message><source>Prune mode is incompatible with -txindex.</source><translation /></message><message><source>Pruning blockstore...</source><translation /></message><message><source>Reducing -maxconnections from %d to %d, because of system limitations.</source><translation /></message><message><source>Replaying blocks...</source><translation /></message><message><source>Rescanning...</source><translation /></message><message><source>Signing transaction failed</source><translation /></message><message><source>Specified -walletdir "%s" does not exist</source><translation /></message><message><source>Specified -walletdir "%s" is a relative path</source><translation /></message><message><source>Specified -walletdir "%s" is not a directory</source><translation /></message><message><source>Starting network threads...</source><translation /></message><message><source>The source code is available from %s.</source><translation /></message><message><source>The transaction amount is too small to pay the fee</source><translation /></message><message><source>The wallet will avoid paying less than the minimum relay fee.</source><translation /></message><message><source>This is experimental software.</source><translation /></message><message><source>This is the minimum transaction fee you pay on every transaction.</source><translation /></message><message><source>This is the transaction fee you will pay if you send a transaction.</source><translation /></message><message><source>Transaction amount too small</source><translation /></message><message><source>Transaction amounts must not be negative</source><translation /></message><message><source>Transaction fee and change calculation failed</source><translation /></message><message><source>Transaction has too long of a mempool chain</source><translation /></message><message><source>Transaction must have at least one recipient</source><translation /></message><message><source>Transaction too large for fee policy</source><translation /></message><message><source>Transaction too large</source><translation /></message><message><source>Unable to bind to %s on this computer (bind returned error %s)</source><translation /></message><message><source>Unable to bind to %s on this computer. %s is probably already running.</source><translation /></message><message><source>Unable to generate initial keys</source><translation /></message><message><source>Unable to generate keys</source><translation /></message><message><source>Unable to start HTTP server. See debug log for details.</source><translation /></message><message><source>Unknown network specified in -onlynet: '%s'</source><translation /></message><message><source>Unsupported argument -benchmark ignored, use -debug=bench.</source><translation /></message><message><source>Unsupported argument -debugnet ignored, use -debug=net.</source><translation /></message><message><source>Unsupported argument -tor found, use -onion.</source><translation /></message><message><source>Unsupported logging category %s=%s.</source><translation /></message><message><source>User Agent comment (%s) contains unsafe characters.</source><translation /></message><message><source>Verifying blocks...</source><translation /></message><message><source>Verifying wallet(s)...</source><translation /></message><message><source>Wallet %s resides outside wallet directory %s</source><translation /></message><message><source>Wallet needed to be rewritten: restart %s to complete</source><translation /></message><message><source>Warning</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -addressindex</source><translation /></message><message><source>You need to rebuild the database using -reindex to change -txindex</source><translation /></message><message><source>Zapping all transactions from wallet...</source><translation /></message><message>
         <location line="+3"/>
         <source>-newwalletmnemonic: %s already exists. Refusing to overwrite it - it may hold a recovery phrase.</source>
@@ -4557,6 +4714,21 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <location line="+34"/>
         <source>The legacy wallet cannot be renamed: its name is what the node resolves by default, and changing it would leave talerd creating an empty wallet in its place.</source>
         <translation>Гаманець legacy не можна перейменувати: його ім'я — це те, що вузол використовує за замовчуванням, і його зміна призвела б до створення talerd порожнього гаманця замість нього.</translation>
+    </message>
+</context>
+<context>
+    <name>RewardsChart</name>
+<message>
+        <location filename="../rewardschart.cpp" line="+101"/>
+        <source>No rewards yet in this wallet</source>
+        <translation>У цьому гаманці ще немає винагород</translation>
+    </message>
+</context>
+<context>
+    <name>BrandBanner</name>
+    <message>
+        <source>Open %1</source>
+        <translation>Відкрити %1</translation>
     </message>
 </context>
 </TS>

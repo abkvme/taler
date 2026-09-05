@@ -161,7 +161,7 @@ QString ClientModel::formatFullVersion() const
 
 QString ClientModel::formatSubVersion() const
 {
-    return QString::fromStdString(strSubVersion);
+    return QString::fromStdString(GetSubVersion());
 }
 
 bool ClientModel::isReleaseVersion() const

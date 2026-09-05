@@ -531,8 +531,15 @@ extern bool fRelayTxes;
 
 extern limitedmap<uint256, int64_t> mapAlreadyAskedFor;
 
-/** Subversion as sent to the P2P network in `version` messages */
-extern std::string strSubVersion;
+/** Subversion as sent to the P2P network in `version` messages.
+ *
+ * Not a bare global any more: a sidecar can register or deregister while the node
+ * is running, so this is written by the scheduler and an RPC thread while the
+ * message handlers read it to compose handshakes. Go through these two, never
+ * the variable. See useragent.h for what the string is made of.
+ */
+std::string GetSubVersion();
+void SetSubVersion(const std::string& subversion);
 
 struct LocalServiceInfo {
     int nScore;

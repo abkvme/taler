@@ -7,6 +7,8 @@
 
 #include <qt/bitcoinunits.h>
 
+#include <qt/rewardsummary.h>
+
 #include <QAbstractTableModel>
 #include <QStringList>
 
@@ -75,6 +77,14 @@ public:
         /** Unprocessed icon */
         RawDecorationRole,
     };
+
+    //! Block rewards this wallet has received, bucketed by month.
+    //!
+    //! Walks the cached records directly rather than going through index()/data():
+    //! that path try-locks cs_wallet twice per row to refresh a transaction's
+    //! status, and none of the fields used here - time, type, isPoS, credit - can
+    //! change with it.
+    RewardSummary summariseRewards(const QDateTime& now) const;
 
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;

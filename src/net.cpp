@@ -89,7 +89,20 @@ bool fRelayTxes = true;
 CCriticalSection cs_mapLocalHost;
 std::map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfLimited[NET_MAX] = {};
-std::string strSubVersion;
+static CCriticalSection cs_subVersion;
+static std::string strSubVersion GUARDED_BY(cs_subVersion);
+
+std::string GetSubVersion()
+{
+    LOCK(cs_subVersion);
+    return strSubVersion;
+}
+
+void SetSubVersion(const std::string& subversion)
+{
+    LOCK(cs_subVersion);
+    strSubVersion = subversion;
+}
 
 limitedmap<uint256, int64_t> mapAlreadyAskedFor(MAX_INV_SZ);
 

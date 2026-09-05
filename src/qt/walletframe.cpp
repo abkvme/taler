@@ -268,6 +268,14 @@ void WalletFrame::usedReceivingAddresses()
         walletView->usedReceivingAddresses();
 }
 
+bool WalletFrame::anyWalletStaking()
+{
+    for (WalletView* const view : mapWalletViews) {
+        if (view && view->getWalletModel() && view->getWalletModel()->isStaking()) return true;
+    }
+    return false;
+}
+
 WalletView *WalletFrame::currentWalletView()
 {
     return qobject_cast<WalletView*>(walletStack->currentWidget());

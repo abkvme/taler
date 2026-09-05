@@ -57,6 +57,17 @@
         <file alias="proxy">res/icons/proxy.png</file>
         <file alias="tab_coins">res/icons/tab_coins.png</file>
     </qresource>
+    <qresource prefix="/images">
+        <!-- Start-up artwork, one per language, chosen by the UI language with
+             English as the fallback. 1200x800 covers the 600x400 splash on a
+             retina display, and JPEG rather than PNG because these are
+             photographic gradients: 663KB for the three instead of 2.7MB, with
+             no visible difference. Needs the Qt JPEG plugin, which configure
+             links in - see QT_IMAGEFORMAT_JPEG. -->
+        <file alias="splash_en">res/images/splash-en.jpg</file>
+        <file alias="splash_ru">res/images/splash-ru.jpg</file>
+        <file alias="splash_be">res/images/splash-be.jpg</file>
+    </qresource>
     <qresource prefix="/movies">
         <file alias="spinner-000">res/movies/spinner-000.png</file>
         <file alias="spinner-001">res/movies/spinner-001.png</file>

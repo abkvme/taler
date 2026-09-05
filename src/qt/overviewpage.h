@@ -7,17 +7,22 @@
 
 #include <interfaces/wallet.h>
 
+#include <qt/rewardsummary.h>
+
 #include <cstdint>
 
 #include <QFrame>
 #include <QLabel>
 #include <QWidget>
+
+class QPushButton;
 #include <memory>
 
 class ClientModel;
 class TransactionFilterProxy;
 class TxViewDelegate;
 class PlatformStyle;
+class RewardsChart;
 class WalletModel;
 
 namespace Ui {
@@ -54,9 +59,15 @@ Q_SIGNALS:
 
 private:
     void updateTransactionsPlaceholder();
+    void buildRecoveryRow();
+
+private Q_SLOTS:
+    /** Full rescan with a widening address window - see recoverwallet. */
+    void recoverBalance();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     QLabel* m_empty_transactions = nullptr;
@@ -65,6 +76,26 @@ private:
     QFrame* m_balance_badge = nullptr;
     QLabel* m_badge_caption = nullptr;
     QLabel* m_badge_value = nullptr;
+
+    //! Bottom of the Balances card: the way out when the balance looks wrong.
+    QWidget* m_recovery_row = nullptr;
+    QPushButton* m_recovery_button = nullptr;
+    QLabel* m_recovery_hint = nullptr;
+
+    //! Right column: how this wallet is earning, and whether it can start again.
+    QFrame* m_staking_badge = nullptr;
+    QLabel* m_staking_badge_title = nullptr;
+    QLabel* m_staking_badge_value = nullptr;
+    QLabel* m_staking_badge_hint = nullptr;
+    QFrame* m_ready_badge = nullptr;
+    QLabel* m_ready_badge_title = nullptr;
+    QLabel* m_ready_badge_value = nullptr;
+    QFrame* m_rewards_card = nullptr;
+    QLabel* m_rewards_total = nullptr;
+    RewardsChart* m_rewards_chart = nullptr;
+    //! Coalesces model churn - a rescan inserts rows by the thousand.
+    QTimer* m_rewards_timer = nullptr;
+    RewardSummary m_rewards;
 
     Ui::OverviewPage *ui;
     ClientModel *clientModel;
@@ -78,6 +109,8 @@ private:
     int64_t stakingDurationSeconds;
 
     QString formatStakingRemaining(int64_t seconds) const;
+    void buildRewardsColumn();
+    void applyBadgeState(QWidget* badge, const char* state);
 
 private Q_SLOTS:
     void updateDisplayUnit();
@@ -89,6 +122,10 @@ private Q_SLOTS:
     void onStopStakingClicked();
     void updateStakingUi();
     void tickStakingTimer();
+    //! Recompute the reward badges and chart from the transaction model.
+    void refreshRewards();
+    //! Ask for a recompute once the model has stopped changing.
+    void scheduleRewardsRefresh();
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H

@@ -16,6 +16,7 @@
 #include <init.h>
 #include <noui.h>
 #include <shutdown.h>
+#include <useragent.h>
 #include <util.h>
 #include <httpserver.h>
 #include <httprpc.h>
@@ -185,6 +186,7 @@ static bool AppInit(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
+    useragent::SetRunMode(useragent::RunMode::Server);
     SetupEnvironment();
 
     // Connect bitcoind signal handlers

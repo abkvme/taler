@@ -72,6 +72,9 @@ class WalletMnemonicTest(BitcoinTestFramework):
         self.log.info("Encryption keeps the phrase and its addresses intact")
         self.check_encryption_preserves_derivation(node)
 
+        self.log.info("Restoring with a passphrase works and leaves the wallet locked")
+        self.check_restore_with_passphrase(node)
+
         self.log.info("An imported key marks the wallet as not fully recoverable")
         self.check_imported_keys_flagged(node)
 
@@ -202,6 +205,34 @@ class WalletMnemonicTest(BitcoinTestFramework):
         node.restorewallet('encrypted_restored', case['mnemonic'])
         restored = node.get_wallet_rpc('encrypted_restored')
         assert_equal([restored.getnewaddress() for _ in range(3)], before)
+
+    def check_restore_with_passphrase(self, node):
+        """A restore that sets a passphrase has to work, and end up locked.
+
+        Encrypting leaves the wallet locked, and a locked keypool cannot be
+        topped up - so the look-ahead window could not be derived, the scan found
+        nothing, and the whole restore failed with "Unable to derive the
+        look-ahead addresses". The Restore dialog sends a passphrase whenever the
+        user does not tick "no passphrase", which made it the common path.
+        """
+        case = self.vectors['cases'][2]
+        expected = [e['address'] for e in case['networks']['regtest']['chains']['external'][:8]]
+
+        result = node.restorewallet('restored_encrypted', case['mnemonic'], 0, None, 'passphrase')
+        assert_greater_than(result['gap_limit'], 0)
+
+        w = node.get_wallet_rpc('restored_encrypted')
+        # Locked when handed back: the passphrase was the point of asking for one.
+        assert_equal(w.getwalletinfo()['unlocked_until'], 0)
+        assert_raises_rpc_error(-13, "passphrase", w.getwalletmnemonic)
+
+        w.walletpassphrase('passphrase', 30)
+        assert_equal(w.getwalletmnemonic(), case['mnemonic'])
+        # Membership, not position: encrypting rebuilds the keypool, so which
+        # index comes out first depends on -keypool, which the test framework
+        # pins to 1. What matters is that the addresses come from this phrase.
+        for address in [w.getnewaddress() for _ in range(3)]:
+            assert address in expected, "%s is not derived from the restored phrase" % address
 
     def check_imported_keys_flagged(self, node):
         """A key that came from outside the phrase cannot be recovered by it.
