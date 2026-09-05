@@ -1855,9 +1855,41 @@ void CConnman::ThreadDNSAddressSeed()
                     found++;
                 }
                 addrman.Add(vAdd, resolveSource);
+            } else if (LookupHost(seed.c_str(), vIPs, nMaxIPs, true)) {
+                // The prefixed name did not resolve, so this seed is a plain A
+                // record rather than seeder software that answers x<bits>.
+                // queries. Taler's seeds are exactly that, which is why this path
+                // used to find nothing and every new node fell back to the two
+                // compiled-in addresses.
+                //
+                // Upstream deliberately declines to use such seeds directly,
+                // because their addresses carry no service-bit guarantee. That
+                // reasoning is sound for a network with dozens of maintained
+                // seeders and weaker for one with three: an address that turns
+                // out not to serve blocks costs a handshake and is dropped, while
+                // having no addresses at all costs a node its start. The same
+                // trade is already made in FetchRemoteSeeds(), which resolves the
+                // bare hostnames from bootstrap.json.
+                //
+                // The addresses are added as NODE_NONE rather than claiming
+                // service bits nobody verified.
+                CNetAddr bareSource;
+                if (!bareSource.SetInternal(seed)) {
+                    continue;
+                }
+                for (const CNetAddr& ip : vIPs) {
+                    int nOneDay = 24*3600;
+                    CAddress addr = CAddress(CService(ip, Params().GetDefaultPort()), NODE_NONE);
+                    addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay);
+                    vAdd.push_back(addr);
+                    found++;
+                }
+                addrman.Add(vAdd, bareSource);
+                LogPrintf("DNS seed %s answered %u addresses without service-bit filtering\n",
+                          seed, (unsigned int)vIPs.size());
             } else {
-                // We now avoid directly using results from DNS Seeds which do not support service bit filtering,
-                // instead using them as a oneshot to get nodes with our desired service bits.
+                // Resolves as neither. Fall back to a one-shot connection, which
+                // at least asks it for addresses before hanging up.
                 AddOneShot(seed);
             }
         }

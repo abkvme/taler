@@ -932,7 +932,7 @@
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+530"/>
+        <location filename="../bitcoin.cpp" line="+531"/>
         <source>A fatal error occurred. Taler can no longer continue safely and will quit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1429,7 +1429,7 @@
 <context>
     <name>InfoPage</name>
     <message>
-        <location filename="../infopage.cpp" line="+161"/>
+        <location filename="../infopage.cpp" line="+228"/>
         <source>Refresh</source>
         <translation>Refresh</translation>
     </message>
@@ -1464,34 +1464,64 @@
         <translation>Discovered Peers</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+9"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+0"/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>API</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
         <source>Maintained by abkvme, 2025-2026</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+121"/>
+        <location line="+65"/>
+        <source>Resolved IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+78"/>
         <source>Unavailable - remote seed list could not be fetched</source>
         <translation>Unavailable - remote seed list could not be fetched</translation>
     </message>
     <message>
-        <location line="-136"/>
-        <location line="+56"/>
+        <location line="+143"/>
+        <source>Resolves to %1 and is answering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Resolves to %1 but is not answering on the peer-to-peer port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Does not resolve - this seed cannot be used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-309"/>
+        <location line="+81"/>
         <source>Node</source>
         <translation>Node</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location line="+56"/>
+        <location line="-81"/>
+        <location line="+81"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-41"/>
         <source>Contribute Your Node</source>
         <translation>Contribute Your Node</translation>
     </message>
@@ -1507,6 +1537,46 @@ Visit the repository to learn how to contribute:</source>
 This helps other Taler nodes discover peers and strengthens the network.
 
 Visit the repository to learn how to contribute:</translation>
+    </message>
+    <message>
+        <source>Reported by the seed itself: %1</source>
+        <translation>Reported by the seed itself: %1</translation>
+    </message>
+    <message>
+        <source>Mode: %1</source>
+        <translation>Mode: %1</translation>
+    </message>
+    <message>
+        <source>API: %1</source>
+        <translation>API: %1</translation>
+    </message>
+    <message>
+        <source>The seed did not complete a version handshake</source>
+        <translation>The seed did not complete a version handshake</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>From</translation>
+    </message>
+    <message>
+        <source>%1 embedded seed    %2 community seed    no marker: found by the node itself</source>
+        <translation>%1 embedded seed    %2 community seed    no marker: found by the node itself</translation>
+    </message>
+    <message>
+        <source>An embedded seed - compiled into this wallet</source>
+        <translation>An embedded seed - compiled into this wallet</translation>
+    </message>
+    <message>
+        <source>An embedded seed, also listed as a community seed</source>
+        <translation>An embedded seed, also listed as a community seed</translation>
+    </message>
+    <message>
+        <source>A community seed - from the seed list on GitHub</source>
+        <translation>A community seed - from the seed list on GitHub</translation>
+    </message>
+    <message>
+        <source>Found by the node itself, not from a seed list</source>
+        <translation>Found by the node itself, not from a seed list</translation>
     </message>
 </context>
 <context>
@@ -2401,7 +2471,7 @@ Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
         <location line="+243"/>
-        <location filename="../overviewpage.cpp" line="+440"/>
+        <location filename="../overviewpage.cpp" line="+485"/>
         <source>Staking</source>
         <translation>Staking</translation>
     </message>
@@ -2452,7 +2522,7 @@ Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../overviewpage.cpp" line="+338"/>
+        <location filename="../overviewpage.cpp" line="+355"/>
         <source>Not staking</source>
         <translation>Not staking</translation>
     </message>
@@ -2467,18 +2537,23 @@ Visit the repository to learn how to contribute:</translation>
         <translation>Stop staking?</translation>
     </message>
     <message>
-        <location line="-558"/>
+        <location line="-620"/>
         <source>Available balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+39"/>
         <source>No transactions yet.
 Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+118"/>
+        <location line="+125"/>
+        <source>An API sidecar is registered with this node and is reported to the network as part of its version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
         <source>Balance looks wrong?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2605,9 +2680,13 @@ The whole chain is read again and the address list is extended as history is fou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+88"/>
+        <location line="+105"/>
         <source>Are you sure you want to stop staking?</source>
         <translation>Are you sure you want to stop staking?</translation>
+    </message>
+    <message>
+        <source>API: %1</source>
+        <translation>API: %1</translation>
     </message>
 </context>
 <context>
@@ -2791,7 +2870,7 @@ The whole chain is read again and the address list is extended as history is fou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+164"/>
+        <location filename="../bitcoin.cpp" line="+168"/>
         <source>%1 didn&apos;t yet exit safely...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2829,6 +2908,11 @@ The whole chain is read again and the address list is extended as history is fou
     <message>
         <location filename="../asyncrpc.cpp" line="+37"/>
         <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../infopage.cpp" line="+27"/>
+        <source>Checking…</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5293,7 +5377,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
     </message>
     <message>
         <location line="+4"/>
-        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <source>Total length of network version string exceeds the maximum: %s. Reduce the number or size of uacomments.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

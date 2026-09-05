@@ -128,6 +128,9 @@ public:
     //! Get num blocks.
     virtual int getNumBlocks() = 0;
 
+    //! The registered API sidecar as "name:version", or empty when there is none.
+    virtual std::string getSidecar() = 0;
+
     //! Get last block time.
     virtual int64_t getLastBlockTime() = 0;
 

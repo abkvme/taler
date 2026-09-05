@@ -60,6 +60,8 @@ Q_SIGNALS:
 private:
     void updateTransactionsPlaceholder();
     void buildRecoveryRow();
+    void buildTopRow();
+    void refreshApiLabel();
 
 private Q_SLOTS:
     /** Full rescan with a widening address window - see recoverwallet. */
@@ -76,6 +78,11 @@ private:
     QFrame* m_balance_badge = nullptr;
     QLabel* m_badge_caption = nullptr;
     QLabel* m_badge_value = nullptr;
+
+    //! Right-hand end of the wallet bar: shown only while a sidecar is registered.
+    QWidget* m_top_row = nullptr;
+    QLabel* m_api_label = nullptr;
+    QTimer* m_api_timer = nullptr;
 
     //! Bottom of the Balances card: the way out when the balance looks wrong.
     QWidget* m_recovery_row = nullptr;

@@ -21,6 +21,7 @@
 #include <primitives/block.h>
 #include <rpc/server.h>
 #include <scheduler.h>
+#include <sidecar.h>
 #include <shutdown.h>
 #include <sync.h>
 #include <txmempool.h>
@@ -164,6 +165,12 @@ class NodeImpl : public Node
     {
         LOCK(::cs_main);
         return ::chainActive.Height();
+    }
+    std::string getSidecar() override
+    {
+        const sidecar::Registration registration = sidecar::Current();
+        if (!registration.registered) return {};
+        return registration.name + ":" + registration.version;
     }
     int64_t getLastBlockTime() override
     {

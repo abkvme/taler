@@ -189,6 +189,21 @@ QLabel[class="heroBalance"] {
     color: %TEXT%;
     padding: 2px 0;
 }
+/* The API sidecar chip on the wallet bar.
+   Light grey in both themes rather than a theme token: it is a badge, and a
+   badge that changes colour with the theme stops reading as one. Grey because
+   the sidecar being present is a fact, not a status - green or blue would ask
+   the reader to react to it. The text colour is fixed to match, since a light
+   chip needs dark text whichever theme is behind it. */
+QLabel[class="apiTag"] {
+    background: #dfe3e9;
+    color: #2b3038;
+    border: none;
+    border-radius: 9px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
 QLabel[class="secondaryCaption"] { color: %MUTED%; }
 QLabel[class="secondaryValue"] { color: %TEXT%; }
 QLabel[class="emptyState"] {

@@ -200,6 +200,7 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // Labels on the left, figures on the right: a column of amounts is read down
     // its last digit, which only works if they share a right edge.
     ui->gridLayout->setColumnStretch(1, 1);
+    buildTopRow();
     buildRecoveryRow();
 
     buildRewardsColumn();
@@ -323,6 +324,51 @@ QFrame* MakeStatusBadge(QWidget* parent, QLabel** title, QLabel** value, QLabel*
 //! an older backup, which never knew about the addresses it used since - looks
 //! exactly like a correct wallet from the inside, so there is nothing for the
 //! application to detect and no moment at which to reveal a hidden button.
+//! The row above the balance: the wallet bar, and the API sidecar at its far end.
+//!
+//! The sidecar note is a small grey chip at the far right of the wallet bar.
+//! Grey and not a status colour on purpose: a registered sidecar is a fact about
+//! the node, not something anyone needs to act on, and it must not compete with
+//! the balance beneath it. Absent entirely when no sidecar is registered - a
+//! permanent "API: none" would be noise on every screen to report that nothing
+//! happened.
+void OverviewPage::buildTopRow()
+{
+    m_top_row = new QWidget(this);
+    QHBoxLayout* row = new QHBoxLayout(m_top_row);
+    row->setContentsMargins(0, 0, 0, 0);
+    row->setSpacing(8);
+    // The wallet bar is inserted at the front of this when it arrives; the
+    // stretch between them keeps the sidecar note against the right edge.
+    row->addStretch(1);
+
+    m_api_label = new QLabel(m_top_row);
+    m_api_label->setProperty("class", "apiTag");
+    m_api_label->setToolTip(tr("An API sidecar is registered with this node and is "
+                               "reported to the network as part of its version"));
+    m_api_label->setVisible(false);
+    row->addWidget(m_api_label, 0, Qt::AlignVCenter);
+
+    if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
+        page->insertWidget(0, m_top_row);
+    }
+}
+
+void OverviewPage::refreshApiLabel()
+{
+    if (!m_api_label || !walletModel) return;
+
+    const QString sidecar = QString::fromStdString(walletModel->node().getSidecar());
+    if (sidecar.isEmpty()) {
+        m_api_label->setVisible(false);
+        return;
+    }
+    // Reported as "name:version"; the label says API itself, so show the version.
+    const int colon = sidecar.indexOf(QChar(':'));
+    m_api_label->setText(tr("API: %1").arg(colon >= 0 ? sidecar.mid(colon + 1) : sidecar));
+    m_api_label->setVisible(true);
+}
+
 void OverviewPage::buildRecoveryRow()
 {
     m_recovery_row = new QWidget(this);
@@ -572,8 +618,8 @@ void OverviewPage::setWalletBar(QWidget* bar)
     // The bar is shared between wallet views, so it arrives here already parented to
     // another page. Inserting it into this layout reparents it and Qt drops it from
     // the previous one; the label it stands in for is hidden while it is present.
-    if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
-        page->insertWidget(0, bar);
+    if (QBoxLayout* row = m_top_row ? qobject_cast<QBoxLayout*>(m_top_row->layout()) : nullptr) {
+        row->insertWidget(0, bar);
         bar->show();
     }
     m_wallet_bar_shown = true;
@@ -655,6 +701,23 @@ void OverviewPage::setWalletModel(WalletModel *model)
         m_wallet_name_label->setVisible(model != nullptr && !m_wallet_bar_shown);
     }
     this->walletModel = model;
+
+    // Poll for the sidecar rather than wait for a signal: it registers and lapses
+    // in the node, on its own schedule, with nothing to notify the GUI. The check
+    // is a mutex read, so five seconds is generous.
+    if (!m_api_timer) {
+        m_api_timer = new QTimer(this);
+        m_api_timer->setInterval(5000);
+        connect(m_api_timer, &QTimer::timeout, this, &OverviewPage::refreshApiLabel);
+    }
+    if (model) {
+        refreshApiLabel();
+        m_api_timer->start();
+    } else {
+        m_api_timer->stop();
+        if (m_api_label) m_api_label->setVisible(false);
+    }
+
     if(model && model->getOptionsModel())
     {
         // Set up transaction list

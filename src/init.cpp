@@ -1752,6 +1752,10 @@ bool AppInitMain()
     // A sidecar that stops answering should stop being advertised.
     sidecar::StartExpiryTask(scheduler);
 
+    // And when what we advertise changes, existing peers have to be given a
+    // chance to hear it - the agent is only ever sent during a handshake.
+    useragent::StartConnectionRefreshTask(scheduler);
+
 #ifdef ENABLE_WALLET
     if (gArgs.GetBoolArg("-gen", false)) { generateCoin (7); } else
         if (gArgs.GetBoolArg("-stakegen", true)) { generateCoin (0); }

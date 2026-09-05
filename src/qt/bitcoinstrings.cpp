@@ -89,8 +89,8 @@ QT_TRANSLATE_NOOP("bitcoin-core", ""
 "the OpenSSL Toolkit %s and cryptographic software written by Eric Young and "
 "UPnP software written by Thomas Bernard."),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
-"Total length of network version string (%i) exceeds maximum length (%i). "
-"Reduce the number or size of uacomments."),
+"Total length of network version string exceeds the maximum: %s. Reduce the "
+"number or size of uacomments."),
 QT_TRANSLATE_NOOP("bitcoin-core", ""
 "Unable to replay blocks. You will need to rebuild the database using "
 "-reindex-chainstate."),
