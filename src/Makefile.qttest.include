@@ -9,6 +9,7 @@ TEST_QT_MOC_CPP = \
   qt/test/moc_compattests.cpp \
   qt/test/moc_rewardsummarytests.cpp \
   qt/test/moc_splashtests.cpp \
+  qt/test/moc_updatecheckertests.cpp \
   qt/test/moc_rpcnestedtests.cpp \
   qt/test/moc_uritests.cpp
 
@@ -24,6 +25,7 @@ TEST_QT_H = \
   qt/test/compattests.h \
   qt/test/rewardsummarytests.h \
   qt/test/splashtests.h \
+  qt/test/updatecheckertests.h \
   qt/test/rpcnestedtests.h \
   qt/test/uritests.h \
   qt/test/util.h \
@@ -42,6 +44,7 @@ qt_test_test_bitcoin_qt_SOURCES = \
   qt/test/compattests.cpp \
   qt/test/rewardsummarytests.cpp \
   qt/test/splashtests.cpp \
+  qt/test/updatecheckertests.cpp \
   qt/test/rpcnestedtests.cpp \
   qt/test/test_main.cpp \
   qt/test/uritests.cpp \

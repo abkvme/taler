@@ -15,6 +15,7 @@
 
 class BanTableModel;
 class OptionsModel;
+class UpdateChecker;
 class PeerTableModel;
 
 class CBlockIndex;
@@ -55,6 +56,8 @@ public:
     OptionsModel *getOptionsModel();
     PeerTableModel *getPeerTableModel();
     BanTableModel *getBanTableModel();
+    //! Whether a newer release is out; shared by every wallet's home screen.
+    UpdateChecker *getUpdateChecker();
 
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
@@ -90,6 +93,7 @@ private:
     OptionsModel *optionsModel;
     PeerTableModel *peerTableModel;
     BanTableModel *banTableModel;
+    UpdateChecker *updateChecker;
 
     QTimer *pollTimer;
 

@@ -38,6 +38,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkForUpdates">
+         <property name="toolTip">
+          <string>Once a day, ask the project's release page on GitHub whether a newer version is available, and show it on the home screen. Nothing is downloaded or installed. The request goes through the proxy configured on the Network tab, if any.</string>
+         </property>
+         <property name="text">
+          <string>Check for &amp;updates</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_0_Main">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

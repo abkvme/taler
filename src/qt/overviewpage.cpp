@@ -18,6 +18,7 @@
 #include <qt/platformstyle.h>
 #include <qt/transactionfilterproxy.h>
 #include <qt/transactiontablemodel.h>
+#include <qt/updatechecker.h>
 #include <qt/walletmodel.h>
 
 #include <algorithm>
@@ -33,6 +34,7 @@
 #include <QPainter>
 #include <QDateTime>
 #include <QUrl>
+#include <QDesktopServices>
 #include <QPushButton>
 #include <QTimer>
 
@@ -201,6 +203,7 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // its last digit, which only works if they share a right edge.
     ui->gridLayout->setColumnStretch(1, 1);
     buildTopRow();
+    buildUpdateBadge();
     buildRecoveryRow();
 
     buildRewardsColumn();
@@ -352,6 +355,74 @@ void OverviewPage::buildTopRow()
     if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
         page->insertWidget(0, m_top_row);
     }
+}
+
+//! The update badge, between the wallet bar and the two columns.
+//!
+//! Full width and in the warning colour, because it is the one thing on this
+//! screen that asks for something to be done - but it is a badge, not a dialog:
+//! it never interrupts, and the button only opens the release page. Nothing is
+//! downloaded or installed from here.
+void OverviewPage::buildUpdateBadge()
+{
+    m_update_badge = new QFrame(this);
+    m_update_badge->setProperty("badge", true);
+    m_update_badge->setProperty("badgeState", "warn");
+    QHBoxLayout* row = new QHBoxLayout(m_update_badge);
+    row->setContentsMargins(14, 10, 14, 12);
+    row->setSpacing(12);
+
+    QVBoxLayout* text = new QVBoxLayout();
+    text->setSpacing(1);
+    QLabel* title = new QLabel(tr("Update available"), m_update_badge);
+    title->setProperty("badgeCaption", true);
+    m_update_value = new QLabel(m_update_badge);
+    m_update_value->setProperty("badgeValue", true);
+    m_update_hint = new QLabel(m_update_badge);
+    m_update_hint->setProperty("badgeCaption", true);
+    m_update_hint->setWordWrap(true);
+    text->addWidget(title);
+    text->addWidget(m_update_value);
+    text->addWidget(m_update_hint);
+    row->addLayout(text, 1);
+
+    QPushButton* open = new QPushButton(tr("View release"), m_update_badge);
+    open->setToolTip(tr("Open the release page with the notes and the downloads "
+                        "for every platform"));
+    open->setCursor(Qt::PointingHandCursor);
+    connect(open, &QPushButton::clicked, this, &OverviewPage::openReleasePage);
+    row->addWidget(open, 0, Qt::AlignVCenter);
+
+    m_update_badge->setVisible(false);
+
+    // Under the wallet bar, and under the plain wallet name while that stands in
+    // for the bar, so the page still reads top down: which wallet, then news.
+    if (QBoxLayout* page = qobject_cast<QBoxLayout*>(layout())) {
+        const int after = page->indexOf(m_wallet_name_label);
+        page->insertWidget(after >= 0 ? after + 1 : 1, m_update_badge);
+    }
+}
+
+void OverviewPage::refreshUpdateBadge()
+{
+    if (!m_update_badge) return;
+    UpdateChecker* checker = clientModel ? clientModel->getUpdateChecker() : nullptr;
+    if (!checker || !checker->isUpdateAvailable()) {
+        m_update_badge->setVisible(false);
+        return;
+    }
+    m_update_value->setText(tr("Taler %1 is out").arg(checker->latestVersion()));
+    m_update_hint->setText(tr("You are running %1. Updating is recommended - it can "
+                              "carry security fixes and network changes.")
+                               .arg(updatecheck::CurrentVersion()));
+    m_update_badge->setVisible(true);
+}
+
+void OverviewPage::openReleasePage()
+{
+    UpdateChecker* checker = clientModel ? clientModel->getUpdateChecker() : nullptr;
+    if (!checker || !checker->releaseUrl().isValid()) return;
+    QDesktopServices::openUrl(checker->releaseUrl());
 }
 
 void OverviewPage::refreshApiLabel()
@@ -673,7 +744,12 @@ void OverviewPage::setClientModel(ClientModel *model)
         // Show warning if this is a prerelease version
         connect(model, SIGNAL(alertsChanged(QString)), this, SLOT(updateAlerts(QString)));
         updateAlerts(model->getStatusBarWarnings());
+
+        if (UpdateChecker* checker = model->getUpdateChecker()) {
+            connect(checker, &UpdateChecker::statusChanged, this, &OverviewPage::refreshUpdateBadge);
+        }
     }
+    refreshUpdateBadge();
 }
 
 void OverviewPage::updateTransactionsPlaceholder()

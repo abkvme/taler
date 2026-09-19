@@ -56,6 +56,7 @@ public:
         SpendZeroConfChange,    // bool
         Listen,                 // bool
         Theme,                  // int: 0 system, 1 light, 2 dark
+        CheckForUpdates,        // bool
         OptionIDRowCount,
     };
 
@@ -76,6 +77,7 @@ public:
     QString getThirdPartyTxUrls() const { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() const { return fCoinControlFeatures; }
+    bool getCheckForUpdates() const { return fCheckForUpdates; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
     /* Restart flag helper */
@@ -94,6 +96,7 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
+    bool fCheckForUpdates;
     /* settings that were overridden by command-line */
     QString strOverriddenByCommandLine;
 
@@ -106,6 +109,7 @@ Q_SIGNALS:
     void displayUnitChanged(int unit);
     void coinControlFeaturesChanged(bool);
     void hideTrayIconChanged(bool);
+    void checkForUpdatesChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

@@ -61,11 +61,15 @@ private:
     void updateTransactionsPlaceholder();
     void buildRecoveryRow();
     void buildTopRow();
+    void buildUpdateBadge();
     void refreshApiLabel();
 
 private Q_SLOTS:
     /** Full rescan with a widening address window - see recoverwallet. */
     void recoverBalance();
+    //! Show or hide the update badge to match the application's update checker.
+    void refreshUpdateBadge();
+    void openReleasePage();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -83,6 +87,11 @@ private:
     QWidget* m_top_row = nullptr;
     QLabel* m_api_label = nullptr;
     QTimer* m_api_timer = nullptr;
+
+    //! Across the top of the page, shown only while a newer release is out.
+    QFrame* m_update_badge = nullptr;
+    QLabel* m_update_value = nullptr;
+    QLabel* m_update_hint = nullptr;
 
     //! Bottom of the Balances card: the way out when the balance looks wrong.
     QWidget* m_recovery_row = nullptr;

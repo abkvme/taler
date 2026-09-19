@@ -81,6 +81,13 @@ void OptionsModel::Init(bool resetSettings)
         settings.setValue("fCoinControlFeatures", false);
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
 
+    // On unless switched off: a wallet that never learns about a security release
+    // is the worse default, and the check only reads a release page - nothing is
+    // downloaded or installed.
+    if (!settings.contains("fCheckForUpdates"))
+        settings.setValue("fCheckForUpdates", true);
+    fCheckForUpdates = settings.value("fCheckForUpdates", true).toBool();
+
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
@@ -295,6 +302,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("theme", static_cast<int>(theme::Theme::System));
         case CoinControlFeatures:
             return fCoinControlFeatures;
+        case CheckForUpdates:
+            return fCheckForUpdates;
         case Prune:
             return settings.value("bPrune");
         case PruneSize:
@@ -430,6 +439,15 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
             Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
+            break;
+        case CheckForUpdates:
+            // Takes effect at once, both ways: the badge goes when it is switched
+            // off, and a check runs shortly after it is switched back on.
+            if (fCheckForUpdates != value.toBool()) {
+                fCheckForUpdates = value.toBool();
+                settings.setValue("fCheckForUpdates", fCheckForUpdates);
+                Q_EMIT checkForUpdatesChanged(fCheckForUpdates);
+            }
             break;
         case Prune:
             if (settings.value("bPrune") != value) {

@@ -11,6 +11,7 @@
 #include <util.h>
 #include <qt/test/rewardsummarytests.h>
 #include <qt/test/splashtests.h>
+#include <qt/test/updatecheckertests.h>
 #include <qt/test/uritests.h>
 #include <qt/test/compattests.h>
 
@@ -99,6 +100,10 @@ int main(int argc, char *argv[])
         fInvalid = true;
     RewardSummaryTests reward_summary_tests;
     if (QTest::qExec(&reward_summary_tests) != 0) {
+        fInvalid = true;
+    }
+    UpdateCheckerTests update_checker_tests;
+    if (QTest::qExec(&update_checker_tests) != 0) {
         fInvalid = true;
     }
 #ifdef ENABLE_WALLET

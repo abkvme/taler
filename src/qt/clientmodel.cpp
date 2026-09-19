@@ -10,6 +10,7 @@
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 #include <qt/peertablemodel.h>
+#include <qt/updatechecker.h>
 
 #include <chain.h>
 #include <chainparams.h>
@@ -39,12 +40,14 @@ ClientModel::ClientModel(interfaces::Node& node, OptionsModel *_optionsModel, QO
     optionsModel(_optionsModel),
     peerTableModel(0),
     banTableModel(0),
+    updateChecker(0),
     pollTimer(0)
 {
     cachedBestHeaderHeight = -1;
     cachedBestHeaderTime = -1;
     peerTableModel = new PeerTableModel(m_node, this);
     banTableModel = new BanTableModel(m_node, this);
+    updateChecker = new UpdateChecker(optionsModel, this);
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(updateTimer()));
     pollTimer->start(MODEL_UPDATE_DELAY);
@@ -152,6 +155,11 @@ PeerTableModel *ClientModel::getPeerTableModel()
 BanTableModel *ClientModel::getBanTableModel()
 {
     return banTableModel;
+}
+
+UpdateChecker *ClientModel::getUpdateChecker()
+{
+    return updateChecker;
 }
 
 QString ClientModel::formatFullVersion() const
