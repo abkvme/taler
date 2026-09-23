@@ -157,14 +157,20 @@ public:
     bool setWalletLocked(bool locked, const SecureString &passPhrase=SecureString());
     bool changePassphrase(const SecureString &oldPass, const SecureString &newPass);
 
-    // Staking (timed wallet unlock). Non-persistent: state lives only in memory.
-    // startStaking unlocks the wallet for seconds_to_stake and arms a QTimer
-    // that relocks it when the duration ends. stopStaking locks the wallet and
-    // cancels the pending auto-relock.
-    bool startStaking(const SecureString &passPhrase, int64_t seconds_to_stake);
-    bool stopStaking();
-    int64_t getStakingSecondsRemaining() const;
+    // Staking and mining. The node holds both, for one wallet at a time, and ends a
+    // timed session itself - relocking the wallet when staking ends. These start
+    // and stop it for this wallet; starting replaces whatever else was running.
+    //! Unlock for `seconds` and stake for as long.
+    bool startStaking(const SecureString &passPhrase, int64_t seconds, QString& error);
+    //! Check the passphrase, set aside a reward address and mine; the wallet stays
+    //! locked. `seconds` 0 mines until stopped.
+    bool startMining(const SecureString &passPhrase, int threads, int64_t seconds, QString& error);
+    //! Stop staking or mining, if this wallet is the one doing it.
+    bool stopGeneration(QString& error);
+    //! True while the node is staking with this wallet.
     bool isStaking() const;
+    //! True while the node is mining to this wallet.
+    bool isMining() const;
 
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext
@@ -232,10 +238,11 @@ private:
     int cachedNumBlocks;
 
     QTimer *pollTimer;
-    QTimer *stakingAutoRelockTimer = nullptr;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
+    //! Run a staking/mining RPC against this wallet.
+    bool generationRpc(const std::string& method, const std::vector<std::string>& args, QString& error);
     void checkBalanceChanged(const interfaces::WalletBalances& new_balances);
 
 Q_SIGNALS:

@@ -76,6 +76,8 @@ private:
     bool rpcForWallet(const QString& wallet, const QString& method, const UniValue& params,
                       UniValue& result, QString& error);
     bool unloadIfLoaded(const WalletRow& row, QString& error);
+    //! Say so and return true if the node is staking with, or mining to, this wallet.
+    bool refuseWhileGenerating(const WalletRow& row, const QString& title);
     //! Move a wallet file or directory into <walletdir>/removed/<name>-<timestamp>/
     bool retire(const QString& path, const QString& name, QString& error);
     static bool copyWallet(const QString& from, const QString& to, QString& error);

@@ -29,7 +29,10 @@
 #include <shutdown.h>
 
 #include <algorithm>
+#include <atomic>
+#include <mutex>
 #include <queue>
+#include <thread>
 #include <utility>
 
 #include <wallet/wallet.h>
@@ -42,6 +45,15 @@
 uint64_t nLastBlockTx = 0;
 uint64_t nLastBlockWeight = 0;
 int64_t nLastCoinStakeSearchInterval = 0;
+
+// End of the last coin-stake search, so the next one covers only the seconds since.
+// 0 until the first search, which then starts from now.
+static std::atomic<int64_t> g_last_coinstake_search_time{0};
+
+void ResetCoinStakeSearch()
+{
+    g_last_coinstake_search_time = GetAdjustedTime();
+}
 
 BlockAssembler::Options::Options() {
     blockMinFeeRate = CFeeRate(DEFAULT_BLOCK_MIN_TX_FEE);
@@ -139,7 +151,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblock->nNonce = 0;
 
     // pos: if coinstake available add coinstake tx
-    static int64_t nLastCoinStakeSearchTime = GetAdjustedTime();  // only initialized at startup
+    if (g_last_coinstake_search_time == 0) g_last_coinstake_search_time = GetAdjustedTime();
+    int64_t nLastCoinStakeSearchTime = g_last_coinstake_search_time;
     uint32_t nCoinStakeTime;
     CAmount nPosReward;
     if (fAddProofOfStake) {
@@ -157,7 +170,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
                 }
             }
             nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
-            nLastCoinStakeSearchTime = nSearchTime;
+            g_last_coinstake_search_time = nSearchTime;
             nCoinStakeTime = header.nTime;            
         }
         if (fPoSCancel)
@@ -512,46 +525,150 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
 
 #ifdef ENABLE_WALLET
 
-// PoW mining
+// Block production is one switch for the whole node: off, staking with one
+// wallet, or mining to one wallet. Staking and mining are exclusive because there
+// is only one state to hold them, not because anything has to police it.
+//
+// Staking names its wallet rather than holding it. The supervisor looks the wallet
+// up on each pass and lets go of it before sleeping, so a staking wallet can be
+// unloaded like any other - holding it for the whole session made UnloadWallet
+// wait forever.
+//
+// A state with an end time is a session: it stops when the time is up, and a
+// staking session also stops when its wallet is locked, and locks the wallet when
+// it ends. A state without an end time is what -stakegen and -gen start, and what
+// the RPCs start without a duration: it runs until stopped, and staking waits out
+// a locked wallet rather than giving up, as it always has.
 
-static int POWCount = 0;
-static int POWWorked = 0;
-static CScript POWScript;
-static int POWTries = 0x0000FFFF;
-static bool isready = false;
+static std::mutex g_generation_mutex;
+static GenerationState g_generation;            // guarded by g_generation_mutex
+static CScript g_mining_script;                 // guarded by g_generation_mutex
+static uint64_t g_generation_session = 0;       // guarded by g_generation_mutex
+static std::atomic<uint64_t> g_mining_epoch{0}; // miner threads of an older epoch stop
+static std::atomic<bool> g_supervisor_started{false};
+static std::atomic<bool> isready{false};
+static std::atomic<int> POWTries{0x0000FFFF};
 
-void POWMinerThread (int POWIndex) {
-    LogPrintf("POWMinerThread %d started\n", POWIndex);
+GenerationState GetGenerationState()
+{
+    std::lock_guard<std::mutex> lock(g_generation_mutex);
+    return g_generation;
+}
+
+int MaxMiningThreads()
+{
+    // Leave one core to the node itself.
+    const int cores = static_cast<int>(std::thread::hardware_concurrency());
+    return std::max(1, cores - 1);
+}
+
+//! A staking session unlocked its wallet for a set time; once the session is over,
+//! so is the unlock.
+static void LockEndedSession(const GenerationState& ended)
+{
+    if (ended.mode != GenerationMode::STAKING || ended.until == 0) return;
+    if (std::shared_ptr<CWallet> pwallet = GetWallet(ended.wallet)) {
+        if (pwallet->IsCrypted() && !pwallet->IsLocked()) pwallet->Lock();
+    }
+}
+
+//! End the state `session` (any state when 0). Returns the state that ended.
+static GenerationState EndGeneration(uint64_t session, const std::string& reason)
+{
+    GenerationState ended;
+    {
+        std::lock_guard<std::mutex> lock(g_generation_mutex);
+        if (g_generation.mode == GenerationMode::OFF) return ended;
+        if (session != 0 && g_generation.session != session) return ended;
+        ended = g_generation;
+        g_generation = GenerationState();
+        g_generation.session = ++g_generation_session;
+        g_mining_script.clear();
+        ++g_mining_epoch;
+    }
+    LogPrintf("Block production: %s for wallet \"%s\" stopped (%s)\n",
+              ended.mode == GenerationMode::STAKING ? "staking" : "mining", ended.wallet, reason);
+
+    LockEndedSession(ended);
+    return ended;
+}
+
+void StopGeneration()
+{
+    EndGeneration(0, "stopped");
+}
+
+void StopGenerationForWallet(const std::string& wallet_name)
+{
+    uint64_t session = 0;
+    {
+        std::lock_guard<std::mutex> lock(g_generation_mutex);
+        if (g_generation.mode == GenerationMode::OFF || g_generation.wallet != wallet_name) return;
+        session = g_generation.session;
+    }
+    EndGeneration(session, "the wallet is being unloaded");
+}
+
+void StartStaking(const std::string& wallet_name, int64_t until, bool from_config)
+{
+    GenerationState replaced;
+    {
+        std::lock_guard<std::mutex> lock(g_generation_mutex);
+        replaced = g_generation;
+        g_generation = GenerationState();
+        g_generation.mode = GenerationMode::STAKING;
+        g_generation.wallet = wallet_name;
+        g_generation.until = until;
+        g_generation.from_config = from_config;
+        g_generation.session = ++g_generation_session;
+        g_mining_script.clear();
+        ++g_mining_epoch;
+    }
+    LogPrintf("Block production: staking with wallet \"%s\"%s\n", wallet_name,
+              until > 0 ? strprintf(" until %s", FormatISO8601DateTime(until)) : std::string());
+    // Staking the same wallet again keeps it unlocked; it was unlocked for this.
+    if (replaced.wallet != wallet_name) LockEndedSession(replaced);
+}
+
+static void POWMinerThread(uint64_t epoch, int index)
+{
+    LogPrintf("POWMinerThread %d started\n", index);
     RenameThread("coin-pow-miner");
-    POWWorked++;
+    CScript script;
+    {
+        std::lock_guard<std::mutex> lock(g_generation_mutex);
+        script = g_mining_script;
+    }
     unsigned int extra = 0;
     try {
-        while (true) {
-            if (ShutdownRequested()) break;
-            if (POWIndex > POWCount) break;
+        while (!ShutdownRequested() && g_mining_epoch == epoch) {
             if (!isready) {
                 if (IsInitialBlockDownload()) { MilliSleep(1000); continue; } else { isready = true; }
             }
             int64_t nTime = GetTimeMillis();
-            std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(POWScript));
-            if (!pblocktemplate.get()) continue;
+            std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(script));
+            if (!pblocktemplate.get()) { MilliSleep(1000); continue; }
             CBlock *pblock = &pblocktemplate->block;
             IncrementExtraNonce(pblock, chainActive.Tip(), extra);
-            int nMaxTries = POWTries;
+            const int nTries = POWTries;
+            int nMaxTries = nTries;
             bool fNegative, fOverflow;
             arith_uint256 bnTarget;
             bnTarget.SetCompact (pblock->nBits, &fNegative, &fOverflow);
             const Consensus::Params& consensus = Params().GetConsensus();
             int nHeight = chainActive.Height() + 1;
-            while ((nMaxTries > 0) && (UintToArith256(pblock->GetPoWHash(nHeight, consensus)) >= bnTarget)) {
+            // A round takes about 30 seconds, so check for a stop inside it too.
+            while ((nMaxTries > 0) && g_mining_epoch == epoch && (UintToArith256(pblock->GetPoWHash(nHeight, consensus)) >= bnTarget)) {
                 pblock->nNonce++;
                 nMaxTries--;
             }
+            if (g_mining_epoch != epoch) break;
             nTime = GetTimeMillis() - nTime; if (nTime < 1) nTime = 1;
-            LogPrintf("POWMinerThread %d speed is %d kb\n", POWIndex, (POWTries-nMaxTries) / nTime);
+            LogPrintf("POWMinerThread %d speed is %d kb\n", index, (nTries-nMaxTries) / nTime);
             if ((nTime < 15000) || (nTime > 45000)) {
-                POWTries = ((POWTries-nMaxTries) / nTime) * 30000;
-                if (POWTries < 0x00000FFF) POWTries = 0x00000FFF;
+                int tries = ((nTries-nMaxTries) / nTime) * 30000;
+                if (tries < 0x00000FFF) tries = 0x00000FFF;
+                POWTries = tries;
             }
             if (nMaxTries == 0) { continue; }
             if (UintToArith256(pblock->GetPoWHash(nHeight, consensus)) >= bnTarget) { continue; }
@@ -561,134 +678,138 @@ void POWMinerThread (int POWIndex) {
         };
     }
     catch (const boost::thread_interrupted&) {
-        POWWorked--;
         LogPrintf("POWMinerThread terminated\n");
         return;
     }
     catch (const std::runtime_error &e) {
-        POWWorked--;
         LogPrintf("POWMinerThread runtime error: %s\n", e.what());
         return;
     } catch (...) {
         PrintExceptionContinue(NULL, "POWMinerThread()");
     }
-    POWWorked--;
-    LogPrintf("POWMinerThread %d stopped\n", POWIndex);
+    LogPrintf("POWMinerThread %d stopped\n", index);
 }
 
-int generatePoWCoin (int nThreads) {
-    if (nThreads < 0) { nThreads = std::thread::hardware_concurrency(); }
-    if (nThreads > 255) { return POWCount; }
-    if (POWCount > 0) {
-        POWCount = 0;
-        while (POWWorked > 0) MilliSleep(100);
-    }
-    if (nThreads == 0) return 0;
-    if (GetWallets().size() == 0) return 0;
-    std::shared_ptr<CWallet> pwallet = GetWallets().front();
+bool StartMining(CWallet& wallet, int threads, int64_t until, bool from_config, std::string& error)
+{
+    threads = std::max(1, std::min(threads, MaxMiningThreads()));
+
+    // The reward address is taken now, so the wallet can stay locked while mining.
     std::shared_ptr<CReserveScript> coinbase;
-    pwallet->GetScriptForMining (coinbase);
-    if (!coinbase) return 0;
-    if (coinbase->reserveScript.empty()) return 0;
-    POWScript = coinbase->reserveScript;
-    CTxDestination Addr;
-    if (ExtractDestination(POWScript, Addr)) { LogPrintf("POWMiner to %s\n", EncodeDestination(Addr)); }
-    for (int i = 1; i <= nThreads; i++) {
-        POWCount++;
-        std::thread newthread (POWMinerThread, i);
-        newthread.detach();
+    wallet.GetScriptForMining(coinbase);
+    if (!coinbase || coinbase->reserveScript.empty()) {
+        error = "Keypool ran out, please call keypoolrefill first";
+        return false;
     }
-    return POWCount;
+    coinbase->KeepScript();
+
+    uint64_t epoch;
+    GenerationState replaced;
+    {
+        std::lock_guard<std::mutex> lock(g_generation_mutex);
+        replaced = g_generation;
+        epoch = ++g_mining_epoch;
+        g_mining_script = coinbase->reserveScript;
+        g_generation = GenerationState();
+        g_generation.mode = GenerationMode::MINING;
+        g_generation.wallet = wallet.GetName();
+        g_generation.until = until;
+        g_generation.threads = threads;
+        g_generation.from_config = from_config;
+        g_generation.session = ++g_generation_session;
+    }
+    CTxDestination dest;
+    if (ExtractDestination(coinbase->reserveScript, dest)) {
+        LogPrintf("Block production: mining to %s (wallet \"%s\", %d threads)\n", EncodeDestination(dest), wallet.GetName(), threads);
+    }
+    LockEndedSession(replaced);
+    for (int i = 1; i <= threads; i++) {
+        std::thread(POWMinerThread, epoch, i).detach();
+    }
+    return true;
 }
 
-// PoS mining
-
-static int POSCount = 0;
-static int POSWorked = 0;
-
-void POSMinerThread (int POSIndex) {
-    LogPrintf("POSMinerThread %d started\n", POSIndex);
-    RenameThread("coin-pos-miner");
-    POSWorked++;
-    unsigned int extra = 0;
-    int skip = 0;
-    try {
-        std::shared_ptr<CWallet> pwallet = GetWallets()[POSIndex-1];
-        while (true) {
-            if (ShutdownRequested()) break;
-            if (POSIndex > POSCount) break;
-            if (!isready) {
-                if (IsInitialBlockDownload()) { MilliSleep(1000); continue; } else { isready = true; }
-            }
-            if (skip > 0) { skip--; MilliSleep(1000); continue; };
-            if (pwallet->IsLocked()) { skip = 3; continue; };
-            bool fPoSCancel = false;
-            std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewPoSBlock(fPoSCancel, pwallet));
-            if (fPoSCancel) { skip = 3; continue; }
-            if (!pblocktemplate.get()) continue;
-            CBlock *pblock = &pblocktemplate->block;
-            if (!pblock->IsNewestFormat()) IncrementExtraNonce(pblock, chainActive.Tip(), extra);
-            if (pblock->IsProofOfStake()) {
-                if (!pblock->IsNewestFormat()) {
-                    if (!SignBlock(*pblock, *pwallet)) continue;
-                }
-                LogPrintf("POSMinerThread: proof-of-stake block found %s\n", pblock->GetHash().ToString());
-                std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-                try {
-                    if (ProcessNewBlock(Params(), shared_pblock, true, nullptr)) { skip = 60; };
-                } catch (...) {
-                    PrintExceptionContinue(NULL, "POSMinerThread()");
-                }
-            };
-            MilliSleep (1000);
-        };
+//! One attempt at a proof-of-stake block. Returns the seconds to wait before the next.
+static int StakeOnce(const std::shared_ptr<CWallet>& pwallet, unsigned int& extra)
+{
+    bool fPoSCancel = false;
+    std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewPoSBlock(fPoSCancel, pwallet));
+    if (fPoSCancel) return 4;
+    if (!pblocktemplate.get()) return 1;
+    CBlock *pblock = &pblocktemplate->block;
+    if (!pblock->IsNewestFormat()) IncrementExtraNonce(pblock, chainActive.Tip(), extra);
+    if (!pblock->IsProofOfStake()) return 1;
+    if (!pblock->IsNewestFormat()) {
+        if (!SignBlock(*pblock, *pwallet)) return 1;
     }
-    catch (const boost::thread_interrupted&) {
-        POSWorked--;
-        LogPrintf("POSMinerThread terminated\n");
-        return;
-    } catch (const std::runtime_error &e) {
-        POSWorked--;
-        LogPrintf("POSMinerThread runtime error: %s\n", e.what());
-        return;
+    LogPrintf("POSMinerThread: proof-of-stake block found %s\n", pblock->GetHash().ToString());
+    std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
+    try {
+        if (ProcessNewBlock(Params(), shared_pblock, true, nullptr)) return 60;
     } catch (...) {
         PrintExceptionContinue(NULL, "POSMinerThread()");
     }
-    POSWorked--;
-    LogPrintf("POSMinerThread %d stopped\n", POSIndex);
+    return 1;
 }
 
-int generatePoSCoin (int nThreads) {
-    if (nThreads < 0) { nThreads = GetWallets().size(); }
-    if (nThreads > 255) { return POSCount; }
-    if (nThreads > GetWallets().size()) { nThreads = GetWallets().size(); }
-    if (POSCount > 0) {
-        POSCount = 0;
-        while (POSWorked > 0) MilliSleep(100);
+static void GenerationSupervisorThread()
+{
+    LogPrintf("POSMinerThread started\n");
+    RenameThread("coin-pos-miner");
+    unsigned int extra = 0;
+    std::string staking_wallet;
+    while (!ShutdownRequested()) {
+        const GenerationState state = GetGenerationState();
+        if (state.mode == GenerationMode::OFF) { MilliSleep(1000); continue; }
+        if (state.until > 0 && GetTime() >= state.until) {
+            EndGeneration(state.session, "its time is up");
+            continue;
+        }
+        if (state.mode == GenerationMode::MINING) { MilliSleep(1000); continue; }
+
+        if (state.wallet != staking_wallet) {
+            // The search window belongs to the wallet that was searched.
+            ResetCoinStakeSearch();
+            staking_wallet = state.wallet;
+        }
+
+        int wait = 1;
+        bool locked_session = false;
+        {
+            std::shared_ptr<CWallet> pwallet = GetWallet(state.wallet);
+            if (!pwallet) {
+                wait = 5; // not loaded (yet): -stakewallet may name a wallet the GUI loads later
+            } else if (!isready && IsInitialBlockDownload()) {
+                wait = 1;
+            } else if (pwallet->IsLocked()) {
+                locked_session = state.until > 0;
+                wait = 3;
+            } else {
+                isready = true;
+                try {
+                    wait = StakeOnce(pwallet, extra);
+                } catch (const std::exception& e) {
+                    LogPrintf("POSMinerThread: %s\n", e.what());
+                    wait = 1;
+                }
+            }
+        } // the wallet is let go here, before any sleep
+        if (locked_session) {
+            EndGeneration(state.session, "the wallet was locked");
+            continue;
+        }
+        for (int i = 0; i < wait && !ShutdownRequested(); ++i) {
+            MilliSleep(1000);
+            if (GetGenerationState().session != state.session) break;
+        }
     }
-    if (nThreads == 0) return 0;
-    if (GetWallets().size() == 0) return 0;
-    for (int i = 1; i <= nThreads; i++) {
-        POSCount++;
-        std::thread newthread (POSMinerThread, i);
-        newthread.detach();
-    }
-    return POSCount;
+    LogPrintf("POSMinerThread stopped\n");
 }
 
-int generateCoin (int nThreads) {
-    if (nThreads < 0) { generatePoWCoin (0); generatePoSCoin (0); }
-    if (nThreads == 0) { generatePoWCoin (0); generatePoSCoin (1); }
-    if ((nThreads > 0) && (nThreads < 63)) {
-        generatePoSCoin (0);
-        int prc = std::thread::hardware_concurrency();
-        if (nThreads >= prc) nThreads = prc - 1;
-        if (nThreads <= 1) nThreads = 1;
-        generatePoWCoin (nThreads);
-    }
-    if (POSCount > 0) return 0;
-    if (POWCount > 0) return POWCount;
-    return -1;
+void StartGenerationSupervisor()
+{
+    if (g_supervisor_started.exchange(true)) return;
+    std::thread(GenerationSupervisorThread).detach();
 }
 
 #endif // ENABLE_WALLET

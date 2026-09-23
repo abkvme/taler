@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <qt/bitcoingui.h>
 
+#include <qt/askpassphrasedialog.h>
 #include <qt/bitcoinunits.h>
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
@@ -261,6 +262,13 @@ void BitcoinGUI::createActions()
     receiveCoinsMenuAction->setStatusTip(receiveCoinsAction->statusTip());
     receiveCoinsMenuAction->setToolTip(receiveCoinsMenuAction->statusTip());
 
+    earnAction = new QAction(platformStyle->SingleColorIcon(":/icons/tx_mined"), tr("&Earn"), this);
+    earnAction->setStatusTip(tr("Stake or mine with this wallet"));
+    earnAction->setToolTip(earnAction->statusTip());
+    earnAction->setCheckable(true);
+    earnAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
+    tabGroup->addAction(earnAction);
+
     historyAction = new QAction(platformStyle->SingleColorIcon(":/icons/history"), tr("&Transactions"), this);
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
@@ -302,6 +310,8 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
+    connect(earnAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(earnAction, SIGNAL(triggered()), this, SLOT(gotoEarnPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
   //  connect(coinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -502,6 +512,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
+        toolbar->addAction(earnAction);
         toolbar->addAction(historyAction);
   //      toolbar->addAction(coinsAction);
 
@@ -634,7 +645,106 @@ bool BitcoinGUI::addWallet(WalletModel *walletModel)
     setWalletActionsEnabled(true);
     m_wallet_selector->addItem(display_name, name);
     rpcConsole->addWallet(walletModel);
-    return walletFrame->addWallet(walletModel);
+    const bool added = walletFrame->addWallet(walletModel);
+    updateGenerationMarkers();
+    return added;
+}
+
+void BitcoinGUI::updateGenerationMarkers()
+{
+    if (!m_wallet_selector) return;
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    const QString active = QString::fromStdString(generation.wallet);
+    for (int i = 0; i < m_wallet_selector->count(); ++i) {
+        const QString name = m_wallet_selector->itemData(i).toString();
+        QString text = GUIUtil::walletDisplayName(name);
+        if (generation.mode != interfaces::NodeGeneration::Mode::OFF && name == active) {
+            text = generation.mode == interfaces::NodeGeneration::Mode::STAKING
+                ? tr("%1 (staking)").arg(text) : tr("%1 (mining)").arg(text);
+        }
+        if (m_wallet_selector->itemText(i) != text) m_wallet_selector->setItemText(i, text);
+    }
+
+    // Only once the startup offer to resume has been made: until then the node is
+    // idle by design, and that must not erase what there is to resume.
+    if (!m_generation_timer) return;
+    // Forget a session the node is no longer running - it ended on its own, or was
+    // stopped from the console - so a restart does not offer it back.
+    GUIUtil::GenerationSession session;
+    if (GUIUtil::loadGenerationSession(session)) {
+        const bool mining = generation.mode == interfaces::NodeGeneration::Mode::MINING;
+        if (generation.mode == interfaces::NodeGeneration::Mode::OFF || session.wallet != active || session.mining != mining) {
+            GUIUtil::clearGenerationSession();
+        }
+    }
+}
+
+void BitcoinGUI::startGenerationWatch(bool legacy_staking_notice)
+{
+    if (!walletFrame || m_generation_timer) return;
+
+    if (legacy_staking_notice) {
+        // Before 0.20.1 the node staked the first wallet in the background whether
+        // or not it was encrypted. Say so once, to the people it affects: an
+        // unencrypted wallet that has something to stake.
+        QSettings settings;
+        if (!settings.value("LegacyStakingNoticeShown", false).toBool()) {
+            settings.setValue("LegacyStakingNoticeShown", true);
+            for (WalletModel* model : walletFrame->walletModels()) {
+                if (model->getEncryptionStatus() != WalletModel::Unencrypted) continue;
+                const interfaces::WalletStakeEligibility eligibility = model->wallet().getStakeEligibility();
+                if (eligibility.stakeable + eligibility.maturing == 0) continue;
+                QMessageBox::information(this, tr("Staking has changed"),
+                    tr("Wallet \"%1\" is not encrypted, so it no longer stakes in the background. "
+                       "Staking now needs an encrypted wallet and is started from the Earn page.\n\n"
+                       "To keep staking, encrypt the wallet (Settings, Encrypt Wallet), then start "
+                       "staking on the Earn page.").arg(GUIUtil::walletDisplayName(model->getWalletName())));
+                break;
+            }
+        }
+    }
+
+    GUIUtil::GenerationSession session;
+    if (GUIUtil::loadGenerationSession(session)) {
+        GUIUtil::clearGenerationSession(); // a successful resume saves it again
+        const int64_t remaining = session.until > 0 ? session.until - GetTime() : 0;
+        WalletModel* model = walletFrame->walletModel(session.wallet);
+        const bool node_idle = m_node.getGeneration().mode == interfaces::NodeGeneration::Mode::OFF;
+        const bool time_left = session.until == 0 ? session.mining : remaining > 0;
+        if (node_idle && time_left && model && model->getEncryptionStatus() != WalletModel::Unencrypted) {
+            const QString wallet = GUIUtil::walletDisplayName(session.wallet);
+            QString question;
+            if (!session.mining) {
+                question = tr("Wallet \"%1\" was staking when Taler closed, with %2 left. Resume staking?")
+                               .arg(wallet, GUIUtil::formatDurationStr(int(remaining)));
+            } else if (session.until > 0) {
+                question = tr("Taler was mining to wallet \"%1\" with %n thread(s) when it closed, with %2 left. Resume mining?", "", session.threads)
+                               .arg(wallet, GUIUtil::formatDurationStr(int(remaining)));
+            } else {
+                question = tr("Taler was mining to wallet \"%1\" with %n thread(s) when it closed. Resume mining?", "", session.threads)
+                               .arg(wallet);
+            }
+            if (QMessageBox::question(this, session.mining ? tr("Resume mining?") : tr("Resume staking?"), question,
+                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
+                setCurrentWallet(session.wallet);
+                AskPassphraseDialog dlg(session.mining ? AskPassphraseDialog::StartMining : AskPassphraseDialog::UnlockStaking, this);
+                dlg.setModel(model);
+                if (session.mining) {
+                    const int threads = std::max(1, std::min(session.threads, m_node.getGeneration().max_threads));
+                    dlg.setMiningParameters(threads, remaining);
+                } else {
+                    dlg.setStakingDuration(remaining);
+                }
+                dlg.exec();
+            }
+        }
+    }
+
+    m_generation_timer = new QTimer(this);
+    m_generation_timer->setInterval(2000);
+    connect(m_generation_timer, &QTimer::timeout, this, &BitcoinGUI::updateGenerationMarkers);
+    m_generation_timer->start();
+    updateGenerationMarkers();
 }
 
 bool BitcoinGUI::removeWallet(WalletModel* walletModel)
@@ -753,6 +863,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     overviewAction->setVisible(enabled);
     sendCoinsAction->setVisible(enabled);
     receiveCoinsAction->setVisible(enabled);
+    earnAction->setVisible(enabled);
     historyAction->setVisible(enabled);
     encryptWalletAction->setVisible(enabled);
     backupWalletAction->setVisible(enabled);
@@ -769,6 +880,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     sendCoinsMenuAction->setEnabled(enabled);
     receiveCoinsAction->setEnabled(enabled);
     receiveCoinsMenuAction->setEnabled(enabled);
+    earnAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
     nodesAction->setEnabled(enabled);
     aboutPageAction->setEnabled(enabled);
@@ -874,20 +986,27 @@ void BitcoinGUI::requestQuit()
     confirm.setWindowTitle(tr("Exit Taler"));
     confirm.setIcon(QMessageBox::Question);
     confirm.setText(tr("Close Taler?"));
-    // Only mention staking when there is staking to lose. Telling someone their
-    // staking will stop when they are not staking is noise, and noise in a
+    // Only mention staking or mining when there is some to lose. Telling someone
+    // their staking will stop when they are not staking is noise, and noise in a
     // confirmation is how people learn to dismiss them unread.
-    bool is_staking = false;
-#ifdef ENABLE_WALLET
-    if (walletFrame) is_staking = walletFrame->anyWalletStaking();
-#endif
-    confirm.setInformativeText(
-        is_staking
-            ? tr("The node will stop, and this wallet will stop staking until you open "
-                 "it again. Shutting down can take a moment while the chain state is "
-                 "written to disk.")
-            : tr("The node will stop. Shutting down can take a moment while the chain "
-                 "state is written to disk."));
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    const QString wallet = GUIUtil::walletDisplayName(QString::fromStdString(generation.wallet));
+    QString text = tr("The node will stop. Shutting down can take a moment while the chain "
+                      "state is written to disk.");
+    if (generation.from_config && generation.mode != interfaces::NodeGeneration::Mode::OFF) {
+        text = tr("The node will stop, and so will staking or mining with wallet \"%1\". taler.conf "
+                  "starts it again with Taler. Shutting down can take a moment while the chain "
+                  "state is written to disk.").arg(wallet);
+    } else if (generation.mode == interfaces::NodeGeneration::Mode::STAKING) {
+        text = tr("The node will stop, and wallet \"%1\" will stop staking. Taler offers to "
+                  "resume it when it starts again. Shutting down can take a moment while the "
+                  "chain state is written to disk.").arg(wallet);
+    } else if (generation.mode == interfaces::NodeGeneration::Mode::MINING) {
+        text = tr("The node will stop, and mining to wallet \"%1\" will stop. Taler offers to "
+                  "resume it when it starts again. Shutting down can take a moment while the "
+                  "chain state is written to disk.").arg(wallet);
+    }
+    confirm.setInformativeText(text);
     QPushButton* leave = confirm.addButton(tr("Exit"), QMessageBox::AcceptRole);
     // Red, because it is the irreversible one. Staying keeps the default styling
     // and the keyboard, so the reflex answer is the harmless answer.
@@ -973,6 +1092,12 @@ void BitcoinGUI::gotoReceiveCoinsPage()
 {
     receiveCoinsAction->setChecked(true);
     if (walletFrame) walletFrame->gotoReceiveCoinsPage();
+}
+
+void BitcoinGUI::gotoEarnPage()
+{
+    earnAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoEarnPage();
 }
 
 void BitcoinGUI::gotoSendCoinsPage(QString addr)

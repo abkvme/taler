@@ -69,6 +69,10 @@
 
 #include <crypto/scrypt.h>
 
+#ifdef ENABLE_WALLET
+#include <wallet/wallet.h>
+#endif
+
 static const bool DEFAULT_PROXYRANDOMIZE = true;
 static const bool DEFAULT_REST_ENABLE = false;
 static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
@@ -380,9 +384,11 @@ void SetupServerArgs()
     gArgs.AddArg("-txindex", strprintf("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)", DEFAULT_TXINDEX), false, OptionsCategory::OPTIONS);
     gArgs.AddArg("-addressindex", strprintf("Maintain a full address index, used by the getaddressbalance rpc call (default: %u)", false), false, OptionsCategory::OPTIONS);
 
-    gArgs.AddArg("-gen", "PoW generate enable", false, OptionsCategory::OPTIONS);
-    gArgs.AddArg("-stakegen", "PoS generate enable", true, OptionsCategory::OPTIONS);
-    gArgs.AddArg("-gencomment", "coinbase comment", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-gen", "Mine (proof-of-work) from startup, to -minewallet, with up to 7 threads; takes precedence over -stakegen (default: 0)", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-stakegen", "Stake (proof-of-stake) from startup with -stakewallet, until stopped; an encrypted wallet stakes only while unlocked (default: 1; the desktop wallet: 0)", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-gencomment=<hex>", "Bytes (hex) to add to the coinbase of blocks this node mines or stakes", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-stakewallet=<name>", "Wallet that -stakegen stakes with (default: the first wallet loaded)", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-minewallet=<name>", "Wallet that -gen mines to (default: the first wallet loaded)", false, OptionsCategory::OPTIONS);
 
     gArgs.AddArg("-addnode=<ip>", "Add a node to connect to and attempt to keep the connection open (see the `addnode` RPC command help for more info). This option can be specified multiple times to add multiple nodes.", false, OptionsCategory::CONNECTION);
     gArgs.AddArg("-banscore=<n>", strprintf("Threshold for disconnecting misbehaving peers (default: %u)", DEFAULT_BANSCORE_THRESHOLD), false, OptionsCategory::CONNECTION);
@@ -1757,8 +1763,32 @@ bool AppInitMain()
     useragent::StartConnectionRefreshTask(scheduler);
 
 #ifdef ENABLE_WALLET
-    if (gArgs.GetBoolArg("-gen", false)) { generateCoin (7); } else
-        if (gArgs.GetBoolArg("-stakegen", true)) { generateCoin (0); }
+    if (!gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET)) {
+        StartGenerationSupervisor();
+        // Without a named wallet these fall back to the first one, as they always have.
+        auto first_wallet = []() -> std::string {
+            const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+            return wallets.empty() ? std::string() : wallets.front()->GetName();
+        };
+        if (gArgs.GetBoolArg("-gen", false)) {
+            const std::string name = gArgs.GetArg("-minewallet", first_wallet());
+            std::shared_ptr<CWallet> pwallet = GetWallet(name);
+            std::string error;
+            if (!pwallet) {
+                LogPrintf("-gen: wallet \"%s\" is not loaded; not mining\n", name);
+            } else if (!StartMining(*pwallet, 7, 0, true, error)) {
+                LogPrintf("-gen: %s; not mining\n", error);
+            }
+        } else if (gArgs.GetBoolArg("-stakegen", true)) {
+            if (gArgs.IsArgSet("-stakewallet")) {
+                StartStaking(gArgs.GetArg("-stakewallet", ""), 0, true);
+            } else if (!GetWallets().empty()) {
+                StartStaking(first_wallet(), 0, true);
+            } else {
+                LogPrintf("-stakegen: no wallet loaded; not staking\n");
+            }
+        }
+    }
     std::string cmt = gArgs.GetArg("-gencomment", "");
     if (cmt != "") COINBASE_FLAGS << ParseHex(cmt);
 #endif 

@@ -46,6 +46,24 @@ rpcallowip=0.0.0.0/0
 disablewallet=0
 
 ##
+## Staking and Mining (see doc/staking-and-mining.md)
+## Only one wallet stakes or mines at a time.
+##
+
+# Stake from startup (default: 1). An encrypted wallet stakes only while
+# unlocked: taler-cli walletpassphrase "passphrase" 99999999
+# stakegen=1
+
+# Wallet to stake with (default: the first wallet loaded; empty = legacy wallet.dat)
+# stakewallet=
+
+# Mine instead of staking (default: 0); uses up to 7 threads, never more than cores - 1
+# gen=0
+
+# Wallet that mining rewards go to (default: the first wallet loaded)
+# minewallet=
+
+##
 ## Logging
 ##
 

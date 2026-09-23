@@ -3679,6 +3679,9 @@ static UniValue unloadwallet(const JSONRPCRequest& request)
     // Release the "main" shared pointer and prevent further notifications.
     // Note that any attempt to load the same wallet would fail until the wallet
     // is destroyed (see CheckUniqueFileid).
+    // Staking or mining with this wallet would outlive it.
+    StopGenerationForWallet(wallet_name);
+
     if (!RemoveWallet(wallet)) {
         throw JSONRPCError(RPC_MISC_ERROR, "Requested wallet already unloaded");
     }
@@ -5342,65 +5345,130 @@ UniValue listminting(const JSONRPCRequest& request) {
     return ret;
 }  
 
+//! These RPCs take their numbers as strings from the command line and as numbers
+//! over JSON; accept both.
+static int64_t GenerationParam(const JSONRPCRequest& request, size_t idx, int64_t fallback)
+{
+    if (request.params.size() <= idx || request.params[idx].isNull()) return fallback;
+    const UniValue& v = request.params[idx];
+    if (v.isNum()) return v.get_int64();
+    int64_t n;
+    if (v.isStr() && ParseInt64(v.get_str(), &n)) return n;
+    throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Parameter %u must be a whole number", idx + 1));
+}
+
+static UniValue GenerationStateToJSON()
+{
+    const GenerationState state = GetGenerationState();
+    UniValue result(UniValue::VOBJ);
+    const char* mode = state.mode == GenerationMode::STAKING ? "staking"
+                     : state.mode == GenerationMode::MINING  ? "mining" : "off";
+    result.pushKV("mode", mode);
+    if (state.mode != GenerationMode::OFF) {
+        result.pushKV("wallet", state.wallet);
+        result.pushKV("until", state.until);
+        result.pushKV("remaining", state.until > 0 ? std::max<int64_t>(0, state.until - GetTime()) : 0);
+        result.pushKV("from_config", state.from_config);
+    }
+    result.pushKV("minerPOWCount", state.mode == GenerationMode::MINING ? state.threads : 0);
+    result.pushKV("minerPOSCount", state.mode == GenerationMode::STAKING ? 1 : 0);
+    return result;
+}
+
+static const std::string GENERATION_RESULT_HELP =
+    "{\n"
+    "  \"mode\": \"off|staking|mining\", (string) what the node is producing blocks with\n"
+    "  \"wallet\": \"name\",            (string) the wallet staking or being mined to\n"
+    "  \"until\": n,                   (numeric) when it stops (unix time), 0 = until stopped\n"
+    "  \"remaining\": n,               (numeric) seconds until it stops, 0 = until stopped\n"
+    "  \"from_config\": true|false,    (boolean) started by -stakegen or -gen\n"
+    "  \"minerPOWCount\": n,           (numeric) mining threads\n"
+    "  \"minerPOSCount\": n            (numeric) 1 while staking\n"
+    "}\n";
+
 UniValue getgenerate (const JSONRPCRequest& request) {
-    if (request.fHelp) {
+    if (request.fHelp || request.params.size() != 0) {
         throw std::runtime_error(
             "getgenerate\n"
-            "\nReturn if the server is set to generate coins or not. The default is false.\n"
-            "It can be set with the setgenerate call.\n"
+            "\nWhat the node is producing blocks with. Only one wallet stakes or mines at a time.\n"
+            "It is set with setgeneratepos and setgeneratepow.\n"
+            "\nResult:\n" + GENERATION_RESULT_HELP +
             "\nExamples:\n"
             + HelpExampleCli("getgenerate", "")
             + HelpExampleRpc("getgenerate", "")
         );
     }
-    LOCK(cs_main);
-    UniValue result(UniValue::VOBJ);
-    int n = generateCoin (4096);
-    result.push_back(Pair("minerPOWCount", (n > 0) ? n : 0));
-    result.push_back(Pair("minerPOSCount", (n == 0) ? 1 : 0));
-    return result;
+    return GenerationStateToJSON();
 }
 
 UniValue setgeneratepow (const JSONRPCRequest& request) {
-    if (request.fHelp || (request.params.size() != 1))
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
-            "setgeneratepow count\n"
-            "1. count          (numeric) The number of generation thread(0 - 63)\n"
+            "setgeneratepow count ( duration )\n"
+            "\nMine to this wallet, replacing whatever staking or mining is running.\n"
+            "The reward goes to a fresh address of the wallet; the wallet can stay locked.\n"
+            "\nArguments:\n"
+            "1. count          (numeric) Mining threads, capped at the number of cores minus one. 0 stops mining.\n"
+            "2. duration       (numeric, optional) Seconds to mine for. 0 or omitted: until stopped.\n"
+            "\nResult:\n" + GENERATION_RESULT_HELP +
             "\nExamples:\n"
-            "\nSet the generation on with a limit of one processor\n" + HelpExampleCli("setgeneratepow", "1") +
-            "\nCheck the setting\n" + HelpExampleCli("getgenerate", "") +
-            "\nTurn off generation\n" + HelpExampleCli("setgeneratepow", "0") +
+            "\nMine with one thread\n" + HelpExampleCli("setgeneratepow", "1") +
+            "\nMine with two threads for an hour\n" + HelpExampleCli("setgeneratepow", "2 3600") +
+            "\nStop mining\n" + HelpExampleCli("setgeneratepow", "0") +
             "\nUsing json rpc\n" + HelpExampleRpc("setgeneratepow", "1"));
-    uint32_t cnt = 0;
-    UniValue ret(UniValue::VOBJ);
-    if (!toInt32 (request, 0, cnt, ret)) return ret;
-    ret.pushKV ("minerPOWRequest", (cnt > 0) ? (int)cnt : 0);
-    ret.pushKV ("minerPOSRequest", 0);
-    int n = generateCoin (cnt);
-    ret.pushKV ("minerPOWCount", (n > 0) ? n : 0);
-    ret.pushKV ("minerPOSCount", (n == 0) ? 1 : 0);
-    return ret;
+
+    const int64_t count = GenerationParam(request, 0, 0);
+    const int64_t duration = GenerationParam(request, 1, 0);
+    if (count < 0 || duration < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "count and duration cannot be negative");
+
+    if (count == 0) {
+        if (GetGenerationState().mode == GenerationMode::MINING) StopGeneration();
+        return GenerationStateToJSON();
+    }
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!EnsureWalletIsAvailable(wallet.get(), request.fHelp)) return NullUniValue;
+
+    std::string error;
+    const int threads = static_cast<int>(std::min<int64_t>(count, MaxMiningThreads()));
+    if (!StartMining(*wallet, threads, duration > 0 ? GetTime() + duration : 0, false, error)) {
+        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, error);
+    }
+    return GenerationStateToJSON();
 }
 
 UniValue setgeneratepos (const JSONRPCRequest& request) {
-    if (request.fHelp || (request.params.size() != 1))
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
-            "setgeneratepos count\n"
-            "See the getgenerate call for the current setting.\n"
+            "setgeneratepos count ( duration )\n"
+            "\nStake with this wallet, replacing whatever staking or mining is running.\n"
+            "Staking needs the wallet unlocked (walletpassphrase) if it is encrypted.\n"
+            "\nArguments:\n"
+            "1. count          (numeric) 1 to stake, 0 to stop.\n"
+            "2. duration       (numeric, optional) Seconds to stake for. With a duration, staking also\n"
+            "                  stops when the wallet is locked, and locks the wallet when it ends.\n"
+            "                  0 or omitted: until stopped, waiting while the wallet is locked.\n"
+            "\nResult:\n" + GENERATION_RESULT_HELP +
             "\nExamples:\n"
-            "\nSet the generation on with a limit of one processor\n" + HelpExampleCli("setgeneratepos", "1") +
-            "\nCheck the setting\n" + HelpExampleCli("getgenerate", "") +
-            "\nTurn off generation\n" + HelpExampleCli("setgeneratepos", "0") +
+            "\nStake with this wallet\n" + HelpExampleCli("setgeneratepos", "1") +
+            "\nStake for a day\n" + HelpExampleCli("setgeneratepos", "1 86400") +
+            "\nStop staking\n" + HelpExampleCli("setgeneratepos", "0") +
             "\nUsing json rpc\n" + HelpExampleRpc("setgeneratepos", "1"));
-	uint32_t cnt = 0;
-    UniValue ret(UniValue::VOBJ);
-    if (!toInt32 (request, 0, cnt, ret)) return ret;
-    ret.pushKV ("minerPOWRequest", 0);
-    ret.pushKV ("minerPOSRequest", (cnt > 0) ? 1 : 0);
-    int n = generateCoin ((cnt > 0) ? 0 : -1);
-    ret.pushKV ("minerPOWCount", (n > 0) ? n : 0);
-    ret.pushKV ("minerPOSCount", (n == 0) ? 1 : 0);
-    return ret;
+
+    const int64_t count = GenerationParam(request, 0, 0);
+    const int64_t duration = GenerationParam(request, 1, 0);
+    if (count < 0 || duration < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "count and duration cannot be negative");
+
+    if (count == 0) {
+        if (GetGenerationState().mode == GenerationMode::STAKING) StopGeneration();
+        return GenerationStateToJSON();
+    }
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!EnsureWalletIsAvailable(wallet.get(), request.fHelp)) return NullUniValue;
+
+    StartStaking(wallet->GetName(), duration > 0 ? GetTime() + duration : 0, false);
+    return GenerationStateToJSON();
 }
 
 extern UniValue abortrescan(const JSONRPCRequest& request); // in rpcdump.cpp
@@ -5494,8 +5562,8 @@ static const CRPCCommand commands[] =
 
     { "minting",            "listminting",                      &listminting,                   {"count", "skip", "minweight", "maxweight"} },
 
-    { "generating",         "setgeneratepow",                   &setgeneratepow,                {"proclimit, algo"} },
-    { "generating",         "setgeneratepos",                   &setgeneratepos,                {"proclimit"} },
+    { "generating",         "setgeneratepow",                   &setgeneratepow,                {"count", "duration"} },
+    { "generating",         "setgeneratepos",                   &setgeneratepos,                {"count", "duration"} },
     { "generating",         "getgenerate",                      &getgenerate,                   {} },	 	      
     { "generating",         "generate",                         &generate,                      {"nblocks","maxtries"} },
 };

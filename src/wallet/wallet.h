@@ -85,6 +85,8 @@ static const unsigned int DEFAULT_TX_CONFIRM_TARGET = 6;
 static const bool DEFAULT_WALLET_RBF = false;
 static const bool DEFAULT_WALLETBROADCAST = true;
 static const bool DEFAULT_DISABLE_WALLET = false;
+//! The smallest coin that can start a stake. Smaller coins only join one.
+static const CAmount MIN_STAKE_KERNEL_AMOUNT = 10 * COIN;
 
 //! Pre-calculated constants for input size estimation in *virtual size*
 static constexpr size_t DUMMY_NESTED_P2WPKH_INPUT_SIZE = 91;
@@ -1072,6 +1074,18 @@ public:
     bool CreateTransaction(const std::vector<CRecipient>& vecSend, CTransactionRef& tx, CReserveKey& reservekey, CAmount& nFeeRet, int& nChangePosInOut,
                            std::string& strFailReason, const CCoinControl& coin_control, bool sign = true);
     bool CreateCoinStake (CBlockHeader& header, int64_t nSearchInterval, CMutableTransaction &txNew, CAmount& posReward);
+
+    //! What this wallet could stake: the same coins CreateCoinStake would consider.
+    struct StakeEligibility
+    {
+        //! Coins that could start a stake now.
+        CAmount stakeable = 0;
+        //! Coins large enough to stake but not yet old enough.
+        CAmount maturing = 0;
+        //! When the first maturing coin becomes stakeable (unix time), 0 if none.
+        int64_t next_stakeable_time = 0;
+    };
+    StakeEligibility GetStakeEligibility() const;
     bool CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::vector<std::pair<std::string, std::string>> orderForm, std::string fromAccount, CReserveKey& reservekey, CConnman* connman, CValidationState& state);
 
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& entries);

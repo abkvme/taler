@@ -19,6 +19,7 @@ class SendCoinsDialog;
 class SendCoinsRecipient;
 class TransactionView;
 class CoinsView;
+class EarnPage;
 class InfoPage;
 class AboutPage;
 class WalletModel;
@@ -66,6 +67,7 @@ private:
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
     QWidget *coinsPage;
+    EarnPage *earnPage;
     ReceiveCoinsDialog *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     AddressBookPage *usedSendingAddressesPage;
@@ -86,6 +88,8 @@ public Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to coins page */
     void gotoCoinsPage();
+    /** Switch to the staking and mining page */
+    void gotoEarnPage();
     /** Switch to nodes page */
     void gotoNodesPage();
 

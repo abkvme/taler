@@ -210,8 +210,15 @@ void WalletManagerDialog::refresh()
         const QString display = GUIUtil::walletDisplayName(row.name);
         QTableWidgetItem* name = new QTableWidgetItem(display);
         name->setFont(bold);
-        if (row.loaded && row.name == m_current_wallet) {
-            name->setText(tr("%1  •  in use").arg(display));
+        QStringList notes;
+        if (row.loaded && row.name == m_current_wallet) notes << tr("in use");
+        const interfaces::NodeGeneration generation = m_node.getGeneration();
+        if (row.loaded && generation.wallet == row.name.toStdString()) {
+            if (generation.mode == interfaces::NodeGeneration::Mode::STAKING) notes << tr("staking");
+            if (generation.mode == interfaces::NodeGeneration::Mode::MINING) notes << tr("mining");
+        }
+        if (!notes.isEmpty()) {
+            name->setText(QStringLiteral("%1  •  %2").arg(display, notes.join(QStringLiteral(", "))));
         }
         name->setToolTip(tr("File name: %1").arg(row.filename));
         m_table->setItem(r, COL_NAME, name);
@@ -301,6 +308,19 @@ void WalletManagerDialog::onRestore()
     }
 }
 
+bool WalletManagerDialog::refuseWhileGenerating(const WalletRow& row, const QString& title)
+{
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    if (!row.loaded || generation.wallet != row.name.toStdString()) return false;
+    if (generation.mode == interfaces::NodeGeneration::Mode::OFF) return false;
+    const QString display = GUIUtil::walletDisplayName(row.name);
+    QMessageBox::warning(this, title,
+        generation.mode == interfaces::NodeGeneration::Mode::STAKING
+            ? tr("Wallet \"%1\" is staking. Stop staking on the Earn page first.").arg(display)
+            : tr("Wallet \"%1\" is being mined to. Stop mining on the Earn page first.").arg(display));
+    return true;
+}
+
 bool WalletManagerDialog::unloadIfLoaded(const WalletRow& row, QString& error)
 {
     if (!row.loaded) return true;
@@ -354,6 +374,7 @@ void WalletManagerDialog::onRename()
     const WalletRow* selected = selectedRow();
     if (!selected) return;
     const WalletRow row = *selected; // refresh() invalidates the pointer
+    if (refuseWhileGenerating(row, tr("Rename wallet"))) return;
 
     bool ok = false;
     const QString new_name = QInputDialog::getText(this, tr("Rename wallet"),
@@ -428,6 +449,7 @@ void WalletManagerDialog::onRemove()
     const WalletRow* selected = selectedRow();
     if (!selected) return;
     const WalletRow row = *selected;
+    if (refuseWhileGenerating(row, tr("Remove wallet"))) return;
     const QString display = GUIUtil::walletDisplayName(row.name);
 
     // What the user is about to lose access to, stated before anything happens.

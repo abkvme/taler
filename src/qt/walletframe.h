@@ -7,6 +7,7 @@
 #define BITCOIN_QT_WALLETFRAME_H
 
 #include <QFrame>
+#include <QList>
 #include <QMap>
 
 class BitcoinGUI;
@@ -39,13 +40,10 @@ public:
 
     bool addWallet(WalletModel *walletModel);
 
-    /** Is any open wallet currently staking?
-     *
-     * Staking is a timed unlock held per wallet, so "are we staking" is a
-     * question about all of them, not just the one on screen.
-     */
-    bool anyWalletStaking();
     bool setCurrentWallet(const QString& name);
+    //! The model of an open wallet, or nullptr.
+    WalletModel* walletModel(const QString& name) const;
+    QList<WalletModel*> walletModels() const;
     bool removeWallet(const QString &name);
     void removeAllWallets();
 
@@ -84,6 +82,8 @@ public Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
+    /** Switch to the staking and mining page */
+    void gotoEarnPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
     /** Switch to nodes page */

@@ -35,6 +35,7 @@ class Handler;
 class PendingWalletTx;
 struct WalletAddress;
 struct WalletBalances;
+struct WalletStakeEligibility;
 struct WalletTx;
 struct WalletTxOut;
 struct WalletTxStatus;
@@ -62,9 +63,12 @@ public:
 
     //! Unlock wallet and set the timestamp after which it will auto-relock.
     //! Mirrors the `walletpassphrase` RPC: Unlock + TopUpKeyPool + set
-    //! CWallet::nRelockTime. The caller is responsible for actually
-    //! scheduling the relock (the Qt WalletModel uses a QTimer).
+    //! CWallet::nRelockTime. The relock itself is the staking session's: the
+    //! node locks the wallet when a timed session ends.
     virtual bool unlockForStaking(const SecureString& wallet_passphrase, int64_t timeout_seconds) = 0;
+
+    //! What this wallet could stake now, and when more becomes stakeable.
+    virtual WalletStakeEligibility getStakeEligibility() = 0;
 
     //! Return the absolute unix time at which the wallet will auto-relock
     //! (CWallet::nRelockTime). Zero means no pending auto-relock.
@@ -335,6 +339,14 @@ struct WalletBalances
                unconfirmed_watch_only_balance != prev.unconfirmed_watch_only_balance ||
                immature_watch_only_balance != prev.immature_watch_only_balance;
     }
+};
+
+//! Coins that could start a stake: at least MIN_STAKE_KERNEL_AMOUNT and old enough.
+struct WalletStakeEligibility
+{
+    CAmount stakeable = 0;
+    CAmount maturing = 0;
+    int64_t next_stakeable_time = 0;
 };
 
 // Wallet transaction information.

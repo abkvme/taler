@@ -187,8 +187,8 @@ def main():
               "0.20 switched an existing wallet to a different derivation")
 
         version = new.rpc('getnetworkinfo')
-        check(version['version'] == 200000, "version is {}, expected 200000".format(version['version']))
-        check('/Taler:0.20.0/' in version['subversion'],
+        check(version['version'] == 200100, "version is {}, expected 200100".format(version['version']))
+        check('/Taler:0.20.1/' in version['subversion'],
               "subversion is {}".format(version['subversion']))
 
         # The wallet must still be where 0.19 will look for it.

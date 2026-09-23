@@ -173,6 +173,37 @@ void clearDefaultWallet()
 }
 
 
+static const char* GENERATION_SESSION_KEY = "GenerationSession";
+
+bool loadGenerationSession(GenerationSession& session)
+{
+    QSettings settings;
+    const QVariantMap map = settings.value(GENERATION_SESSION_KEY).toMap();
+    if (map.isEmpty()) return false;
+    session.mining = map.value("mining").toBool();
+    session.wallet = map.value("wallet").toString();
+    session.until = map.value("until").toLongLong();
+    session.threads = map.value("threads").toInt();
+    return true;
+}
+
+void saveGenerationSession(const GenerationSession& session)
+{
+    QVariantMap map;
+    map.insert("mining", session.mining);
+    map.insert("wallet", session.wallet);
+    map.insert("until", session.until);
+    map.insert("threads", session.threads);
+    QSettings settings;
+    settings.setValue(GENERATION_SESSION_KEY, map);
+}
+
+void clearGenerationSession()
+{
+    QSettings settings;
+    settings.remove(GENERATION_SESSION_KEY);
+}
+
 QString dateTimeStr(const QDateTime &date)
 {
     return date.date().toString(Qt::SystemLocaleShortDate) + QString(" ") + date.toString("hh:mm");

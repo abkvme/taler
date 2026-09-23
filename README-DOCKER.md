@@ -160,6 +160,30 @@ To enable wallet functionality:
 
 The wallet directory can hold multiple wallet files. By default, if wallet is enabled without specifying individual wallet files, the daemon will use `wallet.dat` in the wallet directory.
 
+### Staking and Mining
+
+With the wallet enabled, the daemon stakes with the first wallet by default
+(`stakegen=1`). An **encrypted** wallet stakes only while unlocked, so unlock it
+after each container start:
+
+```bash
+docker exec -it taler taler-cli walletpassphrase "your passphrase" 99999999
+```
+
+To stake with a different wallet, or to mine instead, add these to your mounted
+`taler.conf`:
+
+```conf
+stakegen=1            # stake from startup (default 1)
+stakewallet=savings   # wallet to stake with (default: the first wallet loaded)
+# gen=1               # mine instead of staking
+# minewallet=pool     # wallet mining rewards go to (default: the first wallet loaded)
+```
+
+Only one wallet stakes or mines at a time. See
+[doc/staking-and-mining.md](doc/staking-and-mining.md) for every setting and the
+`setgeneratepos` / `setgeneratepow` / `getgenerate` RPCs.
+
 ### Custom Configuration File
 
 To enable RPC or customize node settings, create a custom `taler.conf`:

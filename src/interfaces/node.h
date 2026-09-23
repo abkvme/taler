@@ -31,6 +31,18 @@ namespace interfaces {
 class Handler;
 class Wallet;
 
+//! What the node is producing blocks with. Mirrors GenerationState in miner.h.
+struct NodeGeneration
+{
+    enum class Mode { OFF, STAKING, MINING };
+    Mode mode = Mode::OFF;
+    std::string wallet;
+    int64_t until = 0; //!< unix time, 0 = until stopped
+    int threads = 0;
+    bool from_config = false;
+    int max_threads = 1; //!< the most mining threads allowed
+};
+
 //! Top-level interface for a bitcoin node (bitcoind process).
 class Node
 {
@@ -178,6 +190,9 @@ public:
 
     //! Return interfaces for accessing wallets (if any).
     virtual std::vector<std::unique_ptr<Wallet>> getWallets() = 0;
+
+    //! What the node is staking or mining with.
+    virtual NodeGeneration getGeneration() = 0;
 
     //! Register handler for init messages.
     using InitMessageFn = std::function<void(const std::string& message)>;

@@ -127,6 +127,21 @@ bool WalletFrame::setCurrentWallet(const QString& name)
     return true;
 }
 
+WalletModel* WalletFrame::walletModel(const QString& name) const
+{
+    WalletView* view = mapWalletViews.value(name, nullptr);
+    return view ? view->getWalletModel() : nullptr;
+}
+
+QList<WalletModel*> WalletFrame::walletModels() const
+{
+    QList<WalletModel*> models;
+    for (WalletView* view : mapWalletViews) {
+        if (view && view->getWalletModel()) models << view->getWalletModel();
+    }
+    return models;
+}
+
 bool WalletFrame::removeWallet(const QString &name)
 {
     if (mapWalletViews.count(name) == 0)
@@ -189,6 +204,13 @@ void WalletFrame::gotoReceiveCoinsPage()
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoReceiveCoinsPage();
+}
+
+void WalletFrame::gotoEarnPage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoEarnPage();
 }
 
 void WalletFrame::gotoSendCoinsPage(QString addr)
@@ -268,13 +290,6 @@ void WalletFrame::usedReceivingAddresses()
         walletView->usedReceivingAddresses();
 }
 
-bool WalletFrame::anyWalletStaking()
-{
-    for (WalletView* const view : mapWalletViews) {
-        if (view && view->getWalletModel() && view->getWalletModel()->isStaking()) return true;
-    }
-    return false;
-}
 
 WalletView *WalletFrame::currentWalletView()
 {

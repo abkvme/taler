@@ -10,6 +10,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <init.h>
+#include <miner.h>
 #include <interfaces/handler.h>
 #include <interfaces/wallet.h>
 #include <net.h>
@@ -233,6 +234,22 @@ class NodeImpl : public Node
 #else
         throw std::logic_error("Node::getWallets() called in non-wallet build.");
 #endif
+    }
+    NodeGeneration getGeneration() override
+    {
+        NodeGeneration result;
+#ifdef ENABLE_WALLET
+        const GenerationState state = GetGenerationState();
+        result.mode = state.mode == GenerationMode::STAKING ? NodeGeneration::Mode::STAKING
+                    : state.mode == GenerationMode::MINING  ? NodeGeneration::Mode::MINING
+                                                            : NodeGeneration::Mode::OFF;
+        result.wallet = state.wallet;
+        result.until = state.until;
+        result.threads = state.threads;
+        result.from_config = state.from_config;
+        result.max_threads = MaxMiningThreads();
+#endif
+        return result;
     }
     std::unique_ptr<Handler> handleInitMessage(InitMessageFn fn) override
     {

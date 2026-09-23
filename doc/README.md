@@ -26,6 +26,11 @@ Unpack the files into a directory, and then run bitcoin-qt.exe.
 
 Drag Taler to your applications folder, and then run Taler.
 
+### Staking and Mining
+
+How to stake or mine with the desktop wallet's Earn page or with `talerd`, the
+`taler.conf` settings that control it, and the RPCs: [Staking and Mining](staking-and-mining.md).
+
 ### Need Help?
 
 * Ask for help on [Telegram](https://t.me/talercommunity).

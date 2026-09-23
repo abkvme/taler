@@ -98,11 +98,19 @@ scripts in [Self-Compile](#self-compile).
 - **Send / Receive / Transactions** — Bitcoin-Core-class wallet: HD keys,
   coin control, address book, QR codes for receive addresses, labeled
   transaction history, CSV export.
-- **One-click staking from the Dashboard** — new in 0.19.5.8. Pick a duration
-  (1h / 6h / 24h / 7d / 30d), enter your passphrase once, and the Overview
-  page shows a live countdown and progress bar. The wallet auto-relocks when
-  the timer expires and on app restart. The panel is hidden for unencrypted
-  wallets (where staking is always-on).
+- **Multiple wallets and recovery phrases** — new in 0.20.0. Create or restore
+  wallets from a 24-word recovery phrase, switch between them from the
+  Overview page, and manage them (rename, remove, set the default) in
+  **Manage wallets**.
+- **Earn page: staking and mining** — new in 0.20.1. Stake or mine with one
+  wallet at a time: pick a duration, enter the passphrase, and the page counts
+  down. Staking unlocks the wallet for the chosen time and locks it again when
+  it ends; mining keeps the wallet locked and lets you choose how many cores to
+  use. When staking can't start, the page says why (wallet not encrypted,
+  coins under 10 TLR or younger than 2 days, another wallet already staking).
+  See the **[Staking and Mining guide](doc/staking-and-mining.md)**, which also
+  covers `taler.conf` settings (`stakegen`, `stakewallet`, `gen`,
+  `minewallet`) and headless staking with `talerd`.
 - **Nodes page** — new in 0.19.2.8. Displays the hardcoded DNS seeds, a
   community-fetched seed list from [`abkvme/taler-seeds`](https://github.com/abkvme/taler-seeds),
   and the peers your node is currently connected to. A background TCP probe

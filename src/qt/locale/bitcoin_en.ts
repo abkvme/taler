@@ -283,7 +283,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+19"/>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,9 +318,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-69"/>
+        <location line="-77"/>
         <source>Start staking</source>
         <translation type="unfinished">Start staking</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enter your wallet passphrase to start mining. The wallet stays locked while mining; rewards go to a new address of this wallet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Start mining</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+69"/>
@@ -364,14 +374,18 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+16"/>
-        <location line="+11"/>
+        <location line="+27"/>
         <location line="+19"/>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-28"/>
+        <source>Start mining failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Wallet decryption failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -381,26 +395,20 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+49"/>
         <location line="+33"/>
         <source>Warning: The Caps Lock key is on!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-238"/>
+        <location line="-247"/>
         <source>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</source>
         <translation>Enter your wallet passphrase to start staking. The wallet will automatically re-lock when the duration ends.</translation>
     </message>
     <message>
-        <location line="+126"/>
-        <location line="+6"/>
+        <location line="+135"/>
         <source>Start staking failed</source>
         <translation>Start staking failed</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Invalid staking duration.</source>
-        <translation>Invalid staking duration.</translation>
     </message>
 </context>
 <context>
@@ -419,17 +427,17 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+375"/>
+        <location filename="../bitcoingui.cpp" line="+385"/>
         <source>Sign &amp;message...</source>
         <translation>Sign &amp;message...</translation>
     </message>
     <message>
-        <location line="+692"/>
+        <location line="+807"/>
         <source>Synchronizing with network...</source>
         <translation>Synchronizing with network...</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-956"/>
         <source>&amp;Overview</source>
         <translation>&amp;Overview</translation>
     </message>
@@ -445,6 +453,16 @@
     </message>
     <message>
         <location line="+28"/>
+        <source>&amp;Earn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stake or mine with this wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>&amp;Transactions</source>
         <translation>&amp;Transactions</translation>
     </message>
@@ -474,7 +492,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+31"/>
         <source>E&amp;xit</source>
         <translation>E&amp;xit</translation>
     </message>
@@ -485,12 +503,12 @@
     </message>
     <message>
         <location line="+22"/>
-        <location line="+553"/>
+        <location line="+662"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-552"/>
+        <location line="-661"/>
         <source>Close Taler</source>
         <translation type="unfinished"></translation>
     </message>
@@ -605,7 +623,60 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+484"/>
+        <location line="+263"/>
+        <source>%1 (staking)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>%1 (mining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Staking has changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wallet &quot;%1&quot; is not encrypted, so it no longer stakes in the background. Staking now needs an encrypted wallet and is started from the Earn page.
+
+To keep staking, encrypt the wallet (Settings, Encrypt Wallet), then start staking on the Earn page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Wallet &quot;%1&quot; was staking when Taler closed, with %2 left. Resume staking?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+3"/>
+        <source>Taler was mining to wallet &quot;%1&quot; with %n thread(s) when it closed, with %2 left. Resume mining?</source>
+        <translation>
+            <numerusform>Taler was mining to wallet &quot;%1&quot; with %n thread when it closed, with %2 left. Resume mining?</numerusform>
+            <numerusform>Taler was mining to wallet &quot;%1&quot; with %n threads when it closed, with %2 left. Resume mining?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+3"/>
+        <source>Taler was mining to wallet &quot;%1&quot; with %n thread(s) when it closed. Resume mining?</source>
+        <translation>
+            <numerusform>Taler was mining to wallet &quot;%1&quot; with %n thread when it closed. Resume mining?</numerusform>
+            <numerusform>Taler was mining to wallet &quot;%1&quot; with %n threads when it closed. Resume mining?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Resume mining?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Resume staking?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+259"/>
         <source>Exit Taler</source>
         <translation type="unfinished"></translation>
     </message>
@@ -615,22 +686,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>The node will stop, and this wallet will stop staking until you open it again. Shutting down can take a moment while the chain state is written to disk.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+6"/>
         <source>The node will stop. Shutting down can take a moment while the chain state is written to disk.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+3"/>
+        <source>The node will stop, and so will staking or mining with wallet &quot;%1&quot;. taler.conf starts it again with Taler. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>Stay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+116"/>
+        <location line="+122"/>
         <source>Click to disable network activity.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -660,12 +731,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1152"/>
+        <location line="-1276"/>
         <source>Send coins to a Taler address</source>
         <translation>Send coins to a Taler address</translation>
     </message>
     <message>
-        <location line="+129"/>
+        <location line="+138"/>
         <source>Backup wallet to another location</source>
         <translation>Backup wallet to another location</translation>
     </message>
@@ -690,12 +761,12 @@
         <translation>&amp;Verify message...</translation>
     </message>
     <message>
-        <location line="+779"/>
+        <location line="+894"/>
         <source>Taler</source>
         <translation>Taler</translation>
     </message>
     <message>
-        <location line="-1059"/>
+        <location line="-1183"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -710,7 +781,7 @@
         <translation>&amp;Receive</translation>
     </message>
     <message>
-        <location line="+104"/>
+        <location line="+113"/>
         <source>&amp;Show / Hide</source>
         <translation>&amp;Show / Hide</translation>
     </message>
@@ -755,12 +826,12 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <location line="-239"/>
+        <location line="-248"/>
         <source>Request payments (generates QR codes and taler: URIs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="+141"/>
         <source>Show the list of used sending addresses and labels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -780,7 +851,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+618"/>
+        <location line="+733"/>
         <source>%n active connection(s) to Taler network</source>
         <translation>
             <numerusform>%n active connection to Taler network</numerusform>
@@ -841,22 +912,32 @@
         <translation>Up to date</translation>
     </message>
     <message>
-        <location line="-703"/>
+        <location line="-818"/>
         <source>Show the %1 help message to get a list with possible Taler command-line options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+154"/>
+        <location line="+155"/>
         <source>Wallet in use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+240"/>
+        <location line="+341"/>
         <source>%1 client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+295"/>
+        <location line="+100"/>
+        <source>The node will stop, and wallet &quot;%1&quot; will stop staking. Taler offers to resume it when it starts again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The node will stop, and mining to wallet &quot;%1&quot; will stop. Taler offers to resume it when it starts again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+204"/>
         <source>Connecting to peers...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -932,12 +1013,12 @@
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../bitcoin.cpp" line="+531"/>
+        <location filename="../bitcoin.cpp" line="+544"/>
         <source>A fatal error occurred. Taler can no longer continue safely and will quit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bitcoingui.cpp" line="-1085"/>
+        <location filename="../bitcoingui.cpp" line="-1202"/>
         <source>&amp;Nodes</source>
         <translation>&amp;Nodes</translation>
     </message>
@@ -1292,6 +1373,250 @@
     </message>
 </context>
 <context>
+    <name>EarnPage</name>
+    <message>
+        <location filename="../earnpage.cpp" line="+98"/>
+        <source>Earn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Stake or mine with one wallet at a time. Switching wallets does not stop either.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Staking</source>
+        <translation type="unfinished">Staking</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Earn proof-of-stake rewards with this wallet&apos;s coins. The wallet stays unlocked for the time you choose, then locks again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <location line="+43"/>
+        <source>Duration:</source>
+        <translation type="unfinished">Duration:</translation>
+    </message>
+    <message>
+        <location line="-41"/>
+        <location line="+43"/>
+        <source>1 hour</source>
+        <translation type="unfinished">1 hour</translation>
+    </message>
+    <message>
+        <location line="-42"/>
+        <location line="+43"/>
+        <source>6 hours</source>
+        <translation type="unfinished">6 hours</translation>
+    </message>
+    <message>
+        <location line="-42"/>
+        <location line="+43"/>
+        <source>24 hours</source>
+        <translation type="unfinished">24 hours</translation>
+    </message>
+    <message>
+        <location line="-42"/>
+        <location line="+43"/>
+        <source>7 days</source>
+        <translation type="unfinished">7 days</translation>
+    </message>
+    <message>
+        <location line="-42"/>
+        <location line="+43"/>
+        <source>30 days</source>
+        <translation type="unfinished">30 days</translation>
+    </message>
+    <message>
+        <location line="-39"/>
+        <source>Start staking</source>
+        <translation type="unfinished">Start staking</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+278"/>
+        <source>Stop staking</source>
+        <translation type="unfinished">Stop staking</translation>
+    </message>
+    <message>
+        <location line="-268"/>
+        <source>Mining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Earn proof-of-work rewards with this computer&apos;s processor. Rewards go to a new address of this wallet, and the wallet stays locked. Mining keeps the chosen number of cores busy, which makes the computer run hot and loud.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Threads:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Until stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Start mining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+230"/>
+        <source>Stop mining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-166"/>
+        <location line="+27"/>
+        <source>Waiting for the node to finish syncing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-25"/>
+        <source>Encrypt this wallet to stake. Staking unlocks it for a set time, which needs a passphrase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>This wallet is mining. Stop mining to stake.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wallet &quot;%1&quot; is mining. Stop mining there to stake.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Wallet &quot;%1&quot; is staking. Only one wallet can stake at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>No coins to stake. A stake starts from a coin of at least %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Coins become stakeable on %1. A coin must be %2 old to stake.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Encrypt this wallet to mine. Starting mining asks for its passphrase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>This wallet is staking. Stop staking to mine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wallet &quot;%1&quot; is staking. Stop staking there to mine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Wallet &quot;%1&quot; is mining. Only one wallet can mine at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+13"/>
+        <source>Mining with %n thread(s), %1 left.</source>
+        <translation>
+            <numerusform>Mining with %n thread, %1 left.</numerusform>
+            <numerusform>Mining with %n threads, %1 left.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+1"/>
+        <source>Mining with %n thread(s) until stopped.</source>
+        <translation>
+            <numerusform>Mining with %n thread until stopped.</numerusform>
+            <numerusform>Mining with %n threads until stopped.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Staking, %1 left.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Staking until stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Waiting: the wallet is locked. Unlock it to stake.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Started by gen=1 in taler.conf.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Started by stakegen=1 in taler.conf.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Not staking.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Stakeable now: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A further %1 becomes stakeable from %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+14"/>
+        <source>Go to &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <source>Not mining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>Stop mining?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Stop staking?</source>
+        <translation type="unfinished">Stop staking?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to stop mining?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Are you sure you want to stop staking?</source>
+        <translation type="unfinished">Are you sure you want to stop staking?</translation>
+    </message>
+</context>
+<context>
     <name>EditAddressDialog</name>
     <message>
         <location filename="../forms/editaddressdialog.ui" line="+14"/>
@@ -1429,7 +1754,7 @@
 <context>
     <name>InfoPage</name>
     <message>
-        <location filename="../infopage.cpp" line="+228"/>
+        <location filename="../infopage.cpp" line="+390"/>
         <source>Refresh</source>
         <translation>Refresh</translation>
     </message>
@@ -1464,12 +1789,13 @@
         <translation>Discovered Peers</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+13"/>
+        <location line="+98"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-98"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1479,22 +1805,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+26"/>
         <source>Maintained by abkvme, 2025-2026</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+72"/>
         <source>Resolved IP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+88"/>
         <source>Unavailable - remote seed list could not be fetched</source>
         <translation>Unavailable - remote seed list could not be fetched</translation>
     </message>
     <message>
-        <location line="+143"/>
+        <location line="+231"/>
         <source>Resolves to %1 and is answering</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1509,19 +1835,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-309"/>
-        <location line="+81"/>
+        <location line="-424"/>
+        <location line="+98"/>
         <source>Node</source>
         <translation>Node</translation>
     </message>
     <message>
-        <location line="-81"/>
-        <location line="+81"/>
+        <location line="-98"/>
+        <location line="+98"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location line="-41"/>
+        <location line="-48"/>
         <source>Contribute Your Node</source>
         <translation>Contribute Your Node</translation>
     </message>
@@ -1539,42 +1865,52 @@ This helps other Taler nodes discover peers and strengthens the network.
 Visit the repository to learn how to contribute:</translation>
     </message>
     <message>
+        <location line="+341"/>
         <source>Reported by the seed itself: %1</source>
         <translation>Reported by the seed itself: %1</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Mode: %1</source>
         <translation>Mode: %1</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>API: %1</source>
         <translation>API: %1</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>The seed did not complete a version handshake</source>
         <translation>The seed did not complete a version handshake</translation>
     </message>
     <message>
+        <location line="-402"/>
         <source>From</source>
         <translation>From</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>%1 embedded seed    %2 community seed    no marker: found by the node itself</source>
         <translation>%1 embedded seed    %2 community seed    no marker: found by the node itself</translation>
     </message>
     <message>
+        <location line="+258"/>
         <source>An embedded seed - compiled into this wallet</source>
         <translation>An embedded seed - compiled into this wallet</translation>
     </message>
     <message>
+        <location line="-1"/>
         <source>An embedded seed, also listed as a community seed</source>
         <translation>An embedded seed, also listed as a community seed</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>A community seed - from the seed list on GitHub</source>
         <translation>A community seed - from the seed list on GitHub</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Found by the node itself, not from a seed list</source>
         <translation>Found by the node itself, not from a seed list</translation>
     </message>
@@ -2023,7 +2359,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+82"/>
         <source>Size of &amp;database cache</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2107,7 +2443,17 @@ Visit the repository to learn how to contribute:</translation>
         <translation>&amp;Network</translation>
     </message>
     <message>
-        <location line="-191"/>
+        <location line="-216"/>
+        <source>Once a day, ask the project&apos;s release page on GitHub whether a newer version is available, and show it on the home screen. Nothing is downloaded or installed. The request goes through the proxy configured on the Network tab, if any.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Check for &amp;updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2330,7 +2676,7 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+79"/>
         <source>Confirm options reset</source>
         <translation>Confirm options reset</translation>
     </message>
@@ -2470,90 +2816,53 @@ Visit the repository to learn how to contribute:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+243"/>
-        <location filename="../overviewpage.cpp" line="+485"/>
+        <location filename="../overviewpage.cpp" line="+538"/>
         <source>Staking</source>
         <translation>Staking</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</source>
-        <translation>Earn Proof-of-Stake rewards by keeping your wallet unlocked.</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Duration:</source>
-        <translation>Duration:</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>1 hour</source>
-        <translation>1 hour</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>6 hours</source>
-        <translation>6 hours</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>24 hours</source>
-        <translation>24 hours</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>7 days</source>
-        <translation>7 days</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>30 days</source>
-        <translation>30 days</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Start staking</source>
-        <translation>Start staking</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Stop staking</source>
-        <translation>Stop staking</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location filename="../overviewpage.cpp" line="+355"/>
-        <source>Not staking</source>
-        <translation>Not staking</translation>
-    </message>
-    <message>
-        <location filename="../overviewpage.cpp" line="-9"/>
-        <source>Staking — %1 remaining</source>
-        <translation>Staking — %1 remaining</translation>
-    </message>
-    <message>
-        <location line="-29"/>
-        <source>Stop staking?</source>
-        <translation>Stop staking?</translation>
-    </message>
-    <message>
-        <location line="-620"/>
+        <location line="-357"/>
         <source>Available balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+38"/>
         <source>No transactions yet.
 Incoming and outgoing payments will appear here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+125"/>
+        <location line="+112"/>
         <source>An API sidecar is registered with this node and is reported to the network as part of its version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+27"/>
+        <source>Update available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>View release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Open the release page with the notes and the downloads for every platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Taler %1 is out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>You are running %1. Updating is recommended - it can carry security fixes and network changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
         <source>Balance looks wrong?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2675,16 +2984,12 @@ The whole chain is read again and the address list is extended as history is fou
         </translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+111"/>
         <source>Wallet: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+105"/>
-        <source>Are you sure you want to stop staking?</source>
-        <translation>Are you sure you want to stop staking?</translation>
-    </message>
-    <message>
+        <location line="-336"/>
         <source>API: %1</source>
         <translation>API: %1</translation>
     </message>
@@ -2755,7 +3060,7 @@ The whole chain is read again and the address list is extended as history is fou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+133"/>
         <source>Enter a Taler address (e.g. %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2805,6 +3110,7 @@ The whole chain is read again and the address list is extended as history is fou
     </message>
     <message numerus="yes">
         <location line="+4"/>
+        <location filename="../earnpage.cpp" line="-360"/>
         <source>%n minute(s)</source>
         <translation>
             <numerusform>%n minute</numerusform>
@@ -2813,6 +3119,7 @@ The whole chain is read again and the address list is extended as history is fou
     </message>
     <message numerus="yes">
         <location line="+4"/>
+        <location filename="../earnpage.cpp" line="-1"/>
         <source>%n hour(s)</source>
         <translation type="unfinished">
             <numerusform>%n hour</numerusform>
@@ -2821,6 +3128,7 @@ The whole chain is read again and the address list is extended as history is fou
     </message>
     <message numerus="yes">
         <location line="+4"/>
+        <location filename="../earnpage.cpp" line="-1"/>
         <source>%n day(s)</source>
         <translation type="unfinished">
             <numerusform>%n day</numerusform>
@@ -2890,13 +3198,13 @@ The whole chain is read again and the address list is extended as history is fou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../guiutil.cpp" line="-902"/>
+        <location filename="../guiutil.cpp" line="-933"/>
         <location filename="../walletmanagerdialog.cpp" line="+6"/>
         <source>That name is reserved by the wallet directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../walletmanagerdialog.cpp" line="+273"/>
+        <location filename="../walletmanagerdialog.cpp" line="+293"/>
         <source>Could not copy %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2911,7 +3219,7 @@ The whole chain is read again and the address list is extended as history is fou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../infopage.cpp" line="+27"/>
+        <location filename="../infopage.cpp" line="-187"/>
         <source>Checking…</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4385,7 +4693,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
         <location line="+14"/>
         <location line="+72"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">From</translation>
     </message>
     <message>
         <location line="-72"/>
@@ -4885,7 +5193,7 @@ Once this wallet sends or receives, its history appears here.</source>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+1230"/>
+        <location filename="../bitcoingui.cpp" line="+1347"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4917,7 +5225,7 @@ Create a new wallet, or restore one from its 24-word recovery phrase.</source>
 <context>
     <name>WalletManagerDialog</name>
     <message>
-        <location filename="../walletmanagerdialog.cpp" line="-244"/>
+        <location filename="../walletmanagerdialog.cpp" line="-264"/>
         <source>Manage wallets</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4993,12 +5301,7 @@ Create a new wallet, or restore one from its 24-word recovery phrase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+54"/>
-        <source>%1  •  in use</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+63"/>
         <source>File name: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5038,7 +5341,17 @@ Create a new wallet, or restore one from its 24-word recovery phrase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+37"/>
+        <source>Wallet &quot;%1&quot; is staking. Stop staking on the Earn page first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wallet &quot;%1&quot; is being mined to. Stop mining on the Earn page first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Closing the wallet...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5053,7 +5366,8 @@ Create a new wallet, or restore one from its 24-word recovery phrase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+11"/>
+        <location line="+3"/>
         <location line="+7"/>
         <location line="+5"/>
         <location line="+32"/>
@@ -5086,7 +5400,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source>&lt;b&gt;Remove wallet &quot;%1&quot;?&lt;/b&gt;&lt;br&gt;&lt;br&gt;File: %2&lt;br&gt;&lt;br&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5106,7 +5420,8 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-20"/>
+        <location line="+24"/>
         <location line="+9"/>
         <location line="+5"/>
         <location line="+9"/>
@@ -5115,7 +5430,22 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-19"/>
+        <location line="-291"/>
+        <source>in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>staking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>mining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+268"/>
         <source>Type the wallet name to confirm: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5138,12 +5468,28 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+219"/>
+        <location filename="../walletmodel.cpp" line="+215"/>
         <source>Send Coins</source>
         <translation type="unfinished">Send Coins</translation>
     </message>
     <message>
-        <location line="+314"/>
+        <location line="+162"/>
+        <source>Invalid staking duration.</source>
+        <translation type="unfinished">Invalid staking duration.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+26"/>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <source>Invalid mining settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+191"/>
         <location line="+39"/>
         <location line="+6"/>
         <source>Fee bump error</source>
@@ -5193,7 +5539,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
 <context>
     <name>WalletView</name>
     <message>
-        <location filename="../walletview.cpp" line="+52"/>
+        <location filename="../walletview.cpp" line="+53"/>
         <source>&amp;Export</source>
         <translation type="unfinished">&amp;Export</translation>
     </message>
@@ -5203,7 +5549,7 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <translation type="unfinished">Export the data in the current tab to a file</translation>
     </message>
     <message>
-        <location line="+243"/>
+        <location line="+255"/>
         <source>Backup Wallet</source>
         <translation type="unfinished"></translation>
     </message>

@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <memory>
+#include <string>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
@@ -203,6 +204,38 @@ private:
 void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev);
 
-int generateCoin (int nThreads);
+//! What the node is producing blocks with: nothing, one wallet's stake, or one
+//! wallet's mining. Only one at a time, across all wallets.
+enum class GenerationMode { OFF, STAKING, MINING };
+
+struct GenerationState
+{
+    GenerationMode mode = GenerationMode::OFF;
+    //! The wallet staking or receiving the mining reward ("" is the default wallet).
+    std::string wallet;
+    //! When this ends (unix time), or 0 to run until stopped.
+    int64_t until = 0;
+    //! Mining threads; 0 while staking.
+    int threads = 0;
+    //! Started by -stakegen or -gen rather than by the user.
+    bool from_config = false;
+    //! Changes whenever the state does, so a change can be noticed without comparing.
+    uint64_t session = 0;
+};
+
+GenerationState GetGenerationState();
+//! Stake with the named wallet. It need not be loaded yet; staking starts when it is.
+void StartStaking(const std::string& wallet_name, int64_t until, bool from_config);
+//! Mine to a fresh address of `wallet`. Fails only if the wallet has no address to give.
+bool StartMining(CWallet& wallet, int threads, int64_t until, bool from_config, std::string& error);
+void StopGeneration();
+//! Stop, if the named wallet is the one staking or being mined to.
+void StopGenerationForWallet(const std::string& wallet_name);
+//! Start the thread that stakes and ends timed sessions. Safe to call more than once.
+void StartGenerationSupervisor();
+//! The most mining threads allowed: every core but one.
+int MaxMiningThreads();
+//! Start the next coin-stake search from now rather than from the last one.
+void ResetCoinStakeSearch();
 
 #endif // BITCOIN_MINER_H

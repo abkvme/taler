@@ -3361,6 +3361,38 @@ bool getCoinInfo (std::map<uint256, uint64_t>& cache, const COutPoint& out, uint
     return true;
 };
 
+CWallet::StakeEligibility CWallet::GetStakeEligibility() const
+{
+    const Consensus::Params& consensus = Params().GetConsensus();
+    StakeEligibility result;
+
+    LOCK2(cs_main, cs_wallet);
+    if (chainActive.Tip() == nullptr) return result;
+    const int64_t now = GetAdjustedTime();
+    std::vector<COutput> vCoins;
+    AvailableCoins(vCoins, true, nullptr, 0);
+    std::map<uint256, uint64_t> cache;
+    // The same tests as CreateCoinStake's kernel search, so this never promises
+    // a stake the staker would not attempt.
+    for (const COutput& out : vCoins) {
+        if (!out.fSpendable) continue;
+        const CInputCoin coin = out.GetInputCoin();
+        if (coin.txout.nValue < MIN_STAKE_KERNEL_AMOUNT) continue;
+        uint32_t offset, time;
+        if (!getCoinInfo(cache, coin.outpoint, time, offset)) continue;
+        const int64_t stakeable_from = int64_t(time) + consensus.nStakeMinAge;
+        if (stakeable_from <= now) {
+            result.stakeable += coin.txout.nValue;
+        } else {
+            result.maturing += coin.txout.nValue;
+            if (result.next_stakeable_time == 0 || stakeable_from < result.next_stakeable_time) {
+                result.next_stakeable_time = stakeable_from;
+            }
+        }
+    }
+    return result;
+}
+
 // pos: create coin stake transaction
 //
 // Payouts go to DEFAULT_ADDRESS_TYPE, which is OutputType::LEGACY - so P2PKH, not
@@ -3395,7 +3427,7 @@ bool CWallet::CreateCoinStake (CBlockHeader& header, int64_t nSearchInterval, CM
     for (const COutput& inpcoin : vCoins) {
         if (!inpcoin.fSpendable) continue;
         CInputCoin pcoin = inpcoin.GetInputCoin(); 
-        if (pcoin.txout.nValue < 10 * COIN) continue;
+        if (pcoin.txout.nValue < MIN_STAKE_KERNEL_AMOUNT) continue;
 
         uint32_t offset, time;
         if (!getCoinInfo (cachedCoins, pcoin.outpoint, time, offset)) continue;
@@ -3435,7 +3467,7 @@ bool CWallet::CreateCoinStake (CBlockHeader& header, int64_t nSearchInterval, CM
         if (!inpcoin.fSpendable) continue;
         CInputCoin pcoin = inpcoin.GetInputCoin();
         if (txNew.vin.size() > 31) break;
-        if (pcoin.txout.nValue > 10 * COIN) continue;
+        if (pcoin.txout.nValue > MIN_STAKE_KERNEL_AMOUNT) continue;
         if (txNew.vin[0].prevout == pcoin.outpoint) continue;
         uint32_t offset, time; 
         if (!getCoinInfo (cachedCoins, pcoin.outpoint, time, offset)) continue;

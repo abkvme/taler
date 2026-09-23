@@ -141,6 +141,15 @@ public:
         return true;
     }
     int64_t getUnlockedUntil() override { return m_wallet.nRelockTime; }
+    WalletStakeEligibility getStakeEligibility() override
+    {
+        const CWallet::StakeEligibility e = m_wallet.GetStakeEligibility();
+        WalletStakeEligibility result;
+        result.stakeable = e.stakeable;
+        result.maturing = e.maturing;
+        result.next_stakeable_time = e.next_stakeable_time;
+        return result;
+    }
     bool isLocked() override { return m_wallet.IsLocked(); }
     bool changeWalletPassphrase(const SecureString& old_wallet_passphrase,
         const SecureString& new_wallet_passphrase) override

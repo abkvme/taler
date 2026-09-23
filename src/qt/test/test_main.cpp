@@ -17,6 +17,7 @@
 
 #ifdef ENABLE_WALLET
 #include <qt/test/addressbooktests.h>
+#include <qt/test/earnpagetests.h>
 #include <qt/test/wallettests.h>
 #endif
 
@@ -107,6 +108,10 @@ int main(int argc, char *argv[])
         fInvalid = true;
     }
 #ifdef ENABLE_WALLET
+    EarnPageTests earn_page_tests;
+    if (QTest::qExec(&earn_page_tests) != 0) {
+        fInvalid = true;
+    }
     WalletTests test5;
     if (QTest::qExec(&test5) != 0) {
         fInvalid = true;

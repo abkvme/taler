@@ -229,6 +229,8 @@ private:
     QTimer *pollShutdownTimer;
 #ifdef ENABLE_WALLET
     std::vector<WalletModel*> m_wallet_models;
+    //! taler.conf does not say stakegen, so the GUI turned background staking off.
+    bool m_stakegen_defaulted_off = false;
     std::unique_ptr<interfaces::Handler> m_handler_load_wallet;
 #endif
     int returnValue;
@@ -384,6 +386,12 @@ void BitcoinApplication::parameterSetup()
     // The GUI offers a creation wizard, so the node must not create a wallet behind it.
     gArgs.SoftSetBoolArg("-createwalletonstart", false);
 
+    // Staking is a choice made on the Earn page, not something the GUI starts on its
+    // own - unless taler.conf asks for it by name, which is then obeyed as in talerd.
+#ifdef ENABLE_WALLET
+    m_stakegen_defaulted_off = gArgs.SoftSetBoolArg("-stakegen", false);
+#endif
+
     m_node.initLogging();
     m_node.initParameterInteraction();
 }
@@ -501,6 +509,11 @@ void BitcoinApplication::initializeResult(bool success)
                 }
             }
         }
+
+        // After the remembered wallets' queued addWallet calls, so every wallet the
+        // user could resume is on screen first.
+        const bool legacy_notice = m_stakegen_defaulted_off;
+        QTimer::singleShot(0, window, [this, legacy_notice] { window->startGenerationWatch(legacy_notice); });
 #endif
 
         // If -min option passed, start window minimized.

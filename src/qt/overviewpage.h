@@ -121,10 +121,7 @@ private:
     TxViewDelegate *txdelegate;
     std::unique_ptr<TransactionFilterProxy> filter;
 
-    QTimer *stakingTickTimer;
-    int64_t stakingDurationSeconds;
 
-    QString formatStakingRemaining(int64_t seconds) const;
     void buildRewardsColumn();
     void applyBadgeState(QWidget* badge, const char* state);
 
@@ -134,10 +131,6 @@ private Q_SLOTS:
     void updateAlerts(const QString &warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
     void handleOutOfSyncWarningClicks();
-    void onStartStakingClicked();
-    void onStopStakingClicked();
-    void updateStakingUi();
-    void tickStakingTimer();
     //! Recompute the reward badges and chart from the transaction model.
     void refreshRewards();
     //! Ask for a recompute once the model has stopped changing.

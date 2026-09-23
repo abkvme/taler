@@ -27,7 +27,8 @@ public:
         Unlock,         /**< Ask passphrase and unlock */
         ChangePass,     /**< Ask old passphrase + new passphrase twice */
         Decrypt,        /**< Ask passphrase and decrypt wallet */
-        UnlockStaking   /**< Ask passphrase, unlock, and arm auto-relock for staking */
+        UnlockStaking,  /**< Ask passphrase, unlock for a timed staking session */
+        StartMining     /**< Ask passphrase to authorise mining; the wallet stays locked */
     };
 
     explicit AskPassphraseDialog(Mode mode, QWidget *parent);
@@ -39,6 +40,8 @@ public:
 
     /** For mode=UnlockStaking, set the staking duration in seconds. */
     void setStakingDuration(int64_t seconds) { stakingDurationSeconds = seconds; }
+    /** For mode=StartMining: threads, and seconds to mine (0 = until stopped). */
+    void setMiningParameters(int threads, int64_t seconds) { miningThreads = threads; miningSeconds = seconds; }
 
 private:
     Ui::AskPassphraseDialog *ui;
@@ -46,6 +49,8 @@ private:
     WalletModel *model;
     bool fCapsLock;
     int64_t stakingDurationSeconds = 0;
+    int miningThreads = 0;
+    int64_t miningSeconds = 0;
 
 private Q_SLOTS:
     void textChanged();

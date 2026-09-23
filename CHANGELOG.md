@@ -1,3 +1,40 @@
+# Taler 0.20.1
+
+## Release Date
+Unreleased
+
+## Fixes
+- Wallets created, restored or reopened in the desktop wallet never staked: the node started one staker at startup, bound to the first wallet loaded, and wallets loaded later had none. A new user with no older wallet had no staker at all
+- The desktop wallet showed "Staking — time remaining" from the unlock timer alone, so it reported staking on wallets where nothing was being staked
+- Removing or renaming the staking wallet hung forever: the staker held the wallet for the whole session and `UnloadWallet` waited on it
+
+## Major Changes
+
+### Staking and Mining: One Wallet at a Time
+- The node holds a single block-production state: off, staking with one wallet, or mining to one wallet. Starting either replaces whatever was running
+- The staker looks its wallet up by name on each pass and lets go of it before sleeping, so any wallet can stake, including ones loaded after startup, and the staking wallet can be unloaded
+- A timed staking session ends when its time is up or its wallet is locked, and the node locks the wallet when it ends. An untimed one (`-stakegen`, or the RPC without a duration) waits out a locked wallet, as before
+- Mining pays a fresh address of the chosen wallet, reserved when mining starts, instead of always the first wallet; the wallet can stay locked while mining
+- New `-stakewallet=<name>` and `-minewallet=<name>` choose the wallet for `-stakegen` and `-gen`; both default to the first wallet, so talerd behaves as before
+- `setgeneratepos` and `setgeneratepow` act on the wallet in the request and take an optional duration; stopping mining no longer restarts staking. `getgenerate` reports the mode, wallet, end time and whether taler.conf started it
+- `unloadwallet` stops staking or mining first when the wallet is the one doing it
+- Stake eligibility (coins of at least 10 TLR, old enough to stake) is computed with the same filters as the staker itself
+
+### Earn Page
+- New Earn page after Receive: staking on the left, mining on the right. The staking controls moved here from the Overview page; the reward badges and chart stay on the Overview
+- Staking and mining both need an encrypted wallet and its passphrase. Staking unlocks the wallet for 1 hour to 30 days; mining keeps it locked, with 1 to cores-1 threads and durations up to "until stopped"
+- Controls that cannot be used are greyed out with the reason: syncing, not encrypted, another wallet staking or mining (with a link to it), mining running, no coin of at least 10 TLR, or coins not yet old enough (with the date)
+- The wallet selector and the Manage wallets list mark the staking or mining wallet; that wallet cannot be removed or renamed until stopped
+- After a restart, Taler offers to resume staking or mining with the time that was left, asking for the passphrase; it never resumes on its own
+- The desktop wallet no longer stakes in the background on its own. `stakegen=1` or `gen=1` set in taler.conf are still obeyed. Users with an unencrypted wallet that has coins to stake are told once, after upgrading, how to keep staking
+- The exit confirmation names the wallet that will stop staking or mining
+
+### Other
+- Russian, Ukrainian and Belarusian translations for the new strings, and for the update-check strings added after 0.20.0
+- Release notes for 0.20.1 in `doc/release-notes-0.20.1.md`
+- New user guide `doc/staking-and-mining.md`: the Earn page, staking requirements, every `taler.conf` setting, headless staking, Docker and the RPCs; linked from the README, `doc/README.md`, `README-DOCKER.md` and `docker/taler.conf.example`
+- `-help` now describes `-gen`, `-stakegen` and `-gencomment` properly
+
 # Taler 0.20.0
 
 ## Release Date

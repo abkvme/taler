@@ -84,6 +84,23 @@ namespace GUIUtil
     void setDefaultWallet(const QString& name);
     void clearDefaultWallet();
 
+    /**
+     * The staking or mining the user last started from the GUI, kept so it can be
+     * offered again after a restart. The node forgets it on exit, and an encrypted
+     * wallet cannot be unlocked again without its passphrase, so resuming is always
+     * a question, never automatic.
+     */
+    struct GenerationSession
+    {
+        bool mining = false;  //!< false: staking
+        QString wallet;
+        qint64 until = 0;     //!< unix time; 0 = until stopped (mining only)
+        int threads = 0;
+    };
+    bool loadGenerationSession(GenerationSession& session);
+    void saveGenerationSession(const GenerationSession& session);
+    void clearGenerationSession();
+
     // Create human-readable string from date
     QString dateTimeStr(const QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);

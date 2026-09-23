@@ -82,6 +82,7 @@ QT_MOC_CPP = \
   qt/moc_macnotificationhandler.cpp \
   qt/moc_mnemonicdialog.cpp \
   qt/moc_walletmanagerdialog.cpp \
+  qt/moc_earnpage.cpp \
   qt/moc_modaloverlay.cpp \
   qt/moc_notificator.cpp \
   qt/moc_openuridialog.cpp \
@@ -157,6 +158,7 @@ BITCOIN_QT_H = \
   qt/asyncrpc.h \
   qt/theme.h \
   qt/walletmanagerdialog.h \
+  qt/earnpage.h \
   qt/modaloverlay.h \
   qt/networkstyle.h \
   qt/notificator.h \
@@ -293,6 +295,7 @@ BITCOIN_QT_WALLET_CPP = \
   qt/editaddressdialog.cpp \
   qt/mnemonicdialog.cpp \
   qt/walletmanagerdialog.cpp \
+  qt/earnpage.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/receivecoinsdialog.cpp \

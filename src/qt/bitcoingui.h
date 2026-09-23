@@ -48,6 +48,7 @@ class QAction;
 class QComboBox;
 class QProgressBar;
 class QProgressDialog;
+class QTimer;
 QT_END_NAMESPACE
 
 /**
@@ -129,6 +130,9 @@ private:
     QAction* aboutAction = nullptr;
     QAction* receiveCoinsAction = nullptr;
     QAction* receiveCoinsMenuAction = nullptr;
+    QAction* earnAction = nullptr;
+    //! Keeps the wallet selector's staking/mining marker in step with the node.
+    QTimer* m_generation_timer = nullptr;
     QAction* optionsAction = nullptr;
     QAction* toggleHideAction = nullptr;
     QAction* createWalletAction = nullptr;
@@ -209,6 +213,10 @@ public Q_SLOTS:
 #ifdef ENABLE_WALLET
     bool setCurrentWallet(const QString& name);
     bool setCurrentWalletBySelectorIndex(int index);
+    /** Once the wallets are open: say what changed about staking if it matters to
+        this user, offer to resume the staking or mining that was running at exit,
+        then start following the node's staking and mining state. */
+    void startGenerationWatch(bool legacy_staking_notice);
     /** Set the UI status indicators based on the currently selected wallet.
     */
     void updateWalletStatus();
@@ -261,8 +269,12 @@ private Q_SLOTS:
     void gotoAboutPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
+    /** Switch to the staking and mining page */
+    void gotoEarnPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
+    /** Mark the staking or mining wallet in the selector */
+    void updateGenerationMarkers();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");

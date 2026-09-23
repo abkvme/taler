@@ -9,6 +9,7 @@
 
 #include <qt/addresstablemodel.h>
 #include <qt/guiconstants.h>
+#include <qt/guiutil.h>
 #include <qt/optionsmodel.h>
 #include <qt/recentrequeststablemodel.h>
 #include <qt/sendcoinsdialog.h>
@@ -24,6 +25,8 @@
 #include <wallet/coincontrol.h>
 #include <wallet/wallet.h>
 
+#include <univalue.h>
+
 #include <stdint.h>
 #include <limits>
 
@@ -31,6 +34,7 @@
 #include <QMessageBox>
 #include <QSet>
 #include <QTimer>
+#include <QUrl>
 
 
 WalletModel::WalletModel(std::unique_ptr<interfaces::Wallet> wallet, interfaces::Node& node, const PlatformStyle *platformStyle, OptionsModel *_optionsModel, QObject *parent) :
@@ -52,14 +56,6 @@ WalletModel::WalletModel(std::unique_ptr<interfaces::Wallet> wallet, interfaces:
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollBalanceChanged()));
     pollTimer->start(4*MODEL_UPDATE_DELAY);
-
-    // Auto-relock timer for staking (single-shot, armed on startStaking).
-    stakingAutoRelockTimer = new QTimer(this);
-    stakingAutoRelockTimer->setSingleShot(true);
-    connect(stakingAutoRelockTimer, &QTimer::timeout, this, [this]() {
-        if (m_wallet) m_wallet->lock();
-        Q_EMIT encryptionStatusChanged();
-    });
 
     subscribeToCoreSignals();
 }
@@ -358,38 +354,100 @@ bool WalletModel::changePassphrase(const SecureString &oldPass, const SecureStri
     return m_wallet->changeWalletPassphrase(oldPass, newPass);
 }
 
-bool WalletModel::startStaking(const SecureString &passPhrase, int64_t seconds_to_stake)
+bool WalletModel::generationRpc(const std::string& method, const std::vector<std::string>& args, QString& error)
 {
-    if (seconds_to_stake <= 0) return false;
-    if (!m_wallet->unlockForStaking(passPhrase, seconds_to_stake)) return false;
-    // Clamp Qt timer to int range (QTimer::start takes int ms).
-    constexpr int64_t MAX_MS = std::numeric_limits<int>::max();
-    int64_t ms = seconds_to_stake * 1000;
-    if (ms > MAX_MS) ms = MAX_MS;
-    stakingAutoRelockTimer->start(static_cast<int>(ms));
-    Q_EMIT encryptionStatusChanged();
-    return true;
+    UniValue params(UniValue::VARR);
+    for (const std::string& arg : args) params.push_back(arg);
+    const QByteArray encoded = QUrl::toPercentEncoding(getWalletName());
+    const std::string uri = "/wallet/" + std::string(encoded.constData(), encoded.length());
+    try {
+        m_node.executeRpc(method, params, uri);
+        return true;
+    } catch (const UniValue& e) {
+        error = QString::fromStdString(find_value(e, "message").getValStr());
+    } catch (const std::exception& e) {
+        error = QString::fromStdString(e.what());
+    }
+    return false;
 }
 
-bool WalletModel::stopStaking()
+bool WalletModel::startStaking(const SecureString &passPhrase, int64_t seconds, QString& error)
 {
-    stakingAutoRelockTimer->stop();
-    const bool ok = m_wallet->lock();
+    if (seconds <= 0) {
+        error = tr("Invalid staking duration.");
+        return false;
+    }
+    if (!m_wallet->unlockForStaking(passPhrase, seconds)) {
+        error = tr("The passphrase entered for the wallet decryption was incorrect.");
+        return false;
+    }
+    const bool ok = generationRpc("setgeneratepos", {"1", std::to_string(seconds)}, error);
+    if (ok) {
+        GUIUtil::GenerationSession session;
+        session.wallet = getWalletName();
+        session.until = GetTime() + seconds;
+        GUIUtil::saveGenerationSession(session);
+    } else {
+        m_wallet->lock();
+    }
     Q_EMIT encryptionStatusChanged();
     return ok;
 }
 
-int64_t WalletModel::getStakingSecondsRemaining() const
+bool WalletModel::startMining(const SecureString &passPhrase, int threads, int64_t seconds, QString& error)
 {
-    const int64_t until = m_wallet->getUnlockedUntil();
-    if (until <= 0) return 0;
-    const int64_t now = GetTime();
-    return (until > now) ? (until - now) : 0;
+    if (threads <= 0 || seconds < 0) {
+        error = tr("Invalid mining settings.");
+        return false;
+    }
+    // The passphrase authorises the start; unlocking also lets the keypool refill
+    // before the reward address is taken. Mining itself needs no keys.
+    const bool was_locked = m_wallet->isLocked();
+    if (!m_wallet->unlock(passPhrase)) {
+        error = tr("The passphrase entered for the wallet decryption was incorrect.");
+        return false;
+    }
+    const bool ok = generationRpc("setgeneratepow", {std::to_string(threads), std::to_string(seconds)}, error);
+    if (was_locked) m_wallet->lock();
+    if (ok) {
+        GUIUtil::GenerationSession session;
+        session.mining = true;
+        session.wallet = getWalletName();
+        session.until = seconds > 0 ? GetTime() + seconds : 0;
+        session.threads = threads;
+        GUIUtil::saveGenerationSession(session);
+    }
+    Q_EMIT encryptionStatusChanged();
+    return ok;
+}
+
+bool WalletModel::stopGeneration(QString& error)
+{
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    if (generation.wallet != getWalletName().toStdString()) return true;
+    bool ok = true;
+    if (generation.mode == interfaces::NodeGeneration::Mode::STAKING) {
+        ok = generationRpc("setgeneratepos", {"0"}, error);
+    } else if (generation.mode == interfaces::NodeGeneration::Mode::MINING) {
+        ok = generationRpc("setgeneratepow", {"0"}, error);
+    }
+    if (ok) GUIUtil::clearGenerationSession();
+    Q_EMIT encryptionStatusChanged();
+    return ok;
 }
 
 bool WalletModel::isStaking() const
 {
-    return !m_wallet->isLocked() && getStakingSecondsRemaining() > 0;
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    return generation.mode == interfaces::NodeGeneration::Mode::STAKING &&
+           generation.wallet == getWalletName().toStdString();
+}
+
+bool WalletModel::isMining() const
+{
+    const interfaces::NodeGeneration generation = m_node.getGeneration();
+    return generation.mode == interfaces::NodeGeneration::Mode::MINING &&
+           generation.wallet == getWalletName().toStdString();
 }
 
 // Handlers for core signals

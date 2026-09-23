@@ -24,6 +24,7 @@
 #include <ui_interface.h>
 
 #include <qt/coinsview.h>
+#include <qt/earnpage.h>
 #include <qt/infopage.h>
 #include <qt/aboutpage.h>
 
@@ -65,6 +66,8 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     vboxCoins->addWidget(coinsView);
     coinsPage->setLayout(vboxCoins);
 
+    earnPage = new EarnPage(this);
+
     infoPage = new InfoPage(platformStyle, this);
     aboutPage = new AboutPage(platformStyle, this);
 
@@ -79,6 +82,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     addWidget(coinsPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
+    addWidget(earnPage);
     addWidget(infoPage);
     addWidget(aboutPage);
 
@@ -126,6 +130,9 @@ void WalletView::setBitcoinGUI(BitcoinGUI *gui)
 
         // Connect HD enabled state signal
         connect(this, SIGNAL(hdEnabledStatusChanged()), gui, SLOT(updateWalletStatus()));
+
+        // "Go to" the wallet that is staking or mining; the new view opens on the same page.
+        connect(earnPage, SIGNAL(switchWalletRequested(QString)), gui, SLOT(setCurrentWallet(QString)));
     }
 }
 
@@ -147,6 +154,7 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
     transactionView->setModel(_walletModel);
     coinsView->setModel(_walletModel);
     overviewPage->setWalletModel(_walletModel);
+    earnPage->setWalletModel(_walletModel);
     receiveCoinsPage->setModel(_walletModel);
     sendCoinsPage->setModel(_walletModel);
     usedReceivingAddressesPage->setModel(_walletModel ? _walletModel->getAddressTableModel() : nullptr);
@@ -214,6 +222,11 @@ void WalletView::gotoHistoryPage()
 void WalletView::gotoCoinsPage()
 {
     setCurrentWidget(coinsPage);
+}
+
+void WalletView::gotoEarnPage()
+{
+    setCurrentWidget(earnPage);
 }
 
 void WalletView::gotoNodesPage()

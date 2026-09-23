@@ -243,6 +243,18 @@
         <source>Invalid staking duration.</source>
         <translation>Неприпустима тривалість стейкінгу.</translation>
     </message>
+    <message>
+        <source>Enter your wallet passphrase to start mining. The wallet stays locked while mining; rewards go to a new address of this wallet.</source>
+        <translation>Введіть пароль гаманця, щоб запустити майнінг. Під час майнінгу гаманець залишається заблокованим; винагороди надходять на нову адресу цього гаманця.</translation>
+    </message>
+    <message>
+        <source>Start mining</source>
+        <translation>Запустити майнінг</translation>
+    </message>
+    <message>
+        <source>Start mining failed</source>
+        <translation>Не вдалося запустити майнінг</translation>
+    </message>
 </context>
 <context>
     <name>BanTableModel</name>
@@ -681,6 +693,66 @@
     <message>
         <source>The node will stop. Shutting down can take a moment while the chain state is written to disk.</source>
         <translation>Вузол буде зупинено. Завершення роботи може зайняти деякий час, доки стан ланцюжка записується на диск.</translation>
+    </message>
+    <message>
+        <source>&amp;Earn</source>
+        <translation>&amp;Заробіток</translation>
+    </message>
+    <message>
+        <source>Stake or mine with this wallet</source>
+        <translation>Стейкінг або майнінг з цим гаманцем</translation>
+    </message>
+    <message>
+        <source>%1 (staking)</source>
+        <translation>%1 (стейкінг)</translation>
+    </message>
+    <message>
+        <source>%1 (mining)</source>
+        <translation>%1 (майнінг)</translation>
+    </message>
+    <message>
+        <source>Staking has changed</source>
+        <translation>Стейкінг змінився</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is not encrypted, so it no longer stakes in the background. Staking now needs an encrypted wallet and is started from the Earn page.
+
+To keep staking, encrypt the wallet (Settings, Encrypt Wallet), then start staking on the Earn page.</source>
+        <translation>Гаманець «%1» не зашифровано, тому він більше не бере участі в стейкінгу у фоні. Тепер для стейкінгу потрібен зашифрований гаманець, а запускається він на сторінці «Заробіток».
+
+Щоб продовжити стейкінг, зашифруйте гаманець (Налаштування, Зашифрувати гаманець), потім запустіть стейкінг на сторінці «Заробіток».</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; was staking when Taler closed, with %2 left. Resume staking?</source>
+        <translation>Коли Taler закрився, гаманець «%1» брав участь у стейкінгу, залишалося %2. Відновити стейкінг?</translation>
+    </message>
+    <message numerus="yes">
+        <source>Taler was mining to wallet &quot;%1&quot; with %n thread(s) when it closed, with %2 left. Resume mining?</source>
+        <translation><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потік, залишалося %2. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоки, залишалося %2. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоків, залишалося %2. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоків, залишалося %2. Відновити майнінг?</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Taler was mining to wallet &quot;%1&quot; with %n thread(s) when it closed. Resume mining?</source>
+        <translation><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потік. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоки. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоків. Відновити майнінг?</numerusform><numerusform>Коли Taler закрився, тривав майнінг у гаманець «%1» у %n потоків. Відновити майнінг?</numerusform></translation>
+    </message>
+    <message>
+        <source>Resume mining?</source>
+        <translation>Відновити майнінг?</translation>
+    </message>
+    <message>
+        <source>Resume staking?</source>
+        <translation>Відновити стейкінг?</translation>
+    </message>
+    <message>
+        <source>The node will stop, and wallet &quot;%1&quot; will stop staking. Taler offers to resume it when it starts again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation>Вузол зупиниться, і гаманець «%1» припинить стейкінг. Під час наступного запуску Taler запропонує його відновити. Завершення може тривати деякий час, поки стан ланцюжка записується на диск.</translation>
+    </message>
+    <message>
+        <source>The node will stop, and mining to wallet &quot;%1&quot; will stop. Taler offers to resume it when it starts again. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation>Вузол зупиниться, і майнінг у гаманець «%1» припиниться. Під час наступного запуску Taler запропонує його відновити. Завершення може тривати деякий час, поки стан ланцюжка записується на диск.</translation>
+    </message>
+    <message>
+        <source>The node will stop, and so will staking or mining with wallet &quot;%1&quot;. taler.conf starts it again with Taler. Shutting down can take a moment while the chain state is written to disk.</source>
+        <translation>Вузол зупиниться, а з ним стейкінг або майнінг з гаманцем «%1». taler.conf знову запустить його разом із Taler. Завершення може тривати деякий час, поки стан ланцюжка записується на диск.</translation>
     </message>
 </context>
 <context>
@@ -1379,6 +1451,14 @@
         <source>Dark</source>
         <translation>Темне</translation>
     </message>
+    <message>
+        <source>Once a day, ask the project&apos;s release page on GitHub whether a newer version is available, and show it on the home screen. Nothing is downloaded or installed. The request goes through the proxy configured on the Network tab, if any.</source>
+        <translation>Раз на день запитувати сторінку релізів проєкту на GitHub, чи вийшла нова версія, і показувати це на головному екрані. Нічого не завантажується і не встановлюється. Запит іде через проксі, налаштований на вкладці «Мережа», якщо його задано.</translation>
+    </message>
+    <message>
+        <source>Check for &amp;updates</source>
+        <translation>Перевіряти &amp;оновлення</translation>
+    </message>
 </context>
 <context>
     <name>OverviewPage</name>
@@ -1662,6 +1742,26 @@ Searching an incomplete chain would report a balance that looks believable but i
     <message>
         <source>API: %1</source>
         <translation>API: %1</translation>
+    </message>
+    <message>
+        <source>Update available</source>
+        <translation>Доступне оновлення</translation>
+    </message>
+    <message>
+        <source>View release</source>
+        <translation>Відкрити реліз</translation>
+    </message>
+    <message>
+        <source>Open the release page with the notes and the downloads for every platform</source>
+        <translation>Відкрити сторінку релізу з описом і завантаженнями для всіх платформ</translation>
+    </message>
+    <message>
+        <source>Taler %1 is out</source>
+        <translation>Вийшов Taler %1</translation>
+    </message>
+    <message>
+        <source>You are running %1. Updating is recommended - it can carry security fixes and network changes.</source>
+        <translation>У вас версія %1. Рекомендується оновитися — оновлення може містити виправлення безпеки та зміни мережі.</translation>
     </message>
 </context>
 <context>
@@ -3538,6 +3638,18 @@ Create a new wallet, or restore one from its 24-word recovery phrase.</source>
         <source>Could not commit transaction</source>
         <translation>Не вдалось виконати транзакцію</translation>
     </message>
+    <message>
+        <source>Invalid staking duration.</source>
+        <translation>Неправильна тривалість стейкінгу.</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>Введено неправильний пароль для розшифрування гаманця.</translation>
+    </message>
+    <message>
+        <source>Invalid mining settings.</source>
+        <translation>Неправильні параметри майнінгу.</translation>
+    </message>
 </context>
 <context>
     <name>WalletView</name>
@@ -4787,6 +4899,26 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
         <source>The legacy wallet cannot be renamed: its name is what the node resolves by default, and changing it would leave talerd creating an empty wallet in its place.</source>
         <translation>Гаманець legacy не можна перейменувати: його ім'я — це те, що вузол використовує за замовчуванням, і його зміна призвела б до створення talerd порожнього гаманця замість нього.</translation>
     </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is staking. Stop staking on the Earn page first.</source>
+        <translation>Гаманець «%1» бере участь у стейкінгу. Спочатку зупиніть стейкінг на сторінці «Заробіток».</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is being mined to. Stop mining on the Earn page first.</source>
+        <translation>У гаманець «%1» триває майнінг. Спочатку зупиніть майнінг на сторінці «Заробіток».</translation>
+    </message>
+    <message>
+        <source>in use</source>
+        <translation>використовується</translation>
+    </message>
+    <message>
+        <source>staking</source>
+        <translation>стейкінг</translation>
+    </message>
+    <message>
+        <source>mining</source>
+        <translation>майнінг</translation>
+    </message>
 </context>
 <context>
     <name>RewardsChart</name>
@@ -4801,6 +4933,189 @@ The previous file was moved to the &quot;removed&quot; folder rather than delete
     <message>
         <source>Open %1</source>
         <translation>Відкрити %1</translation>
+    </message>
+</context>
+<context>
+    <name>EarnPage</name>
+    <message>
+        <source>Earn</source>
+        <translation>Заробіток</translation>
+    </message>
+    <message>
+        <source>Stake or mine with one wallet at a time. Switching wallets does not stop either.</source>
+        <translation>Стейкінг або майнінг — одним гаманцем за раз. Перемикання гаманців не зупиняє ні те, ні інше.</translation>
+    </message>
+    <message>
+        <source>Staking</source>
+        <translation>Стейкінг</translation>
+    </message>
+    <message>
+        <source>Earn proof-of-stake rewards with this wallet&apos;s coins. The wallet stays unlocked for the time you choose, then locks again.</source>
+        <translation>Отримуйте винагороди proof-of-stake за монети цього гаманця. Гаманець залишається розблокованим на обраний час, потім знову блокується.</translation>
+    </message>
+    <message>
+        <source>Duration:</source>
+        <translation>Тривалість:</translation>
+    </message>
+    <message>
+        <source>1 hour</source>
+        <translation>1 година</translation>
+    </message>
+    <message>
+        <source>6 hours</source>
+        <translation>6 годин</translation>
+    </message>
+    <message>
+        <source>24 hours</source>
+        <translation>24 години</translation>
+    </message>
+    <message>
+        <source>7 days</source>
+        <translation>7 днів</translation>
+    </message>
+    <message>
+        <source>30 days</source>
+        <translation>30 днів</translation>
+    </message>
+    <message>
+        <source>Start staking</source>
+        <translation>Запустити стейкінг</translation>
+    </message>
+    <message>
+        <source>Stop staking</source>
+        <translation>Зупинити стейкінг</translation>
+    </message>
+    <message>
+        <source>Mining</source>
+        <translation>Майнінг</translation>
+    </message>
+    <message>
+        <source>Earn proof-of-work rewards with this computer&apos;s processor. Rewards go to a new address of this wallet, and the wallet stays locked. Mining keeps the chosen number of cores busy, which makes the computer run hot and loud.</source>
+        <translation>Отримуйте винагороди proof-of-work за допомогою процесора цього комп&apos;ютера. Винагороди надходять на нову адресу цього гаманця, а гаманець залишається заблокованим. Майнінг навантажує обрану кількість ядер, через що комп&apos;ютер нагрівається і шумить.</translation>
+    </message>
+    <message>
+        <source>Threads:</source>
+        <translation>Потоки:</translation>
+    </message>
+    <message>
+        <source>Until stopped</source>
+        <translation>До зупинки</translation>
+    </message>
+    <message>
+        <source>Start mining</source>
+        <translation>Запустити майнінг</translation>
+    </message>
+    <message>
+        <source>Stop mining</source>
+        <translation>Зупинити майнінг</translation>
+    </message>
+    <message>
+        <source>Waiting for the node to finish syncing.</source>
+        <translation>Очікування завершення синхронізації вузла.</translation>
+    </message>
+    <message>
+        <source>Encrypt this wallet to stake. Staking unlocks it for a set time, which needs a passphrase.</source>
+        <translation>Зашифруйте цей гаманець, щоб брати участь у стейкінгу. Стейкінг розблоковує його на заданий час, для цього потрібен пароль.</translation>
+    </message>
+    <message>
+        <source>This wallet is mining. Stop mining to stake.</source>
+        <translation>Цей гаманець зайнятий майнінгом. Зупиніть майнінг, щоб запустити стейкінг.</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is mining. Stop mining there to stake.</source>
+        <translation>Гаманець «%1» зайнятий майнінгом. Зупиніть там майнінг, щоб запустити стейкінг.</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is staking. Only one wallet can stake at a time.</source>
+        <translation>Гаманець «%1» бере участь у стейкінгу. Стейкінг можливий лише одним гаманцем за раз.</translation>
+    </message>
+    <message>
+        <source>No coins to stake. A stake starts from a coin of at least %1.</source>
+        <translation>Немає монет для стейкінгу. Стейк починається з монети не менше %1.</translation>
+    </message>
+    <message>
+        <source>Coins become stakeable on %1. A coin must be %2 old to stake.</source>
+        <translation>Монети стануть доступні для стейкінгу %1. Для стейкінгу монеті має бути не менше %2.</translation>
+    </message>
+    <message>
+        <source>Encrypt this wallet to mine. Starting mining asks for its passphrase.</source>
+        <translation>Зашифруйте цей гаманець, щоб майнити. Для запуску майнінгу потрібен його пароль.</translation>
+    </message>
+    <message>
+        <source>This wallet is staking. Stop staking to mine.</source>
+        <translation>Цей гаманець бере участь у стейкінгу. Зупиніть стейкінг, щоб запустити майнінг.</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is staking. Stop staking there to mine.</source>
+        <translation>Гаманець «%1» бере участь у стейкінгу. Зупиніть там стейкінг, щоб запустити майнінг.</translation>
+    </message>
+    <message>
+        <source>Wallet &quot;%1&quot; is mining. Only one wallet can mine at a time.</source>
+        <translation>Гаманець «%1» зайнятий майнінгом. Майнінг можливий лише в один гаманець за раз.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Mining with %n thread(s), %1 left.</source>
+        <translation><numerusform>Майнінг у %n потік, залишилося %1.</numerusform><numerusform>Майнінг у %n потоки, залишилося %1.</numerusform><numerusform>Майнінг у %n потоків, залишилося %1.</numerusform><numerusform>Майнінг у %n потоків, залишилося %1.</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Mining with %n thread(s) until stopped.</source>
+        <translation><numerusform>Майнінг у %n потік до зупинки.</numerusform><numerusform>Майнінг у %n потоки до зупинки.</numerusform><numerusform>Майнінг у %n потоків до зупинки.</numerusform><numerusform>Майнінг у %n потоків до зупинки.</numerusform></translation>
+    </message>
+    <message>
+        <source>Staking, %1 left.</source>
+        <translation>Стейкінг, залишилося %1.</translation>
+    </message>
+    <message>
+        <source>Staking until stopped.</source>
+        <translation>Стейкінг до зупинки.</translation>
+    </message>
+    <message>
+        <source>Waiting: the wallet is locked. Unlock it to stake.</source>
+        <translation>Очікування: гаманець заблоковано. Розблокуйте його для стейкінгу.</translation>
+    </message>
+    <message>
+        <source>Started by gen=1 in taler.conf.</source>
+        <translation>Запущено параметром gen=1 у taler.conf.</translation>
+    </message>
+    <message>
+        <source>Started by stakegen=1 in taler.conf.</source>
+        <translation>Запущено параметром stakegen=1 у taler.conf.</translation>
+    </message>
+    <message>
+        <source>Not staking.</source>
+        <translation>Стейкінг не триває.</translation>
+    </message>
+    <message>
+        <source>Stakeable now: %1.</source>
+        <translation>Доступно для стейкінгу: %1.</translation>
+    </message>
+    <message>
+        <source>A further %1 becomes stakeable from %2.</source>
+        <translation>Ще %1 стане доступно для стейкінгу з %2.</translation>
+    </message>
+    <message>
+        <source>Go to &quot;%1&quot;</source>
+        <translation>Перейти до «%1»</translation>
+    </message>
+    <message>
+        <source>Not mining.</source>
+        <translation>Майнінг не триває.</translation>
+    </message>
+    <message>
+        <source>Stop mining?</source>
+        <translation>Зупинити майнінг?</translation>
+    </message>
+    <message>
+        <source>Stop staking?</source>
+        <translation>Зупинити стейкінг?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop mining?</source>
+        <translation>Ви впевнені, що хочете зупинити майнінг?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop staking?</source>
+        <translation>Ви впевнені, що хочете зупинити стейкінг?</translation>
     </message>
 </context>
 </TS>
