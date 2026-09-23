@@ -96,7 +96,9 @@ jobs:
         with:
           files: bin/taler-${{ github.ref_name }}-win64.zip
           draft: false
-          prerelease: false
+          # A tag with a suffix (v0.20.1-rc1) is a release candidate: a pre-release,
+          # never "Latest", so the wallets' update check does not announce it.
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
